@@ -7,10 +7,13 @@ root_url = 'http://export.arxiv.org/api/'
 # TODO: Do I want to support boolean operators?
 # TODO: Do I want to add support for quotes to group words?
 def query(s, prune=True, start=0, max_results=10):
-	# TODO: Error parsing here; abstract to own method?
 	# TODO: Some kind of a results paging interface, modifying start val
 	# Gets a list of top results, each of which is a dict
-	results = feedparser.parse(root_url + 'query?search_query=all:' + s + '&start=' + str(start) + '&max_results=' + str(results))['entries']
+	results = feedparser.parse(root_url + 'query?search_query=all:' + s + '&start=' + str(start) + '&max_results=' + str(max_results))
+	if results['status'] != 200:
+		raise Exception('Error', results['status'])
+	else:
+		results = results['entries']
 
 	for result in results:
 		# Renamings and modifications
@@ -33,18 +36,19 @@ def mod_query_result(result):
 
 	# TODO: Parse this? pagecount, figure count, table count
 	# 		Might not be reliable
-	try:
+
+	if 'arxiv_comment' in result:
 		result['arxiv_comment'] = result['arxiv_comment'].rstrip('\n')
-	except KeyError:
-		pass
-	try:
+	else:
+		result['arxiv_comment'] = None
+	if 'arxiv_journal_ref' in result:
 		result['journal_reference'] = result.pop('arxiv_journal_ref')
-	except KeyError:
-		pass
-	try:
+	else:
+		result['journal_reference'] = None
+	if 'arxiv_doi' in result:
 		result['doi'] = result.pop('arxiv_doi')
-	except KeyError:
-		pass
+	else:
+		result['doi'] = None
 
 
 def prune_query_result(result):
