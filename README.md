@@ -12,9 +12,13 @@ Cool demos hopefully coming soon!
 
 ## Docs
 
+To get the arxiv package, simply run `pip install arxiv` at the command line.
+
+At the beginning of your Python script, include the line `import arxiv`.
+
 ### Query
 
-`query(s, prune=True, start=0, max_results=10)`
+`arxiv.query(s, prune=True, start=0, max_results=10)`
 
 Sends arXiv a simple query, and returns a list of results, each of which is a `dict` representing an article that matches the query. The articles are ordered for relevance by arXiv.
 
@@ -24,18 +28,18 @@ Sends arXiv a simple query, and returns a list of results, each of which is a `d
 
 ### Clean query results
 
-`mod_query_result(result)`
+`arxiv.mod_query_result(result)`
 
 Takes a query result dict representing an article and modifies some keys and values to be more user-readable.
 See code for specifics.
 
-`prune_query_result(result)`
+`arxiv.prune_query_result(result)`
 
 Takes a query result dict representing an article and removes some keys that are redundant or useless.
 See code for specifics.
 
 ### Download PDF
 
-`download(obj)`
+`arxiv.download(obj)`
 
 Looks up keys `pdf_url` and `title` on dict `obj`. Downloads the PDF from `pdf_url` and saves it to {title}.pdf in the present working directory.

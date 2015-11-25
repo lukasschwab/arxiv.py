@@ -5,12 +5,12 @@ root_url = 'http://export.arxiv.org/api/'
 
 # TODO: Field queries ("Details of Query Construction")
 # TODO: Do I want to support boolean operators?
-# TODO: Do I want to add support for quotes to group words?
+# TODO: Do I want to add support for quotes to group words/order of ops?
 def query(s, prune=True, start=0, max_results=10):
-	# TODO: Some kind of a results paging interface, modifying start val
 	# Gets a list of top results, each of which is a dict
 	results = feedparser.parse(root_url + 'query?search_query=all:' + s + '&start=' + str(start) + '&max_results=' + str(max_results))
 	if results['status'] != 200:
+		# TODO: better error reporting
 		raise Exception('Error', results['status'])
 	else:
 		results = results['entries']
@@ -36,9 +36,6 @@ def mod_query_result(result):
 	result['title'] = result['title'].rstrip('\n')
 	result['summary'] = result['summary'].rstrip('\n')
 	result['authors'] = [d['name'] for d in result['authors']]
-
-	# TODO: Parse this? pagecount, figure count, table count
-	# 		Might not be reliable
 
 	if 'arxiv_comment' in result:
 		result['arxiv_comment'] = result['arxiv_comment'].rstrip('\n')
