@@ -38,6 +38,4 @@ See code for specifics.
 
 `download(obj)`
 
-This functionality doesn't work with the current implementation of `mod_query_result`, because of some inconsistency in the location of a PDF link. This will be fixed soon, and the method is internally functional.
-
 Looks up keys `pdf_url` and `title` on dict `obj`. Downloads the PDF from `pdf_url` and saves it to {title}.pdf in the present working directory.

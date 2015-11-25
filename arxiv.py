@@ -26,11 +26,14 @@ def query(s, prune=True, start=0, max_results=10):
 
 def mod_query_result(result):
 	# Useful to have for download automation
-	# Need to test if list is this long
-	# result['pdf_url'] = result['links'][2]['href']
+	result['pdf_url'] = None
+	for link in result['links']:
+		if 'title' in link and link['title'] == 'pdf':
+			result['pdf_url'] = link['href']
 
 	result['affiliation'] = result.pop('arxiv_affiliation', 'None')
 	result['arxiv_url'] = result.pop('link')
+	result['title'] = result['title'].rstrip('\n')
 	result['summary'] = result['summary'].rstrip('\n')
 	result['authors'] = [d['name'] for d in result['authors']]
 
@@ -73,7 +76,7 @@ def prune_query_result(result):
 def download(obj):
 	# Downloads file in obj (can be result or unique page) if it has a .pdf link
 	import urllib
-	try:
+	if 'pdf_url' in obj and 'title' in obj and obj['pdf_url'] and obj['title']:
 		urllib.urlretrieve(obj['pdf_url'],obj['title']+".pdf")
-	except KeyError:
-		print obj + " has no key 'pdf_url' or no key 'title'"
+	else:
+		print str(obj) + " has no PDF URL, or has no title"
