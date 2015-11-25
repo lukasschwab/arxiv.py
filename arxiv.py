@@ -74,6 +74,6 @@ def download(obj):
 	# Downloads file in obj (can be result or unique page) if it has a .pdf link
 	import urllib
 	try:
-		urllib.urlretrieve(obj['pdf_url'],"/Users/lukas/Desktop/"+obj['title']+".pdf")
+		urllib.urlretrieve(obj['pdf_url'],obj['title']+".pdf")
 	except KeyError:
 		print obj + " has no key 'pdf_url' or no key 'title'"

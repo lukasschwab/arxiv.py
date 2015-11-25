@@ -12,4 +12,32 @@ Cool demos hopefully coming soon!
 
 ## Docs
 
-Coming later tonight!
+### Query
+
+`query(s, prune=True, start=0, max_results=10)`
+
+Sends arXiv a simple query, and returns a list of results, each of which is a `dict` representing an article that matches the query. The articles are ordered for relevance by arXiv.
+
++ When bool `prune` is `True` (default), a number of artifacts of the ATOM-to-dict conversion are removed from each result to isolate the useful fields. When `prune` is `False`, `prune_query_result` is not called and those key/value pairs are not removed.
++ Integer `start` identifies a 0-indexed position where the query results begin. For example, `query('term', start=4)` will only request and return results indexed 4-14.
++ Integer `max_results` identifies the number of results to be returned (thus, `query` will return results at positions `start` through `start + max_results`). There are some upper limits involved; if you want to pull >60,000 results at a time you should look at the arXiv [API documentation](http://arxiv.org/help/api/user-manual).
+
+### Clean query results
+
+`mod_query_result(result)`
+
+Takes a query result dict representing an article and modifies some keys and values to be more user-readable.
+See code for specifics.
+
+`prune_query_result(result)`
+
+Takes a query result dict representing an article and removes some keys that are redundant or useless.
+See code for specifics.
+
+### Download PDF
+
+`download(obj)`
+
+This functionality doesn't work with the current implementation of `mod_query_result`, because of some inconsistency in the location of a PDF link. This will be fixed soon, and the method is internally functional.
+
+Looks up keys `pdf_url` and `title` on dict `obj`. Downloads the PDF from `pdf_url` and saves it to {title}.pdf in the present working directory.
