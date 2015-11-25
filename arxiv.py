@@ -79,4 +79,4 @@ def download(obj):
 	if 'pdf_url' in obj and 'title' in obj and obj['pdf_url'] and obj['title']:
 		urllib.urlretrieve(obj['pdf_url'],obj['title']+".pdf")
 	else:
-		print str(obj) + " has no PDF URL, or has no title"
+		print "Object passed in has no PDF URL, or has no title"
