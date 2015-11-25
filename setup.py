@@ -6,10 +6,7 @@ setup(
 	packages=["arxiv"],
 
 	# dependencies
-	install_requires=[
-		'feedparser',
-		'urllib'
-	],
+	install_requires=['feedparser'],
 
 	# metadata for upload to PyPI
 	authors="Lukas Schwab",
