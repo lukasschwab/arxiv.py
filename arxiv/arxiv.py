@@ -1,7 +1,11 @@
 # http://arxiv.org/help/api/user-manual#extension_elements
 
 import feedparser
+from requests.exceptions import HTTPError
+
+
 root_url = 'http://export.arxiv.org/api/'
+
 
 # TODO: Field queries ("Details of Query Construction")
 # TODO: Do I want to support boolean operators?
@@ -11,7 +15,7 @@ def query(s, prune=True, start=0, max_results=10):
 	results = feedparser.parse(root_url + 'query?search_query=all:' + s + '&start=' + str(start) + '&max_results=' + str(max_results))
 	if results['status'] != 200:
 		# TODO: better error reporting
-		raise Exception('Error', results['status'])
+		raise Exception("HTTP Error " + str(results['status']) + " in query")
 	else:
 		results = results['entries']
 
