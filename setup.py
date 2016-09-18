@@ -6,7 +6,10 @@ setup(
 	packages=["arxiv"],
 
 	# dependencies
-	install_requires=['feedparser'],
+	install_requires=[
+		'feedparser',
+		'requests',
+	],
 
 	# metadata for upload to PyPI
 	authors="Lukas Schwab",
