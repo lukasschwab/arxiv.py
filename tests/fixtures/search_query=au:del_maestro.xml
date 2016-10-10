@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <link href="http://arxiv.org/api/query?search_query%3Dau%3Adel_maestro%26id_list%3D%26start%3D0%26max_results%3D10" rel="self" type="application/atom+xml"/>
+  <title type="html">ArXiv Query: search_query=au:del_maestro&amp;id_list=&amp;start=0&amp;max_results=10</title>
+  <id>http://arxiv.org/api/ctp4pS6S0+O1vHtro0R+jCHLHu8</id>
+  <updated>2016-10-09T00:00:00-04:00</updated>
+  <opensearch:totalResults xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">31</opensearch:totalResults>
+  <opensearch:startIndex xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">0</opensearch:startIndex>
+  <opensearch:itemsPerPage xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">10</opensearch:itemsPerPage>
+  <entry>
+    <id>http://arxiv.org/abs/1201.4869v1</id>
+    <updated>2012-01-23T21:15:02Z</updated>
+    <published>2012-01-23T21:15:02Z</published>
+    <title>A Luttinger Liquid Core Inside Helium-4 Filled Nanopores</title>
+    <summary>  As helium-4 is cooled below 2.17 K it undergoes a phase transition to a
+fundamentally new state of matter known as a superfluid which supports flow
+without viscosity. This type of dissipationless transport can be observed by
+forcing helium to travel through a narrow constriction that the normal liquid
+could not penetrate. Recent experiments have highlighted the feasibility of
+fabricating smooth pores with nanometer radii, that approach the truly one
+dimensional limit where it is believed that a system of bosons (like helium-4)
+may have startlingly different behavior than in three dimensions. The one
+dimensional system is predicted to have a linear hydrodynamic description known
+as Luttinger liquid theory, where no type of long range order can be sustained.
+In the limit where the pore radius is small, Luttinger liquid theory would
+predict that helium inside the channel behaves as a sort of quasi-supersolid
+with all correlations decaying as power-law functions of distance at zero
+temperature. We have performed large scale quantum Monte Carlo simulations of
+helium-4 inside nanopores of varying radii at low temperature with realistic
+helium-helium and helium-pore interactions. The results indicate that helium
+inside the nanopore forms concentric cylindrical shells surrounding a core that
+can be described via Luttinger liquid theory and provides insights into the
+exciting possibility of the experimental detection of this intriguing low
+dimensional state of matter.
+</summary>
+    <author>
+      <name>Adrian Del Maestro</name>
+    </author>
+    <arxiv:doi xmlns:arxiv="http://arxiv.org/schemas/atom">10.1142/S021797921244002X</arxiv:doi>
+    <link title="doi" href="http://dx.doi.org/10.1142/S021797921244002X" rel="related"/>
+    <arxiv:comment xmlns:arxiv="http://arxiv.org/schemas/atom">26 pages, 10 figures</arxiv:comment>
+    <arxiv:journal_ref xmlns:arxiv="http://arxiv.org/schemas/atom">Int. J. Mod. Phys. B, 26, 1244002 (2012)</arxiv:journal_ref>
+    <link href="http://arxiv.org/abs/1201.4869v1" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/1201.4869v1" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="cond-mat.mes-hall" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.mes-hall" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.other" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/cond-mat/0412498v1</id>
+    <updated>2004-12-19T16:18:24Z</updated>
+    <published>2004-12-19T16:18:24Z</published>
+    <title>Thermal melting of density waves on the square lattice</title>
+    <summary>  We present the theory of the effect of thermal fluctuations on commensurate
+"p x p" density wave ordering on the square lattice (p &gt;= 3, integer). For the
+case in which this order is lost by a second order transition, we argue that
+the adjacent state is generically an incommensurate striped state, with
+commensurate p-periodic long range order along one direction, and
+incommensurate quasi-long-range order along the orthogonal direction. We also
+present the routes by which the fully disordered high temperature state can be
+reached. For p=4, and at special commensurate densities, the "4 x 4"
+commensurate state can melt directly into the disordered state via a self-dual
+critical point with non-universal exponents.
+</summary>
+    <author>
+      <name>Adrian Del Maestro</name>
+    </author>
+    <author>
+      <name>Subir Sachdev</name>
+    </author>
+    <arxiv:doi xmlns:arxiv="http://arxiv.org/schemas/atom">10.1103/PhysRevB.71.184511</arxiv:doi>
+    <link title="doi" href="http://dx.doi.org/10.1103/PhysRevB.71.184511" rel="related"/>
+    <arxiv:comment xmlns:arxiv="http://arxiv.org/schemas/atom">12 pages, 5 figures</arxiv:comment>
+    <arxiv:journal_ref xmlns:arxiv="http://arxiv.org/schemas/atom">Physical Review B 71, 184511 (2005)</arxiv:journal_ref>
+    <link href="http://arxiv.org/abs/cond-mat/0412498v1" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/cond-mat/0412498v1" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/cond-mat/0603029v1</id>
+    <updated>2006-03-02T02:22:45Z</updated>
+    <published>2006-03-02T02:22:45Z</published>
+    <title>From stripe to checkerboard order on the square lattice in the presence
+  of quenched disorder</title>
+    <summary>  We discuss the effects of quenched disorder on a model of charge density wave
+(CDW) ordering on the square lattice. Our model may be applicable to the
+cuprate superconductors, where a random electrostatic potential exists in the
+CuO2 planes as a result of the presence of charged dopants. We argue that the
+presence of a random potential can affect the unidirectionality of the CDW
+order, characterized by an Ising order parameter. Coupling to a unidirectional
+CDW, the random potential can lead to the formation of domains with 90 degree
+relative orientation, thus tending to restore the rotational symmetry of the
+underlying lattice. We find that the correlation length of the Ising order can
+be significantly larger than the CDW correlation length. For a checkerboard CDW
+on the other hand, disorder generates spatial anisotropies on short length
+scales and thus some degree of unidirectionality. We quantify these disorder
+effects and suggest new techniques for analyzing the local density of states
+(LDOS) data measured in scanning tunneling microscopy experiments.
+</summary>
+    <author>
+      <name>Adrian Del Maestro</name>
+    </author>
+    <author>
+      <name>Bernd Rosenow</name>
+    </author>
+    <author>
+      <name>Subir Sachdev</name>
+    </author>
+    <arxiv:doi xmlns:arxiv="http://arxiv.org/schemas/atom">10.1103/PhysRevB.74.024520</arxiv:doi>
+    <link title="doi" href="http://dx.doi.org/10.1103/PhysRevB.74.024520" rel="related"/>
+    <arxiv:comment xmlns:arxiv="http://arxiv.org/schemas/atom">10 pages, 11 figures; added reference</arxiv:comment>
+    <arxiv:journal_ref xmlns:arxiv="http://arxiv.org/schemas/atom">Phys. Rev. B 74, 024520 (2006)</arxiv:journal_ref>
+    <link href="http://arxiv.org/abs/cond-mat/0603029v1" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/cond-mat/0603029v1" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.supr-con" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1005.5383v1</id>
+    <updated>2010-05-28T20:00:05Z</updated>
+    <published>2010-05-28T20:00:05Z</published>
+    <title>Interacting bosons in one dimension and Luttinger liquid theory</title>
+    <summary>  Harmonically trapped ultra-cold atoms and helium-4 in nanopores provide new
+experimental realizations of bosons in one dimension, motivating the search for
+a more complete theoretical understanding of their low energy properties. Worm
+algorithm path integral quantum Monte Carlo results for interacting bosons
+restricted to the one dimensional continuum are compared to the finite
+temperature and system size predictions of Luttinger liquid theory. For large
+system sizes at low temperature, excellent agreement is obtained after
+including the leading irrelevant interactions in the Hamiltonian which are
+determined explicitly.
+</summary>
+    <author>
+      <name>Adrian Del Maestro</name>
+    </author>
+    <author>
+      <name>Ian Affleck</name>
+    </author>
+    <arxiv:doi xmlns:arxiv="http://arxiv.org/schemas/atom">10.1103/PhysRevB.82.060515</arxiv:doi>
+    <link title="doi" href="http://dx.doi.org/10.1103/PhysRevB.82.060515" rel="related"/>
+    <arxiv:comment xmlns:arxiv="http://arxiv.org/schemas/atom">4 pages, 3 figures</arxiv:comment>
+    <arxiv:journal_ref xmlns:arxiv="http://arxiv.org/schemas/atom">Physical Review B 82, 060515(R) (2010)</arxiv:journal_ref>
+    <link href="http://arxiv.org/abs/1005.5383v1" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/1005.5383v1" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1303.6954v2</id>
+    <updated>2013-09-03T01:06:36Z</updated>
+    <published>2013-03-27T20:00:04Z</published>
+    <title>Local Superfluidity at the Nanoscale</title>
+    <summary>  We have performed quantum Monte Carlo simulations measuring the finite size
+and temperature superfluid response of helium-4 to the linear and rotational
+motion of the walls of a nanopore. Within the two-fluid model, the portion of
+the normal liquid dragged along with the boundaries is dependent on the type of
+motion and the resulting anisotropic superfluid density saturates far below
+unity at T=0.5 K. The origin of the saturation is uncovered by computing the
+spatial distribution of superfluidity, with only the core of the nanopore
+exhibiting any evidence of phase coherence. The superfluid core displays
+scaling behavior consistent with Luttinger liquid theory, thereby providing an
+experimental test for the emergence of a one dimensional quantum liquid.
+</summary>
+    <author>
+      <name>B. Kulchytskyy</name>
+    </author>
+    <author>
+      <name>G. Gervais</name>
+    </author>
+    <author>
+      <name>A. Del Maestro</name>
+    </author>
+    <arxiv:doi xmlns:arxiv="http://arxiv.org/schemas/atom">10.1103/PhysRevB.88.064512</arxiv:doi>
+    <link title="doi" href="http://dx.doi.org/10.1103/PhysRevB.88.064512" rel="related"/>
+    <arxiv:comment xmlns:arxiv="http://arxiv.org/schemas/atom">Added a figure and extended discussion</arxiv:comment>
+    <arxiv:journal_ref xmlns:arxiv="http://arxiv.org/schemas/atom">Physical Review B 88, 064512 (2013)</arxiv:journal_ref>
+    <link href="http://arxiv.org/abs/1303.6954v2" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/1303.6954v2" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="cond-mat.mes-hall" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.mes-hall" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1312.6177v1</id>
+    <updated>2013-12-20T23:48:25Z</updated>
+    <published>2013-12-20T23:48:25Z</published>
+    <title>Quantum Monte Carlo measurement of the chemical potential of helium-4</title>
+    <summary>  A path integral Monte Carlo method based on the worm algorithm has been
+developed to compute the chemical potential of interacting bosonic quantum
+fluids. By applying it to finite-sized systems of helium-4 atoms, we have
+confirmed that the chemical potential scales inversely with the number of
+particles to lowest order. The introduction of a simple scaling form allows for
+the extrapolation of the chemical potential to the thermodynamic limit, where
+we observe excellent agreement with known experimental results for helium-4 at
+saturated vapor pressure. We speculate on future applications of the proposed
+technique, including its use in studies of confined quantum fluids.
+</summary>
+    <author>
+      <name>C. M. Herdman</name>
+    </author>
+    <author>
+      <name>A. Rommal</name>
+    </author>
+    <author>
+      <name>A. Del Maestro</name>
+    </author>
+    <arxiv:doi xmlns:arxiv="http://arxiv.org/schemas/atom">10.1103/PhysRevB.89.224502</arxiv:doi>
+    <link title="doi" href="http://dx.doi.org/10.1103/PhysRevB.89.224502" rel="related"/>
+    <arxiv:comment xmlns:arxiv="http://arxiv.org/schemas/atom">7 pages, 4 figures</arxiv:comment>
+    <arxiv:journal_ref xmlns:arxiv="http://arxiv.org/schemas/atom">Phys. Rev. B 89, 224502 (2014)</arxiv:journal_ref>
+    <link href="http://arxiv.org/abs/1312.6177v1" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/1312.6177v1" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.other" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1412.6529v2</id>
+    <updated>2015-02-25T23:04:37Z</updated>
+    <published>2014-12-19T21:00:08Z</published>
+    <title>Particle partition entanglement of bosonic Luttinger liquids</title>
+    <summary>  We consider the R\'{e}nyi entanglement entropy of bosonic Luttinger liquids
+under a particle bipartition and demonstrate that the leading order finite-size
+scaling is logarithmic in the system size with a prefactor equal to the inverse
+Luttinger parameter. While higher order corrections involve a microscopic
+length scale, the leading order scaling depends only on this sole dimensionless
+parameter which characterizes the low energy quantum hydrodynamics. This result
+contrasts the leading entanglement entropy scaling under a spatial bipartition,
+for which the coefficient is universal and independent of the Luttinger
+parameter. Using quantum Monte Carlo calculations, we explicitly confirm the
+scaling predictions of Luttinger liquid theory for the Lieb-Liniger model of
+$\delta$-function interacting bosons in the one dimensional spatial continuum.
+</summary>
+    <author>
+      <name>C. M. Herdman</name>
+    </author>
+    <author>
+      <name>A. Del Maestro</name>
+    </author>
+    <arxiv:doi xmlns:arxiv="http://arxiv.org/schemas/atom">10.1103/PhysRevB.91.184507</arxiv:doi>
+    <link title="doi" href="http://dx.doi.org/10.1103/PhysRevB.91.184507" rel="related"/>
+    <arxiv:comment xmlns:arxiv="http://arxiv.org/schemas/atom">10 pages, 8 figures; updated figure 5, added references, revised
+  text, reformatted</arxiv:comment>
+    <arxiv:journal_ref xmlns:arxiv="http://arxiv.org/schemas/atom">Phys. Rev. B 91, 184507 (2015)</arxiv:journal_ref>
+    <link href="http://arxiv.org/abs/1412.6529v2" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/1412.6529v2" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="cond-mat.quant-gas" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.quant-gas" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/cond-mat/0607501v2</id>
+    <updated>2006-11-06T19:33:40Z</updated>
+    <published>2006-07-19T20:12:54Z</published>
+    <title>A striped supersolid phase and the search for deconfined quantum
+  criticality in hard-core bosons on the triangular lattice</title>
+    <summary>  Using large-scale quantum Monte Carlo simulations we study bosons hopping on
+a triangular lattice with nearest (V) and next-nearest (V') neighbor repulsive
+interactions. In the limit where V=0 but V' is large, we find an example of an
+unusual period-three striped supersolid state that is stable at 1/2-filling. We
+discuss the relationship of this state to others on the rich ground-state phase
+diagram, which include a previously-discovered nearest-neighbor supersolid, a
+uniform superfluid, as well as several Mott insulating phases. We study several
+superfluid- and supersolid-to-Mott phase transitions, including one proposed by
+a recent phenomenological dual vortex field theory as a candidate for an exotic
+deconfined quantum critical point. We find no examples of unconventional
+quantum criticality among any of the interesting phase transitions in the
+model.
+</summary>
+    <author>
+      <name>R. G. Melko</name>
+    </author>
+    <author>
+      <name>A. Del Maestro</name>
+    </author>
+    <author>
+      <name>A. A. Burkov</name>
+    </author>
+    <arxiv:doi xmlns:arxiv="http://arxiv.org/schemas/atom">10.1103/PhysRevB.74.214517</arxiv:doi>
+    <link title="doi" href="http://dx.doi.org/10.1103/PhysRevB.74.214517" rel="related"/>
+    <arxiv:comment xmlns:arxiv="http://arxiv.org/schemas/atom">10 pages, 11 figures: new data for superfluid density anisotropy</arxiv:comment>
+    <arxiv:journal_ref xmlns:arxiv="http://arxiv.org/schemas/atom">Phys. Rev. B 74, 214517 (2006)</arxiv:journal_ref>
+    <link href="http://arxiv.org/abs/cond-mat/0607501v2" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/cond-mat/0607501v2" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/cond-mat/0702661v2</id>
+    <updated>2007-06-25T21:09:59Z</updated>
+    <published>2007-02-27T21:02:02Z</published>
+    <title>Low temperature specific heat and possible gap to magnetic excitations
+  in the Heisenberg pyrochlore antiferromagnet Gd2Sn207</title>
+    <summary>  The Gd2Sn2O7 pyrochlore Heisenberg antiferromagnet displays a phase
+transition to a four sublattice Neel ordered state at a temperature near 1 K.
+Despite the seemingly conventional nature of the ordered state, the specific
+heat has been found to be described in the temperature range 350-800 mK by an
+anomalous T-squared power law. A similar temperature dependence has also been
+reported for Gd2Ti2O7, another pyrochlore Heisenberg material. Such anomalous
+T-squared behavior in Cv has been argued to be correlated to an unusual
+energy-dependence of the density of states which also seemingly manifests
+itself in low-temperature spin fluctuations found in muon spin relaxation
+experiments. In this paper, we report calculations of Cv that consider spin
+wave like excitations out of the Neel order observed in Gd2Sn2O7 and argue that
+the parametric T-squared behavior does not reflect the true low-energy
+excitations of Gd2Sn2O7. Rather, we find that the low-energy excitations of
+this material are antiferromagnetic magnons gapped by single-ion and dipolar
+anisotropy effects, and that the lowest temperature of 350 mK considered in
+previous specific heat measurements accidentally happens to coincide with a
+crossover temperature below which magnons become thermally activated and Cv
+takes an exponential form. We argue that further specific heat measurements
+that extend down to at least 100 mK are required in order to ascribe an
+unconventional description of magnetic excitations out of the ground state of
+Gd2Sn2O7 or to invalidate the standard picture of gapped excitations proposed
+herein.
+</summary>
+    <author>
+      <name>Adrian Del Maestro</name>
+    </author>
+    <author>
+      <name>Michel J. P. Gingras</name>
+    </author>
+    <arxiv:doi xmlns:arxiv="http://arxiv.org/schemas/atom">10.1103/PhysRevB.76.064418</arxiv:doi>
+    <link title="doi" href="http://dx.doi.org/10.1103/PhysRevB.76.064418" rel="related"/>
+    <arxiv:comment xmlns:arxiv="http://arxiv.org/schemas/atom">12 pages, 13 figures; shortened introduction and added 1 figure</arxiv:comment>
+    <arxiv:journal_ref xmlns:arxiv="http://arxiv.org/schemas/atom">Phys. Rev. B 76, 064418 (2007)</arxiv:journal_ref>
+    <link href="http://arxiv.org/abs/cond-mat/0702661v2" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/cond-mat/0702661v2" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="cond-mat.mtrl-sci" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.mtrl-sci" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/0807.2873v1</id>
+    <updated>2008-07-17T20:37:17Z</updated>
+    <published>2008-07-17T20:37:17Z</published>
+    <title>Theory of the pairbreaking superconductor-metal transition in nanowires</title>
+    <summary>  We present a detailed description of a zero temperature phase transition
+between superconducting and diffusive metallic states in very thin wires due to
+a Cooper pair breaking mechanism. The dissipative critical theory contains
+current reducing fluctuations in the guise of both quantum and thermally
+activated phase slips. A full cross-over phase diagram is computed via an
+expansion in the inverse number of complex components of the superconducting
+order parameter (one in the physical case). The fluctuation corrections to the
+direct current electrical and thermal conductivities are determined, and we
+find that the electrical conductivity has a non-monotonic temperature
+dependence in the metallic phase which may be consistent with recent
+experimental results on ultra-narrow wires. In the quantum critical regime, the
+ratio of the thermal to electrical conductivity displays a linear temperature
+dependence and thus the Wiedemann-Franz law is obeyed, with a new universal
+experimentally verifiable Lorenz number.
+</summary>
+    <author>
+      <name>Adrian Del Maestro</name>
+    </author>
+    <author>
+      <name>Bernd Rosenow</name>
+    </author>
+    <author>
+      <name>Subir Sachdev</name>
+    </author>
+    <arxiv:doi xmlns:arxiv="http://arxiv.org/schemas/atom">10.1016/j.aop.2008.08.003</arxiv:doi>
+    <link title="doi" href="http://dx.doi.org/10.1016/j.aop.2008.08.003" rel="related"/>
+    <arxiv:comment xmlns:arxiv="http://arxiv.org/schemas/atom">91 pages, 18 figures, single column format</arxiv:comment>
+    <arxiv:journal_ref xmlns:arxiv="http://arxiv.org/schemas/atom">Annals of Physics 324, 523 (2009).</arxiv:journal_ref>
+    <link href="http://arxiv.org/abs/0807.2873v1" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/0807.2873v1" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="cond-mat.supr-con" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.supr-con" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+</feed>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <link href="http://arxiv.org/api/query?search_query%3D%26id_list%3D1111.2011v2%26start%3D0%26max_results%3D10" rel="self" type="application/atom+xml"/>
+  <title type="html">ArXiv Query: search_query=&amp;id_list=1111.2011v2&amp;start=0&amp;max_results=10</title>
+  <id>http://arxiv.org/api/VQIAl76NSsUAVMxIWuZHfsSl2Fs</id>
+  <updated>2016-10-09T00:00:00-04:00</updated>
+  <opensearch:totalResults xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">1</opensearch:totalResults>
+  <opensearch:startIndex xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">0</opensearch:startIndex>
+  <opensearch:itemsPerPage xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">10</opensearch:itemsPerPage>
+  <entry>
+    <id>http://arxiv.org/abs/1111.2011v2</id>
+    <updated>2012-04-02T12:38:54Z</updated>
+    <published>2011-11-08T18:48:36Z</published>
+    <title>Quantum Criticality for Extended Nodes on a Bethe Lattice in the Large
+  Connectivity Limit</title>
+    <summary>  Theoretical description of anisotropic systems, such as layered
+superconductors and coupled spin chains, is often a challenge due to the
+different natures of interactions along different directions. As a model of
+such a system, we present an analytical study of d-dimensional "nodes" arranged
+as the vertices of a Bethe lattice, where each node has nonzero spatial
+dimension and is described by an O(N) quantum rotor model, and there is hopping
+between neighboring nodes. In the limit of large connectivity on the Bethe
+lattice, the hopping can be treated by constructing a self-consistent effective
+action for a single node. This procedure is akin to dynamical mean field
+theory, but generalized so that spatial as well as quantum fluctuations are
+taken into account on each node. The quantum phase transition is studied using
+this effective action for both infinite and finite N. The importance of the
+Perron-Frobenius uniform mode on the Bethe lattice is discussed, and its
+elimination via an "infinite range hopping" term shifts the transition, leading
+to nontrivial critical behavior. We calculate critical exponents and find that
+the internode hopping reduces the upper and lower critical dimensions each by
+one, indicating that--at least for the purposes of quantum criticality--the
+large number of internode couplings is similar to adding a single extra
+dimension to the theory describing a single node.
+</summary>
+    <author>
+      <name>James M. Murray</name>
+    </author>
+    <author>
+      <name>Adrian Del Maestro</name>
+    </author>
+    <author>
+      <name>Zlatko Tesanovic</name>
+    </author>
+    <arxiv:doi xmlns:arxiv="http://arxiv.org/schemas/atom">10.1103/PhysRevB.85.115117</arxiv:doi>
+    <link title="doi" href="http://dx.doi.org/10.1103/PhysRevB.85.115117" rel="related"/>
+    <arxiv:comment xmlns:arxiv="http://arxiv.org/schemas/atom">8 pages, 3 figures. Published version</arxiv:comment>
+    <arxiv:journal_ref xmlns:arxiv="http://arxiv.org/schemas/atom">Phys. Rev. B 85, 115117 (2012)</arxiv:journal_ref>
+    <link href="http://arxiv.org/abs/1111.2011v2" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/1111.2011v2" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+</feed>

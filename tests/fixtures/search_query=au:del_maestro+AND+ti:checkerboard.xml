@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <link href="http://arxiv.org/api/query?search_query%3Dau%3Adel_maestro%20AND%20ti%3Acheckerboard%26id_list%3D%26start%3D0%26max_results%3D10" rel="self" type="application/atom+xml"/>
+  <title type="html">ArXiv Query: search_query=au:del_maestro AND ti:checkerboard&amp;id_list=&amp;start=0&amp;max_results=10</title>
+  <id>http://arxiv.org/api/FX5wusAMkzsShow84WzqqTGlDpk</id>
+  <updated>2016-10-09T00:00:00-04:00</updated>
+  <opensearch:totalResults xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">1</opensearch:totalResults>
+  <opensearch:startIndex xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">0</opensearch:startIndex>
+  <opensearch:itemsPerPage xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">10</opensearch:itemsPerPage>
+  <entry>
+    <id>http://arxiv.org/abs/cond-mat/0603029v1</id>
+    <updated>2006-03-02T02:22:45Z</updated>
+    <published>2006-03-02T02:22:45Z</published>
+    <title>From stripe to checkerboard order on the square lattice in the presence
+  of quenched disorder</title>
+    <summary>  We discuss the effects of quenched disorder on a model of charge density wave
+(CDW) ordering on the square lattice. Our model may be applicable to the
+cuprate superconductors, where a random electrostatic potential exists in the
+CuO2 planes as a result of the presence of charged dopants. We argue that the
+presence of a random potential can affect the unidirectionality of the CDW
+order, characterized by an Ising order parameter. Coupling to a unidirectional
+CDW, the random potential can lead to the formation of domains with 90 degree
+relative orientation, thus tending to restore the rotational symmetry of the
+underlying lattice. We find that the correlation length of the Ising order can
+be significantly larger than the CDW correlation length. For a checkerboard CDW
+on the other hand, disorder generates spatial anisotropies on short length
+scales and thus some degree of unidirectionality. We quantify these disorder
+effects and suggest new techniques for analyzing the local density of states
+(LDOS) data measured in scanning tunneling microscopy experiments.
+</summary>
+    <author>
+      <name>Adrian Del Maestro</name>
+    </author>
+    <author>
+      <name>Bernd Rosenow</name>
+    </author>
+    <author>
+      <name>Subir Sachdev</name>
+    </author>
+    <arxiv:doi xmlns:arxiv="http://arxiv.org/schemas/atom">10.1103/PhysRevB.74.024520</arxiv:doi>
+    <link title="doi" href="http://dx.doi.org/10.1103/PhysRevB.74.024520" rel="related"/>
+    <arxiv:comment xmlns:arxiv="http://arxiv.org/schemas/atom">10 pages, 11 figures; added reference</arxiv:comment>
+    <arxiv:journal_ref xmlns:arxiv="http://arxiv.org/schemas/atom">Phys. Rev. B 74, 024520 (2006)</arxiv:journal_ref>
+    <link href="http://arxiv.org/abs/cond-mat/0603029v1" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/cond-mat/0603029v1" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.supr-con" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+</feed>
