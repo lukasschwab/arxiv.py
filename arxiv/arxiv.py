@@ -75,10 +75,10 @@ def prune_query_result(result):
             pass
 
 
-def download(obj):
+def download(obj, dirname='./'):
     # Downloads file in obj (can be result or unique page) if it has a .pdf link
     if 'pdf_url' in obj and 'title' in obj and obj['pdf_url'] and obj['title']:
-        filename = obj['title']+".pdf"
+        filename = dirname + obj['title']+".pdf"
         try:
             import urllib
             urllib.urlretrieve(obj['pdf_url'], filename)
