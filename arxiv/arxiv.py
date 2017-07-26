@@ -80,10 +80,26 @@ def prune_query_result(result):
             pass
 
 
-def download(obj, dirname='./'):
+def download(obj, dirname='./', prepend_id=False, slug=False):
     # Downloads file in obj (can be result or unique page) if it has a .pdf link
     if 'pdf_url' in obj and 'title' in obj and obj['pdf_url'] and obj['title']:
-        filename = dirname + obj['title']+".pdf"
+        filename = obj['title']
+
+        space = ' '
+
+        # remove special characters
+        if slug:
+            filename = ''.join(c if c.isalnum() else '_' for c in filename)
+            # delete duplicate underscores
+            filename = '_'.join(list(filter(None, filename.split('_'))))
+            space = '_'
+
+        # prepend arxiv id
+        if prepend_id:
+            filename = obj['arxiv_url'].split('/')[-1] + space + filename
+
+        filename = dirname + filename + '.pdf'
+
         try:
             import urllib
             urllib.urlretrieve(obj['pdf_url'], filename)
