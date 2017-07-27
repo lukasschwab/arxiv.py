@@ -1,14 +1,11 @@
-# http://arxiv.org/help/api/user-manual#extension_elements
 from __future__ import print_function
+from requests.exceptions import HTTPError
 
 try:
     from urllib import quote_plus
 except ImportError:
     from urllib.parse import quote_plus
-
-import feedparser
-from requests.exceptions import HTTPError
-
+import urllib, feedparser
 
 root_url = 'http://export.arxiv.org/api/'
 
@@ -80,34 +77,28 @@ def prune_query_result(result):
             pass
 
 
-def download(obj, dirname='./', prepend_id=False, slug=False):
+def to_slug(title):
+    # Remove special characters
+    filename = ''.join(c if c.isalnum() else '_' for c in title)
+    # delete duplicate underscores
+    filename = '_'.join(list(filter(None, filename.split('_'))))
+    return filename
+
+
+def download(obj, dirname='./', prepend_id=False, slugify=False):
     # Downloads file in obj (can be result or unique page) if it has a .pdf link
     if 'pdf_url' in obj and 'title' in obj and obj['pdf_url'] and obj['title']:
         filename = obj['title']
-
-        space = ' '
-
-        # remove special characters
-        if slug:
-            filename = ''.join(c if c.isalnum() else '_' for c in filename)
-            # delete duplicate underscores
-            filename = '_'.join(list(filter(None, filename.split('_'))))
-            space = '_'
-
-        # prepend arxiv id
+        if slugify:
+            filename = to_slug(filename)
         if prepend_id:
-            filename = obj['arxiv_url'].split('/')[-1] + space + filename
-
+            filename = obj['arxiv_url'].split('/')[-1] + '-' + filename
         filename = dirname + filename + '.pdf'
-
+        # Download
         try:
-            import urllib
             urllib.urlretrieve(obj['pdf_url'], filename)
-
-            # Return the filename of the pdf
         except AttributeError:  # i.e. except python is python 3
-            from urllib import request
-            request.urlretrieve(obj['pdf_url'], filename)
+            urllib.request.urlretrieve(obj['pdf_url'], filename)
 
         return filename
     else:
