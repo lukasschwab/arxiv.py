@@ -9,13 +9,14 @@ import urllib, feedparser
 
 root_url = 'http://export.arxiv.org/api/'
 
-
 # TODO: Field queries ("Details of Query Construction")
-# TODO: Do I want to support boolean operators?
 # TODO: Do I want to add support for quotes to group words/order of ops?
-def query(s, prune=True, start=0, max_results=10):
-    # Gets a list of top results, each of which is a dict
-    results = feedparser.parse(root_url + 'query?search_query=all:' + quote_plus(s) + '&start=' + str(start) + '&max_results=' + str(max_results))
+def query(search_query="", id_list=[], prune=True, start=0, max_results=10):
+    url_args = urllib.urlencode({"search_query": search_query, 
+                                 "id_list": ','.join(id_list),
+                                 "start": start,
+                                 "max_results": max_results})
+    results = feedparser.parse(root_url + 'query?' + url_args)
     if results.get('status') != 200:
         # TODO: better error reporting
         raise Exception("HTTP Error " + str(results.get('status', 'no status')) + " in query")
