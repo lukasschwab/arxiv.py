@@ -12,7 +12,7 @@ setup(
 	],
 
 	# metadata for upload to PyPI
-	authors="Lukas Schwab",
+	author="Lukas Schwab",
 	author_email="lukas.schwab@gmail.com",
 	description="Python wrapper for the arXiv API: http://arxiv.org/help/api/",
 	license="MIT",
