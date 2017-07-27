@@ -2,17 +2,23 @@ from __future__ import print_function
 from requests.exceptions import HTTPError
 
 try:
+    # Python 2
     from urllib import quote_plus
+    from urllib import urlencode
+    from urllib import urlretrieve
 except ImportError:
+    # Python 3
     from urllib.parse import quote_plus
-import urllib, feedparser
+    from urllib.parse import urlencode
+    from urllib.request import urlretrieve
+import feedparser
 
 root_url = 'http://export.arxiv.org/api/'
 
 # TODO: Field queries ("Details of Query Construction")
 # TODO: Do I want to add support for quotes to group words/order of ops?
 def query(search_query="", id_list=[], prune=True, start=0, max_results=10):
-    url_args = urllib.urlencode({"search_query": search_query, 
+    url_args = urlencode({"search_query": search_query, 
                                  "id_list": ','.join(id_list),
                                  "start": start,
                                  "max_results": max_results})
@@ -96,11 +102,7 @@ def download(obj, dirname='./', prepend_id=False, slugify=False):
             filename = obj['arxiv_url'].split('/')[-1] + '-' + filename
         filename = dirname + filename + '.pdf'
         # Download
-        try:
-            urllib.urlretrieve(obj['pdf_url'], filename)
-        except AttributeError:  # i.e. except python is python 3
-            urllib.request.urlretrieve(obj['pdf_url'], filename)
-
+        urlretrieve(obj['pdf_url'], filename)
         return filename
     else:
         print("Object passed in has no PDF URL, or has no title")
