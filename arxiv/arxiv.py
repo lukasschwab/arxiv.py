@@ -1,29 +1,23 @@
-# http://arxiv.org/help/api/user-manual#extension_elements
 from __future__ import print_function
+from requests.exceptions import HTTPError
 
 try:
     from urllib import quote_plus
 except ImportError:
     from urllib.parse import quote_plus
-
-import feedparser
-from requests.exceptions import HTTPError
+import urllib, feedparser
 
 
 root_url = 'http://export.arxiv.org/api/'
 
-
 # TODO: Field queries ("Details of Query Construction")
-# TODO: Do I want to support boolean operators?
 # TODO: Do I want to add support for quotes to group words/order of ops?
-def query(s, prune=True, start=0, max_results=10, id=False):
-    # Gets a list of top results, each of which is a dict
-    q = 'query?search_query=all:'
-    # if looking for a specific arXiv id
-    if id:
-        q = 'query?id_list='
-
-    results = feedparser.parse(root_url + q + quote_plus(s) + '&start=' + str(start) + '&max_results=' + str(max_results))
+def query(search_query="", id_list=[], prune=True, start=0, max_results=10):
+    url_args = urllib.urlencode({"search_query": search_query, 
+                                 "id_list": ','.join(id_list),
+                                 "start": start,
+                                 "max_results": max_results})
+    results = feedparser.parse(root_url + 'query?' + url_args)
     if results.get('status') != 200:
         # TODO: better error reporting
         raise Exception("HTTP Error " + str(results.get('status', 'no status')) + " in query")
