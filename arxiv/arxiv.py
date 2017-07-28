@@ -15,8 +15,6 @@ import feedparser
 
 root_url = 'http://export.arxiv.org/api/'
 
-# TODO: Field queries ("Details of Query Construction")
-# TODO: Do I want to add support for quotes to group words/order of ops?
 def query(search_query="", id_list=[], prune=True, start=0, max_results=10):
     url_args = urlencode({"search_query": search_query, 
                                  "id_list": ','.join(id_list),
@@ -28,15 +26,12 @@ def query(search_query="", id_list=[], prune=True, start=0, max_results=10):
         raise Exception("HTTP Error " + str(results.get('status', 'no status')) + " in query")
     else:
         results = results['entries']
-
     for result in results:
         # Renamings and modifications
         mod_query_result(result)
         if prune:
             prune_query_result(result)
-
     return results
-
 
 def mod_query_result(result):
     # Useful to have for download automation
@@ -44,13 +39,11 @@ def mod_query_result(result):
     for link in result['links']:
         if 'title' in link and link['title'] == 'pdf':
             result['pdf_url'] = link['href']
-
     result['affiliation'] = result.pop('arxiv_affiliation', 'None')
     result['arxiv_url'] = result.pop('link')
     result['title'] = result['title'].rstrip('\n')
     result['summary'] = result['summary'].rstrip('\n')
     result['authors'] = [d['name'] for d in result['authors']]
-
     if 'arxiv_comment' in result:
         result['arxiv_comment'] = result['arxiv_comment'].rstrip('\n')
     else:
@@ -63,7 +56,6 @@ def mod_query_result(result):
         result['doi'] = result.pop('arxiv_doi')
     else:
         result['doi'] = None
-
 
 def prune_query_result(result):
     prune_keys = ['updated_parsed',
@@ -83,14 +75,12 @@ def prune_query_result(result):
         except KeyError:
             pass
 
-
 def to_slug(title):
     # Remove special characters
     filename = ''.join(c if c.isalnum() else '_' for c in title)
     # delete duplicate underscores
     filename = '_'.join(list(filter(None, filename.split('_'))))
     return filename
-
 
 def download(obj, dirname='./', prepend_id=False, slugify=False):
     # Downloads file in obj (can be result or unique page) if it has a .pdf link
@@ -105,4 +95,4 @@ def download(obj, dirname='./', prepend_id=False, slugify=False):
         urlretrieve(obj['pdf_url'], filename)
         return filename
     else:
-        print("Object passed in has no PDF URL, or has no title")
+        print("Object obj has no PDF URL, or has no title")

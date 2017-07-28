@@ -75,6 +75,6 @@ paper = arxiv.query(id_list=["1707.08567"])[0]
 arxiv.download(paper)
 # You can skip the query step if you have the paper info!
 paper2 = {"pdf_url": "http://arxiv.org/pdf/1707.08567v1",
-         "title": "The Paper Title"}
+          "title": "The Paper Title"}
 arxiv.download(paper2)
 ```
