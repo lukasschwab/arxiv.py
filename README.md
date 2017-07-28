@@ -8,8 +8,6 @@ They have [an API](http://arxiv.org/help/api/index) that uses ATOM feeds to serv
 Unfortunately, handling these ATOM requsts can be clumsy (especially given inconsistency in data between different result objects, even in the same query).
 This is where arxiv.py comes it: it constructs requests for arXiv and gets ATOM feeds via a simple handful of methods, and parses the results into an intuitive format.
 
-Cool demos hopefully coming soon!
-
 ## Docs
 
 To get the arxiv package, simply run `pip install arxiv` at the command line.
@@ -18,28 +16,65 @@ At the beginning of your Python script, include the line `import arxiv`.
 
 ### Query
 
-`arxiv.query(s, prune=True, start=0, max_results=10)`
+```python
+arxiv.query(search_query, id_list, prune, start, max_results)
+```
 
-Sends arXiv a simple query, and returns a list of results, each of which is a `dict` representing an article that matches the query. The articles are ordered for relevance by arXiv.
+| **Argument**   | **Type**        | **Default** | **Required?** |
+|----------------|-----------------|-------------|---------------|
+| `search_query` | string          | `""`        | No            |
+| `id_list`      | list of strings | `[]`        | No            |
+| `start`        | int             | 0           | No            |
+| `max_results`  | int             | 10          | No            |
 
-+ When bool `prune` is `True` (default), a number of artifacts of the ATOM-to-dict conversion are removed from each result to isolate the useful fields. When `prune` is `False`, `prune_query_result` is not called and those key/value pairs are not removed.
-+ Integer `start` identifies a 0-indexed position where the query results begin. For example, `query('term', start=4)` will only request and return results indexed 4-14.
-+ Integer `max_results` identifies the number of results to be returned (thus, `query` will return results at positions `start` through `start + max_results`). There are some upper limits involved; if you want to pull >60,000 results at a time you should look at the arXiv [API documentation](http://arxiv.org/help/api/user-manual).
++ `search_query` is a query string; details of its usage are documented [here](https://arxiv.org/help/api/user-manual#Quickstart).
++ `id_list` contains arXiv record IDs (typically of the format `"0710.5765v1"`)
++ `start` is the result offset for paging through a long query result. If set to 0, the API response will begin with the first result; if set to 10, the API response will begin with the 11th.
++ `max_results` is the maximum number of results per query.
 
-### Clean query results
+All of these arguments are documented more comprehensively in the [arXiv API documentation](https://arxiv.org/help/api/user-manual#Quickstart).
 
-`arxiv.mod_query_result(result)`
+**Query examples:**
 
-Takes a query result dict representing an article and modifies some keys and values to be more user-readable.
-See code for specifics.
+```python
+import arxiv
+# Keyword search
+arxiv.query(search_query="quantum")
+# Get single record by ID
+arxiv.query(id_list=["1707.08567"])
+# Get multiple records by ID
+arxiv.query(id_list=["1707.08567", "1707.08567"])
+```
 
-`arxiv.prune_query_result(result)`
-
-Takes a query result dict representing an article and removes some keys that are redundant or useless.
-See code for specifics.
+For a more detailed description of the interaction between `search_query` and `id_list`, see [this section of the arXiv documentation](https://arxiv.org/help/api/user-manual#search_query_and_id_list).
 
 ### Download PDF
 
-`arxiv.download(obj)`
+```python
+arxiv.download(obj, dirname, prepend_id, slugify)
+```
 
-Looks up keys `pdf_url` and `title` on dict `obj`. Downloads the PDF from `pdf_url` and saves it to {title}.pdf in the present working directory.
+| **Argument** | **Type** | **Default** | **Required?** |
+|--------------|----------|-------------|---------------|
+| `obj`        | dict     | N/A         | Yes           |
+| `dirname`    | string   | `"./"`      | No            |
+| `prepend_id` | boolean  | False       | No            |
+| `slugify`    | boolean  | False       | No            |
+
++ `obj` is a result object, one of a list returned by query(). This function looks up keys `pdf_url` and `title` in `obj` to make the download request.
++ `dirname` is the relative directory path to which the downloaded PDF will be saved. It defaults to the present working directory.
++ When `prepend_id` is True, the arXiv record ID will be prepended to the download filename.
++ When `slugify` is True, the paper title will be stripped of non-alphanumeric characters before being used as a filename.
+
+**Download PDF examples:**
+
+```python
+import arxiv
+# Query for a paper of interest, then download
+paper = arxiv.query(id_list=["1707.08567"])[0]
+arxiv.download(paper)
+# You can skip the query step if you have the paper info!
+paper2 = {"pdf_url": "http://arxiv.org/pdf/1707.08567v1",
+         "title": "The Paper Title"}
+arxiv.download(paper2)
+```
