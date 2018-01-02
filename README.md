@@ -8,24 +8,34 @@ They have [an API](http://arxiv.org/help/api/index) that uses ATOM feeds to serv
 Unfortunately, handling these ATOM requsts can be clumsy (especially given inconsistency in data between different result objects, even in the same query).
 This is where arxiv.py comes it: it constructs requests for arXiv and gets ATOM feeds via a simple handful of methods, and parses the results into an intuitive format.
 
-## Docs
+## Usage
 
-To get the arxiv package, simply run `pip install arxiv` at the command line.
+### Installation
 
-At the beginning of your Python script, include the line `import arxiv`.
+```bash
+$ pip install arxiv
+```
+
+In your Python script, include the line
+
+```python
+import arxiv
+```
 
 ### Query
 
 ```python
-arxiv.query(search_query, id_list, prune, start, max_results)
+arxiv.query(search_query, id_list, prune, start, max_results, sort_by, sort_order)
 ```
 
-| **Argument**   | **Type**        | **Default** | **Required?** |
-|----------------|-----------------|-------------|---------------|
-| `search_query` | string          | `""`        | No            |
-| `id_list`      | list of strings | `[]`        | No            |
-| `start`        | int             | 0           | No            |
-| `max_results`  | int             | 10          | No            |
+| **Argument**   | **Type**        | **Default**    | **Required?** |
+|----------------|-----------------|----------------|---------------|
+| `search_query` | string          | `""`           | No            |
+| `id_list`      | list of strings | `[]`           | No            |
+| `start`        | int             | 0              | No            |
+| `max_results`  | int             | 10             | No            |
+| `sort_by`      | string          | `"relevance"`  | No            |
+| `sort_order`   | string          | `"descending"` | No            |
 
 + `search_query` is a query string; details of its usage are documented [here](https://arxiv.org/help/api/user-manual#Quickstart).
 + `id_list` contains arXiv record IDs (typically of the format `"0710.5765v1"`)

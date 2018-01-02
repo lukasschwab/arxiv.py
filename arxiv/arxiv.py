@@ -20,8 +20,8 @@ def query(search_query="",
          prune=True, 
          start=0, 
          max_results=10, 
-         sortBy="relevance", 
-         sortOrder="descending"):
+         sort_by="relevance", 
+         sort_order="descending"):
     url_args = urlencode({"search_query": search_query, 
                           "id_list": ','.join(id_list),
                           "start": start,
