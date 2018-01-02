@@ -15,11 +15,19 @@ import feedparser
 
 root_url = 'http://export.arxiv.org/api/'
 
-def query(search_query="", id_list=[], prune=True, start=0, max_results=10):
+def query(search_query="", 
+         id_list=[], 
+         prune=True, 
+         start=0, 
+         max_results=10, 
+         sortBy="relevance", 
+         sortOrder="descending"):
     url_args = urlencode({"search_query": search_query, 
-                                 "id_list": ','.join(id_list),
-                                 "start": start,
-                                 "max_results": max_results})
+                          "id_list": ','.join(id_list),
+                          "start": start,
+                          "max_results": max_results,
+                          "sortBy": sort_by,
+                          "sortOrder": sort_order})
     results = feedparser.parse(root_url + 'query?' + url_args)
     if results.get('status') != 200:
         # TODO: better error reporting
