@@ -22,6 +22,12 @@ In your Python script, include the line
 import arxiv
 ```
 
+Verify the installation with
+
+```bash
+$ python setup.py test
+
+
 ### Query
 
 ```python
