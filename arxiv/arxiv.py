@@ -15,19 +15,20 @@ import feedparser
 
 root_url = 'http://export.arxiv.org/api/'
 
-def query(search_query="", 
-         id_list=[], 
-         prune=True, 
-         start=0, 
-         max_results=10, 
-         sort_by="relevance", 
-         sort_order="descending"):
-    url_args = urlencode({"search_query": search_query, 
+
+def query(search_query="",
+          id_list=[],
+          prune=True,
+          start=0,
+          max_results=10,
+          sort_by="relevance",
+          sort_order="descending"):
+    url_args = urlencode({"search_query": search_query,
                           "id_list": ','.join(id_list),
                           "start": start,
                           "max_results": max_results,
                           "sortBy": sort_by,
-                          "sortOrder": sort_order})
+                          "sortOrder": sort_order}, quote='+')
     results = feedparser.parse(root_url + 'query?' + url_args)
     if results.get('status') != 200:
         # TODO: better error reporting
@@ -40,6 +41,7 @@ def query(search_query="",
         if prune:
             prune_query_result(result)
     return results
+
 
 def mod_query_result(result):
     # Useful to have for download automation
@@ -65,6 +67,7 @@ def mod_query_result(result):
     else:
         result['doi'] = None
 
+
 def prune_query_result(result):
     prune_keys = ['updated_parsed',
                   'published_parsed',
@@ -83,12 +86,14 @@ def prune_query_result(result):
         except KeyError:
             pass
 
+
 def to_slug(title):
     # Remove special characters
     filename = ''.join(c if c.isalnum() else '_' for c in title)
     # delete duplicate underscores
     filename = '_'.join(list(filter(None, filename.split('_'))))
     return filename
+
 
 def download(obj, dirname='./', prepend_id=False, slugify=False):
     # Downloads file in obj (can be result or unique page) if it has a .pdf link
