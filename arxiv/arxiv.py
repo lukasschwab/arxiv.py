@@ -16,6 +16,25 @@ logger = logging.getLogger(__name__)
 
 
 class Search(object):
+    """
+    Class to search and download abstracts from the arXiv
+
+    Args:
+        query (string):
+        id_list (list): List of arXiv IDs to be downloaded
+        max_results (int): The maximum number of abstracts that should be downloaded. Defaults to
+            infinity, i.e., no limit at all
+        sort_by (string): The arXiv field by which the result should be sorted
+        sort_order (string): The sorting order, i.e. "ascending", "descending" or None.
+        max_results_per_call (int): Internally, a arXiv search query is split up into smaller
+            queries that download the data iteratively in chunks. This parameter sets an upper bound
+            on the number of abstracts to be downloaded in a single call from the arXiv API.
+        time_sleep (int): Time (in seconds) between two subsequent arXiv REST calls. Defaults to
+            :code:`3`, the recommendation of arXiv.
+        prune (bool): Whether some of the keys in a downloaded arXiv result should be dropped.
+            Defaults to True.
+
+    """
 
     root_url = 'http://export.arxiv.org/api/'
     prune_keys = [
@@ -31,17 +50,17 @@ class Search(object):
         'tags',
         'id']
 
-    def __init__(self, query=None, id_list=None, max_results=None, sort_by=None,
+    def __init__(self, query=None, id_list=None, max_results=float('inf'), sort_by=None,
                  sort_order=None, max_results_per_call=None, time_sleep=3, prune=True):
 
         self.query = query
         self.id_list = id_list
-        self.max_results = max_results
         self.sort_by = sort_by
         self.sort_order = sort_order
         self.max_results_per_call = max_results_per_call
         self.time_sleep = time_sleep
         self.prune = prune
+        self.max_results = max_results
 
     def _get_url(self, start=0, max_results=None):
 
@@ -59,6 +78,9 @@ class Search(object):
         return self.root_url + 'query?' + url_args
 
     def _parse(self, url):
+        """
+        Downloads the data provided by the REST endpoint given in the url.
+        """
         result = feedparser.parse(url)
 
         if result.get('status') != 200:
@@ -69,6 +91,9 @@ class Search(object):
             return result['entries']
 
     def _prune_result(self, result):
+        """
+        Deletes some of the keys from the downloaded result
+        """
 
         for key in self.prune_keys:
             try:
@@ -115,12 +140,11 @@ class Search(object):
 
         while n_left > 0:
 
-            logger.info('Fetch from arxiv ({} results left to download)'.format(n_left))
-
             if n_left < self.max_results:
                 logger.info('... play nice on the arXiv and sleep a bit ...')
                 time.sleep(self.time_sleep)
 
+            logger.info('Fetch from arxiv ({} results left to download)'.format(n_left))
             url = self._get_url(
                 start=start,
                 max_results=min(n_left, self.max_results_per_call))
@@ -146,8 +170,17 @@ class Search(object):
             yield results
 
     def download(self, iterative=False):
+        """
+        Triggers the download of the result of the given search query.
+
+        Args:
+            iterative (bool): If true, then an iterator is returned, which allows to download the
+                data iteratively. Otherwise, all the data is fetched first and then returned.
+
+        Returns:
+            iterable: Either a list or a general iterator holding the result of the search query.
+        """
         logger.info('Start downloading')
-        print('ABC')
         if iterative:
 
             logger.info('Build iterator')
@@ -158,14 +191,13 @@ class Search(object):
                     yield result
             return iterator
         else:
-
             results = list()
             for result in self._get_next():
                 results = results + result
             return results
 
 
-def query(search_query="", id_list=[], prune=True, max_results=10, sort_by="relevance",
+def query(search_query="", id_list=[], prune=True, max_results=None, sort_by="relevance",
           sort_order="descending", max_results_per_call=1000, iterative=False):
     """
     """
