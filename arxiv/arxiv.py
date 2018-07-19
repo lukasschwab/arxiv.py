@@ -1,4 +1,7 @@
 from __future__ import print_function
+import logging
+import time
+import feedparser
 
 try:
     # Python 2
@@ -8,79 +11,175 @@ except ImportError:
     # Python 3
     from urllib.parse import urlencode
     from urllib.request import urlretrieve
-import feedparser
 
-root_url = 'http://export.arxiv.org/api/'
-
-
-def query(search_query="", id_list=[], prune=True, start=0, max_results=10, sort_by="relevance",
-          sort_order="descending"):
-
-    url_args = urlencode({"search_query": search_query,
-                          "id_list": ','.join(id_list),
-                          "start": start,
-                          "max_results": max_results,
-                          "sortBy": sort_by,
-                          "sortOrder": sort_order})
-
-    results = feedparser.parse(root_url + 'query?' + url_args)
-    if results.get('status') != 200:
-        # TODO: better error reporting
-        raise Exception("HTTP Error " + str(results.get('status', 'no status')) + " in query")
-    else:
-        results = results['entries']
-    for result in results:
-        # Renamings and modifications
-        mod_query_result(result)
-
-        if prune:
-            prune_query_result(result)
-
-    return results
+logger = logging.getLogger(__name__)
 
 
-def mod_query_result(result):
-    # Useful to have for download automation
-    result['pdf_url'] = None
-    for link in result['links']:
-        if 'title' in link and link['title'] == 'pdf':
-            result['pdf_url'] = link['href']
-    result['affiliation'] = result.pop('arxiv_affiliation', 'None')
-    result['arxiv_url'] = result.pop('link')
-    result['title'] = result['title'].rstrip('\n')
-    result['summary'] = result['summary'].rstrip('\n')
-    result['authors'] = [d['name'] for d in result['authors']]
-    if 'arxiv_comment' in result:
-        result['arxiv_comment'] = result['arxiv_comment'].rstrip('\n')
-    else:
-        result['arxiv_comment'] = None
-    if 'arxiv_journal_ref' in result:
-        result['journal_reference'] = result.pop('arxiv_journal_ref')
-    else:
-        result['journal_reference'] = None
-    if 'arxiv_doi' in result:
-        result['doi'] = result.pop('arxiv_doi')
-    else:
-        result['doi'] = None
+class Search(object):
+
+    root_url = 'http://export.arxiv.org/api/'
+    prune_keys = [
+        'updated_parsed',
+        'published_parsed',
+        'arxiv_primary_category',
+        'summary_detail',
+        'author',
+        'author_detail',
+        'links',
+        'guidislink',
+        'title_detail',
+        'tags',
+        'id']
+
+    def __init__(self, query=None, id_list=None, max_results=None, sort_by=None,
+                 sort_order=None, max_results_per_call=None, time_sleep=3, prune=True):
+
+        self.query = query
+        self.id_list = id_list
+        self.max_results = max_results
+        self.sort_by = sort_by
+        self.sort_order = sort_order
+        self.max_results_per_call = max_results_per_call
+        self.time_sleep = time_sleep
+        self.prune = prune
+
+    def _get_url(self, start=0, max_results=None):
+
+        url_args = urlencode(
+            {
+                "search_query": self.query,
+                "id_list": self.id_list,
+                "start": start,
+                "max_results": max_results,
+                "sortBy": self.sort_by,
+                "sortOrder": self.sort_order
+            }
+        )
+
+        return self.root_url + 'query?' + url_args
+
+    def _parse(self, url):
+        result = feedparser.parse(url)
+
+        if result.get('status') != 200:
+            # TODO: better error reporting
+            raise Exception(
+                "HTTP Error {} in query".format(result.get('status', 'no status')))
+        else:
+            return result['entries']
+
+    def _prune_result(self, result):
+
+        for key in self.prune_keys:
+            try:
+                del result['key']
+            except KeyError:
+                pass
+
+        return result
+
+    def _process_result(self, result):
+
+        # Useful to have for download automation
+        result['pdf_url'] = None
+        for link in result['links']:
+            if 'title' in link and link['title'] == 'pdf':
+                result['pdf_url'] = link['href']
+        result['affiliation'] = result.pop('arxiv_affiliation', 'None')
+        result['arxiv_url'] = result.pop('link')
+        result['title'] = result['title'].rstrip('\n')
+        result['summary'] = result['summary'].rstrip('\n')
+        result['authors'] = [d['name'] for d in result['authors']]
+        if 'arxiv_comment' in result:
+            result['arxiv_comment'] = result['arxiv_comment'].rstrip('\n')
+        else:
+            result['arxiv_comment'] = None
+        if 'arxiv_journal_ref' in result:
+            result['journal_reference'] = result.pop('arxiv_journal_ref')
+        else:
+            result['journal_reference'] = None
+        if 'arxiv_doi' in result:
+            result['doi'] = result.pop('arxiv_doi')
+        else:
+            result['doi'] = None
+
+        if self.prune:
+            result = self._prune_result(result)
+
+        return result
+
+    def _get_next(self):
+
+        n_left = self.max_results
+        start = 0
+
+        while n_left > 0:
+
+            logger.info('Fetch from arxiv ({} results left to download)'.format(n_left))
+
+            if n_left < self.max_results:
+                logger.info('... play nice on the arXiv and sleep a bit ...')
+                time.sleep(self.time_sleep)
+
+            url = self._get_url(
+                start=start,
+                max_results=min(n_left, self.max_results_per_call))
+
+            results = self._parse(url)
+
+            # Update the entries left to download
+            n_fetched = len(results)
+            logger.info('Received {} entries'.format(n_fetched))
+
+            if n_fetched == 0:
+                logger.info('No more entries left to fetch')
+                logger.info('Fetching finished.')
+                break
+
+            # Update the number of results left to download
+            n_left = n_left - n_fetched
+            start = start + n_fetched
+
+            # Process results
+            results = [self._process_result(r) for r in results]
+
+            yield results
+
+    def download(self, iterative=False):
+        logger.info('Start downloading')
+        print('ABC')
+        if iterative:
+
+            logger.info('Build iterator')
+
+            def iterator():
+                logger.info('Start iterating')
+                for result in self._get_next():
+                    yield result
+            return iterator
+        else:
+
+            results = list()
+            for result in self._get_next():
+                results = results + result
+            return results
 
 
-def prune_query_result(result):
-    prune_keys = ['updated_parsed',
-                  'published_parsed',
-                  'arxiv_primary_category',
-                  'summary_detail',
-                  'author',
-                  'author_detail',
-                  'links',
-                  'guidislink',
-                  'title_detail',
-                  'tags',
-                  'id']
-    for key in prune_keys:
-        try:
-            del result['key']
-        except KeyError:
-            pass
+def query(search_query="", id_list=[], prune=True, max_results=10, sort_by="relevance",
+          sort_order="descending", max_results_per_call=1000, iterative=False):
+    """
+    """
+
+    search = Search(
+        query=search_query,
+        id_list=','.join(id_list),
+        sort_by=sort_by,
+        sort_order=sort_order,
+        prune=prune,
+        max_results=max_results,
+        max_results_per_call=max_results_per_call)
+
+    return search.download(iterative=iterative)
 
 
 def to_slug(title):
