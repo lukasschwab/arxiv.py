@@ -67,6 +67,7 @@ For a more detailed description of the interaction between `search_query` and `i
 **Iterative downloads**
 
 ```python
+import arxiv
 result = arxiv.query(search_query="quantum", iterative=True)
 
 for paper in result():
