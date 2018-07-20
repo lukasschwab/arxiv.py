@@ -50,7 +50,7 @@ class Search(object):
         'tags',
         'id']
 
-    def __init__(self, query=None, id_list=None, max_results=float('inf'), sort_by=None,
+    def __init__(self, query=None, id_list=None, max_results=None, sort_by=None,
                  sort_order=None, max_results_per_call=None, time_sleep=3, prune=True):
 
         self.query = query
@@ -61,6 +61,10 @@ class Search(object):
         self.time_sleep = time_sleep
         self.prune = prune
         self.max_results = max_results
+
+        if not self.max_results:
+            logger.info('No maximal number of results given by the user. Download all')
+            self.max_results = float('inf')
 
     def _get_url(self, start=0, max_results=None):
 
