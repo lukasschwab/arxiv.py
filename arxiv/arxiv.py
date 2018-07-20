@@ -192,7 +192,8 @@ class Search(object):
             def iterator():
                 logger.info('Start iterating')
                 for result in self._get_next():
-                    yield result
+                    for entry in result:
+                        yield entry
             return iterator
         else:
             results = list()
@@ -204,6 +205,7 @@ class Search(object):
 def query(search_query="", id_list=[], prune=True, max_results=None, sort_by="relevance",
           sort_order="descending", max_results_per_call=1000, iterative=False):
     """
+    See :py:class:`arxiv.Search` for a description of the parameters.
     """
 
     search = Search(

@@ -1,6 +1,5 @@
 import unittest
 from unittest.mock import patch
-import time
 from arxiv import Search
 from arxiv import query
 import numpy as np
@@ -123,6 +122,6 @@ class TestSearch(unittest.TestCase):
             iterative=True)
 
         with patch.object(feedparser, "parse", new_callable=get_parse_callable):
-            length = [len(result) for result in iterator()]
+            results = [r for r in iterator()]
 
-        self.assertListEqual(length, [111, 89])
+        self.assertEqual(len(results), 200)

@@ -1,13 +1,8 @@
 import unittest
-import time
 from arxiv import query
 
 
 class TestAPI(unittest.TestCase):
-
-    def setUp(self):
-        # Wait a few seconds before
-        time.sleep(3)
 
     def test_download_on_id(self):
         papers = query(id_list=["1707.08567", "1707.08567"])
@@ -39,8 +34,3 @@ class TestAPI(unittest.TestCase):
             self.assertIn('tags', paper)
             self.assertIn('title', paper)
             self.assertIn('title_detail', paper)
-
-    def test_download_by_search_query(self):
-        papers = query(search_query="quantum", max_results=314, max_results_per_call=100)
-
-        self.assertEqual(len(papers), 314)
