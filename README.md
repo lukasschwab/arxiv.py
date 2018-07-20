@@ -64,6 +64,16 @@ arxiv.query(id_list=["1707.08567", "1707.08567"])
 
 For a more detailed description of the interaction between `search_query` and `id_list`, see [this section of the arXiv documentation](https://arxiv.org/help/api/user-manual#search_query_and_id_list).
 
+**Iterative downloads**
+
+```python
+result = arxiv.query(search_query="quantum", iterative=True)
+
+for paper in result():
+   print(paper) # a single result
+```
+
+
 ### Download PDF
 
 ```python
