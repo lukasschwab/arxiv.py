@@ -99,5 +99,5 @@ def custom_slugify(obj):
     return obj.get('id').split('/')[-1]
 
 # Download with a specified slugifier function
-arxiv.download(paper2, slugify=custom_slugify)
+arxiv.download(paper, slugify=custom_slugify)
 ```
