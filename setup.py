@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
 	name="arxiv",
-	version="0.2.3",
+	version="0.3.0",
 	packages=["arxiv"],
 
 	# dependencies
@@ -18,5 +18,10 @@ setup(
 	license="MIT",
 	keywords="arxiv api wrapper academic journals papers",
 	url="https://github.com/lukasschwab/arxiv.py",
-	download_url="https://github.com/lukasschwab/arxiv.py/tarball/0.2.3",
+	download_url="https://github.com/lukasschwab/arxiv.py/tarball/"+version,
+    classifiers=[
+        "Programming Language :: Python",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
 )
