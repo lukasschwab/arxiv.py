@@ -1,8 +1,10 @@
 from setuptools import setup
 
+version = "0.3.0"
+
 setup(
 	name="arxiv",
-	version="0.3.0",
+	version=version,
 	packages=["arxiv"],
 
 	# dependencies
