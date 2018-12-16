@@ -38,9 +38,13 @@ arxiv.query(search_query, id_list, prune, start, max_results, sort_by, sort_orde
 | `sort_order`   | string          | `"descending"` | No            |
 
 + `search_query` is a query string; details of its usage are documented [here](https://arxiv.org/help/api/user-manual#Quickstart).
+  + **Note:** multi-field queries must be space-delimited. `au:balents_leon AND cat:cond-mat.str-el` is valid; `au:balents_leon+AND+cat:cond-mat.str-el` is *not* valid.
+
 + `id_list` contains arXiv record IDs (typically of the format `"0710.5765v1"`)
+
 + `start` is the result offset for paging through a long query result. If set to 0, the API response will begin with the first result; if set to 10, the API response will begin with the 11th.
-+ `max_results` is the maximum number of results per query.
+
++ `max_results` is the maximum number of results per response.
 
 All of these arguments are documented more comprehensively in the [arXiv API documentation](https://arxiv.org/help/api/user-manual#Quickstart).
 
@@ -48,8 +52,10 @@ All of these arguments are documented more comprehensively in the [arXiv API doc
 
 ```python
 import arxiv
-# Keyword search
+# Keyword queries
 arxiv.query(search_query="quantum")
+# Multi-field queries
+arxiv.query(search_query="au:balents_leon AND cat:cond-mat.str-el")
 # Get single record by ID
 arxiv.query(id_list=["1707.08567"])
 # Get multiple records by ID
@@ -72,8 +78,11 @@ arxiv.download(obj, dirname, prepend_id, slugify)
 | `slugify`    | boolean  | False       | No            |
 
 + `obj` is a result object, one of a list returned by query(). This function looks up keys `pdf_url` and `title` in `obj` to make the download request.
+
 + `dirname` is the relative directory path to which the downloaded PDF will be saved. It defaults to the present working directory.
+
 + When `prepend_id` is True, the arXiv record ID will be prepended to the download filename.
+
 + When `slugify` is True, the paper title will be stripped of non-alphanumeric characters before being used as a filename.
 
 **Download PDF examples:**
