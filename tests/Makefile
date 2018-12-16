@@ -1,3 +1,3 @@
 clean:
-	rm **/*.pdf
-	
+	rm -f *.pdf
+	rm -f **/*.pdf
