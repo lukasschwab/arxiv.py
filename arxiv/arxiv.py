@@ -12,17 +12,18 @@ except ImportError:
     from urllib.parse import urlencode
     from urllib.request import urlretrieve
 import feedparser
+import re
 
 root_url = 'http://export.arxiv.org/api/'
 
-def query(search_query="", 
-         id_list=[], 
-         prune=True, 
-         start=0, 
-         max_results=10, 
-         sort_by="relevance", 
+def query(search_query="",
+         id_list=[],
+         prune=True,
+         start=0,
+         max_results=10,
+         sort_by="relevance",
          sort_order="descending"):
-    url_args = urlencode({"search_query": search_query, 
+    url_args = urlencode({"search_query": search_query,
                           "id_list": ','.join(id_list),
                           "start": start,
                           "max_results": max_results,
@@ -83,24 +84,19 @@ def prune_query_result(result):
         except KeyError:
             pass
 
-def to_slug(title):
-    # Remove special characters
-    filename = ''.join(c if c.isalnum() else '_' for c in title)
-    # delete duplicate underscores
-    filename = '_'.join(list(filter(None, filename.split('_'))))
+def slugify(obj):
+    # Remove special characters from object title
+    filename = '_'.join(re.findall(r'\w+', obj.get('title', 'UNTITLED')))
+    # Prepend object id
+    filename = "%s.%s" % (obj.get('pdf_url').split('/')[-1], filename)
     return filename
 
-def download(obj, dirname='./', prepend_id=False, slugify=False):
-    # Downloads file in obj (can be result or unique page) if it has a .pdf link
-    if 'pdf_url' in obj and 'title' in obj and obj['pdf_url'] and obj['title']:
-        filename = obj['title']
-        if slugify:
-            filename = to_slug(filename)
-        if prepend_id:
-            filename = obj['arxiv_url'].split('/')[-1] + '-' + filename
-        filename = dirname + filename + '.pdf'
-        # Download
-        urlretrieve(obj['pdf_url'], filename)
-        return filename
-    else:
-        print("Object obj has no PDF URL, or has no title")
+def download(obj, dirpath='./', slugify=slugify):
+    if not obj.get('pdf_url', ''):
+        print("Object has no PDF URL.")
+        return
+    if dirpath[-1] != '/':
+        dirpath += '/'
+    path = dirpath + slugify(obj) + '.pdf'
+    urlretrieve(obj['pdf_url'], path)
+    return path

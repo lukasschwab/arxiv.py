@@ -67,23 +67,20 @@ For a more detailed description of the interaction between `search_query` and `i
 ### Download PDF
 
 ```python
-arxiv.download(obj, dirname, prepend_id, slugify)
+arxiv.download(obj, dirname, slugify)
 ```
 
 | **Argument** | **Type** | **Default** | **Required?** |
 |--------------|----------|-------------|---------------|
 | `obj`        | dict     | N/A         | Yes           |
 | `dirname`    | string   | `"./"`      | No            |
-| `prepend_id` | boolean  | False       | No            |
 | `slugify`    | boolean  | False       | No            |
 
 + `obj` is a result object, one of a list returned by query(). This function looks up keys `pdf_url` and `title` in `obj` to make the download request.
 
 + `dirname` is the relative directory path to which the downloaded PDF will be saved. It defaults to the present working directory.
 
-+ When `prepend_id` is True, the arXiv record ID will be prepended to the download filename.
-
-+ When `slugify` is True, the paper title will be stripped of non-alphanumeric characters before being used as a filename.
++ `slugify` is a function that processes `obj` into a filename. By default, `arxiv.download(obj)` prepends the object ID to the object title.
 
 **Download PDF examples:**
 
@@ -96,4 +93,11 @@ arxiv.download(paper)
 paper2 = {"pdf_url": "http://arxiv.org/pdf/1707.08567v1",
           "title": "The Paper Title"}
 arxiv.download(paper2)
+
+# Returns the object id
+def custom_slugify(obj):
+    return obj.get('id').split('/')[-1]
+
+# Download with a specified slugifier function
+arxiv.download(paper2, slugify=custom_slugify)
 ```
