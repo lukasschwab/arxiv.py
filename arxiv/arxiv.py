@@ -35,6 +35,7 @@ def query(search_query="",
         raise Exception("HTTP Error " + str(results.get('status', 'no status')) + " in query")
     else:
         results = results['entries']
+    results = [result for result in results if result.get("title", None)]
     for result in results:
         # Renamings and modifications
         mod_query_result(result)
