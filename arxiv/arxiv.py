@@ -1,6 +1,7 @@
 from __future__ import print_function
 import logging
 import time
+import re
 import feedparser
 
 try:
@@ -198,6 +199,8 @@ class Search(object):
         else:
             results = list()
             for result in self._get_next():
+                # Only append result if title is not empty
+                result = [r for r in result if r.get("title", None)]
                 results = results + result
             return results
 
@@ -220,25 +223,20 @@ def query(search_query="", id_list=[], prune=True, max_results=None, sort_by="re
     return search.download(iterative=iterative)
 
 
-def to_slug(title):
-    # Remove special characters
-    filename = ''.join(c if c.isalnum() else '_' for c in title)
-    # delete duplicate underscores
-    filename = '_'.join(list(filter(None, filename.split('_'))))
+def slugify(obj):
+    # Remove special characters from object title
+    filename = '_'.join(re.findall(r'\w+', obj.get('title', 'UNTITLED')))
+    # Prepend object id
+    filename = "%s.%s" % (obj.get('pdf_url').split('/')[-1], filename)
     return filename
 
 
-def download(obj, dirname='./', prepend_id=False, slugify=False):
-    # Downloads file in obj (can be result or unique page) if it has a .pdf link
-    if 'pdf_url' in obj and 'title' in obj and obj['pdf_url'] and obj['title']:
-        filename = obj['title']
-        if slugify:
-            filename = to_slug(filename)
-        if prepend_id:
-            filename = obj['arxiv_url'].split('/')[-1] + '-' + filename
-        filename = dirname + filename + '.pdf'
-        # Download
-        urlretrieve(obj['pdf_url'], filename)
-        return filename
-    else:
-        print("Object obj has no PDF URL, or has no title")
+def download(obj, dirpath='./', slugify=slugify):
+    if not obj.get('pdf_url', ''):
+        print("Object has no PDF URL.")
+        return
+    if dirpath[-1] != '/':
+        dirpath += '/'
+    path = dirpath + slugify(obj) + '.pdf'
+    urlretrieve(obj['pdf_url'], path)
+    return path

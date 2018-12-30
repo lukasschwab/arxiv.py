@@ -1,8 +1,10 @@
 from setuptools import setup
 
+version = "0.3.1"
+
 setup(
     name="arxiv",
-    version="0.2.3",
+    version=version,
     packages=["arxiv"],
 
     # dependencies
@@ -14,7 +16,6 @@ setup(
     tests_require=[
         "pytest",
     ],
-
     # metadata for upload to PyPI
     author="Lukas Schwab",
     author_email="lukas.schwab@gmail.com",
@@ -22,5 +23,9 @@ setup(
     license="MIT",
     keywords="arxiv api wrapper academic journals papers",
     url="https://github.com/lukasschwab/arxiv.py",
-    download_url="https://github.com/lukasschwab/arxiv.py/tarball/0.2.3",
+    classifiers=[
+        "Programming Language :: Python",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
 )
