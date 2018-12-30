@@ -104,6 +104,9 @@ class TestSearch(unittest.TestCase):
 
         self.assertTrue(callable(results))
 
+    def test_invalid_id(self):
+        self.assertEqual(len(query(id_list=["1912.08031"])),  0)
+
     def test_query(self):
 
         with patch.object(feedparser, "parse", new_callable=get_parse_callable):

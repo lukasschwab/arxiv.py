@@ -116,6 +116,7 @@ class Search(object):
             if 'title' in link and link['title'] == 'pdf':
                 result['pdf_url'] = link['href']
         result['affiliation'] = result.pop('arxiv_affiliation', 'None')
+
         result['arxiv_url'] = result.pop('link')
         result['title'] = result['title'].rstrip('\n')
         result['summary'] = result['summary'].rstrip('\n')
@@ -170,7 +171,7 @@ class Search(object):
             start = start + n_fetched
 
             # Process results
-            results = [self._process_result(r) for r in results]
+            results = [self._process_result(r) for r in results if r.get("title", None)]
 
             yield results
 
@@ -200,7 +201,6 @@ class Search(object):
             results = list()
             for result in self._get_next():
                 # Only append result if title is not empty
-                result = [r for r in result if r.get("title", None)]
                 results = results + result
             return results
 
