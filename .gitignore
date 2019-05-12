@@ -7,6 +7,7 @@ RELEASE-HOWTO.md
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+*.pytest_cache
 
 # C extensions
 *.so
@@ -18,7 +19,7 @@ build/
 develop-eggs/
 dist/
 downloads/
-eggs/
+*.eggs/
 lib/
 lib64/
 parts/
