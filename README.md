@@ -84,18 +84,18 @@ for paper in result():
 ### Download PDF
 
 ```python
-arxiv.download(obj, dirname, slugify)
+arxiv.download(obj, dirpath, slugify)
 ```
 
 | **Argument** | **Type** | **Default** | **Required?** |
 |--------------|----------|-------------|---------------|
 | `obj`        | dict     | N/A         | Yes           |
-| `dirname`    | string   | `"./"`      | No            |
+| `dirpath`    | string   | `"./"`      | No            |
 | `slugify`    | boolean  | False       | No            |
 
 + `obj` is a result object, one of a list returned by query(). This function looks up keys `pdf_url` and `title` in `obj` to make the download request.
 
-+ `dirname` is the relative directory path to which the downloaded PDF will be saved. It defaults to the present working directory.
++ `dirpath` is the relative directory path to which the downloaded PDF will be saved. It defaults to the present working directory.
 
 + `slugify` is a function that processes `obj` into a filename. By default, `arxiv.download(obj)` prepends the object ID to the object title.
 
