@@ -26,7 +26,7 @@ Verify the installation with
 
 ```bash
 $ python setup.py test
-
+```
 
 ### Query
 
