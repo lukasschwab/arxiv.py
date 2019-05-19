@@ -27,9 +27,9 @@ class Search(object):
             infinity, i.e., no limit at all
         sort_by (string): The arXiv field by which the result should be sorted
         sort_order (string): The sorting order, i.e. "ascending", "descending" or None.
-        max_results_per_call (int): Internally, a arXiv search query is split up into smaller
+        max_chunk_results (int): Internally, a arXiv search query is split up into smaller
             queries that download the data iteratively in chunks. This parameter sets an upper bound
-            on the number of abstracts to be downloaded in a single call from the arXiv API.
+            on the number of abstracts to be retrieved in a single internal request.
         time_sleep (int): Time (in seconds) between two subsequent arXiv REST calls. Defaults to
             :code:`3`, the recommendation of arXiv.
         prune (bool): Whether some of the keys in a downloaded arXiv result should be dropped.
@@ -52,13 +52,13 @@ class Search(object):
         'id']
 
     def __init__(self, query=None, id_list=None, max_results=None, sort_by=None,
-                 sort_order=None, max_results_per_call=None, time_sleep=3, prune=True):
+                 sort_order=None, max_chunk_results=None, time_sleep=3, prune=True):
 
         self.query = query
         self.id_list = id_list
         self.sort_by = sort_by
         self.sort_order = sort_order
-        self.max_results_per_call = max_results_per_call
+        self.max_chunk_results = max_chunk_results
         self.time_sleep = time_sleep
         self.prune = prune
         self.max_results = max_results
@@ -89,11 +89,10 @@ class Search(object):
         result = feedparser.parse(url)
 
         if result.get('status') != 200:
-            # TODO: better error reporting
-            raise Exception(
+            logger.error(
                 "HTTP Error {} in query".format(result.get('status', 'no status')))
-        else:
-            return result['entries']
+            return []
+        return result['entries']
 
     def _prune_result(self, result):
         """
@@ -153,7 +152,7 @@ class Search(object):
             logger.info('Fetch from arxiv ({} results left to download)'.format(n_left))
             url = self._get_url(
                 start=start,
-                max_results=min(n_left, self.max_results_per_call))
+                max_results=min(n_left, self.max_chunk_results))
 
             results = self._parse(url)
 
@@ -206,7 +205,7 @@ class Search(object):
 
 
 def query(search_query="", id_list=[], prune=True, max_results=None, sort_by="relevance",
-          sort_order="descending", max_results_per_call=1000, iterative=False):
+          sort_order="descending", max_chunk_results=1000, iterative=False):
     """
     See :py:class:`arxiv.Search` for a description of the parameters.
     """
@@ -218,7 +217,7 @@ def query(search_query="", id_list=[], prune=True, max_results=None, sort_by="re
         sort_order=sort_order,
         prune=prune,
         max_results=max_results,
-        max_results_per_call=max_results_per_call)
+        max_chunk_results=max_chunk_results)
 
     return search.download(iterative=iterative)
 
