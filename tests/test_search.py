@@ -1,5 +1,8 @@
 import unittest
-from unittest.mock import patch
+try:
+    from unittest.mock import patch
+except ImportError:
+    from mock import patch
 from arxiv import Search
 from arxiv import query
 import numpy as np
@@ -7,7 +10,7 @@ import feedparser
 
 try:
     # Python 2
-    from urllib import parse_qsl
+    from urlparse import parse_qsl
 except ImportError:
     # Python 3
     from urllib.parse import parse_qsl
@@ -81,7 +84,7 @@ class TestSearch(unittest.TestCase):
 
     def test_get_next(self):
 
-        search = Search(max_results=200, max_results_per_call=30, time_sleep=0)
+        search = Search(max_results=200, max_chunk_results=30, time_sleep=0)
 
         with patch.object(feedparser, "parse", new_callable=get_parse_callable):
 
@@ -90,14 +93,14 @@ class TestSearch(unittest.TestCase):
         self.assertListEqual(lenghts, [30, 30, 30, 30, 30, 30, 20])
 
     def test_download(self):
-        search = Search(max_results=221, max_results_per_call=33, time_sleep=0)
+        search = Search(max_results=221, max_chunk_results=33, time_sleep=0)
 
         with patch.object(feedparser, "parse", new_callable=get_parse_callable):
             results = search.download(iterative=False)
         self.assertEqual(len(results), 221)
 
     def test_download_iterator(self):
-        search = Search(max_results=221, max_results_per_call=33, time_sleep=0)
+        search = Search(max_results=221, max_chunk_results=33, time_sleep=0)
 
         with patch.object(feedparser, "parse", new_callable=get_parse_callable):
             results = search.download(iterative=True)
@@ -121,7 +124,7 @@ class TestSearch(unittest.TestCase):
         iterator = query(
             search_query="sth",
             max_results=200,
-            max_results_per_call=111,
+            max_chunk_results=111,
             iterative=True)
 
         with patch.object(feedparser, "parse", new_callable=get_parse_callable):

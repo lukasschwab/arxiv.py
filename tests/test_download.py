@@ -1,5 +1,6 @@
 import arxiv
 import os
+import shutil
 import tempfile
 import unittest
 
@@ -19,43 +20,46 @@ class TestDownload(unittest.TestCase):
             "pdf_url": "http://arxiv.org/pdf/1605.08386v1",
             "title": "The Paper Title"}
 
+    @classmethod
+    def setUp(self):
+        self.temp_dir = tempfile.mkdtemp()
+
+    @classmethod
+    def tearDown(self):
+        shutil.rmtree(self.temp_dir)
+
     def test_download_with_custom_slugify_from_query(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
-            arxiv.download(self.paper_query, slugify=custom_slugify, dirpath=temp_dir)
-            self.assertTrue(
-                    os.path.exists(
-                        os.path.join(temp_dir, '1605.08386v1.pdf')
-                    )
-            )
+        arxiv.download(self.paper_query, slugify=custom_slugify, dirpath=self.temp_dir)
+        self.assertTrue(
+                os.path.exists(
+                    os.path.join(self.temp_dir, '1605.08386v1.pdf')
+                )
+        )
 
     def test_download_with_custom_slugify_from_dict(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
-            arxiv.download(self.paper_dict, slugify=custom_slugify, dirpath=temp_dir)
-            self.assertTrue(
-                    os.path.exists(
-                        os.path.join(temp_dir, '1605.08386v1.pdf')
-                    )
-            )
+        arxiv.download(self.paper_dict, slugify=custom_slugify, dirpath=self.temp_dir)
+        self.assertTrue(
+                os.path.exists(
+                    os.path.join(self.temp_dir, '1605.08386v1.pdf')
+                )
+        )
 
     def test_download_from_dict(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
-            arxiv.download(self.paper_dict, dirpath=temp_dir)
-            self.assertTrue(
-                    os.path.exists(
-                        os.path.join(
-                            temp_dir,
-                            '1605.08386v1.The_Paper_Title.pdf')
-                    )
-            )
+        arxiv.download(self.paper_dict, dirpath=self.temp_dir)
+        self.assertTrue(
+                os.path.exists(
+                    os.path.join(
+                        self.temp_dir,
+                        '1605.08386v1.The_Paper_Title.pdf')
+                )
+        )
 
     def test_download_from_query(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
-            arxiv.download(self.paper_query, dirpath=temp_dir)
-
-            self.assertTrue(
-                    os.path.exists(
-                        os.path.join(
-                            temp_dir,
-                            '1605.08386v1.Heat_bath_random_walks_with_Markov_bases.pdf')
-                    )
-            )
+        arxiv.download(self.paper_query, dirpath=self.temp_dir)
+        self.assertTrue(
+                os.path.exists(
+                    os.path.join(
+                        self.temp_dir,
+                        '1605.08386v1.Heat_bath_random_walks_with_Markov_bases.pdf')
+                )
+        )
