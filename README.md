@@ -1,3 +1,4 @@
+
 # arxiv.py [![Python 2.7](https://img.shields.io/badge/python-2.7-blue.svg)](https://www.python.org/downloads/release/python-270/) [![Python 3.6](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/)
 
 Python wrapper for [the arXiv API](http://arxiv.org/help/api/index).
@@ -31,6 +32,7 @@ import arxiv
 ```python
 arxiv.query(search_query="",
             id_list=[],
+            start = 0,
             max_results=None,
             sort_by="relevance",
             sort_order="descending",
@@ -43,6 +45,7 @@ arxiv.query(search_query="",
 |----------------|-----------------|----------------|
 | `search_query` | string          | `""`           |
 | `id_list`      | list of strings | `[]`           |
+| `start`       | int                   |  0              |
 | `max_results`  | int             | 10             |
 | `sort_by`      | string          | `"relevance"`  |
 | `sort_order`   | string          | `"descending"` |
@@ -56,6 +59,8 @@ arxiv.query(search_query="",
 + `id_list`: list of arXiv record IDs (typically of the format `"0710.5765v1"`).
 
 + `max_results`: the maximum number of results returned by the query.
+
++ `start`: start defines the offset of the first returned object from the arXiv query results.
 
 + `sort_by`: the arXiv field by which the result should be sorted.
 
