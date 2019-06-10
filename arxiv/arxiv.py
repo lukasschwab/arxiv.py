@@ -25,7 +25,7 @@ class Search(object):
         id_list (list): List of arXiv IDs to be downloaded
         max_results (int): The maximum number of abstracts that should be downloaded. Defaults to
             infinity, i.e., no limit at all
-        start (int): Where to start downloading within results returned. 
+        start (int): Start defines the offset of the first returned object from the arXiv query results. 
         sort_by (string): The arXiv field by which the result should be sorted
         sort_order (string): The sorting order, i.e. "ascending", "descending" or None.
         max_chunk_results (int): Internally, a arXiv search query is split up into smaller
@@ -52,7 +52,7 @@ class Search(object):
         'tags',
         'id']
 
-    def __init__(self, query=None, id_list=None, max_results=None, start = 0, sort_by=None,
+    def __init__(self, query=None, id_list=None, max_results=None, start=0, sort_by=None,
                  sort_order=None, max_chunk_results=None, time_sleep=3, prune=True):
 
         self.query = query
@@ -142,7 +142,7 @@ class Search(object):
 
     def _get_next(self):
 
-        n_left = self.max_results - self.start
+        n_left = self.max_results
         start = self.start
 
         while n_left > 0:
@@ -206,7 +206,7 @@ class Search(object):
             return results
 
 
-def query(search_query="", id_list=[], prune=True, max_results=None, start = 0, sort_by="relevance",
+def query(search_query="", id_list=[], prune=True, max_results=None, start=0, sort_by="relevance",
           sort_order="descending", max_chunk_results=1000, iterative=False):
     """
     See :py:class:`arxiv.Search` for a description of the parameters.
