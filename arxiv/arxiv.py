@@ -64,6 +64,7 @@ class Search(object):
         self.prune = prune
         self.max_results = max_results
         self.start = start
+        self.time_sleep = time_sleep
 
         if not self.max_results:
             logger.info('No maximal number of results given by the user. Download all')
@@ -220,7 +221,8 @@ def query(search_query="", id_list=[], prune=True, max_results=None, start=0, so
         prune=prune,
         max_results=max_results,
         start = start,
-        max_chunk_results=max_chunk_results)
+        max_chunk_results=max_chunk_results
+        time_sleep=time_sleep)
 
     return search.download(iterative=iterative)
 
