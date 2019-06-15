@@ -114,7 +114,7 @@ class TestSearch(unittest.TestCase):
 
         with patch.object(feedparser, "parse", new_callable=get_parse_callable):
             result = query(
-                search_query="sth",
+                query="sth",
                 max_results=341)
 
         self.assertEqual(len(result), 341)
@@ -122,7 +122,7 @@ class TestSearch(unittest.TestCase):
     def test_query_iterator(self):
 
         iterator = query(
-            search_query="sth",
+            query="sth",
             max_results=200,
             max_chunk_results=111,
             iterative=True)

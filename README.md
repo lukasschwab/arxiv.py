@@ -1,4 +1,3 @@
-
 # arxiv.py [![Python 2.7](https://img.shields.io/badge/python-2.7-blue.svg)](https://www.python.org/downloads/release/python-270/) [![Python 3.6](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/)
 
 Python wrapper for [the arXiv API](http://arxiv.org/help/api/index).
@@ -30,10 +29,10 @@ import arxiv
 ### Query
 
 ```python
-arxiv.query(search_query="",
+arxiv.query(query="",
             id_list=[],
-            start = 0,
             max_results=None,
+            start = 0,
             sort_by="relevance",
             sort_order="descending",
             prune=True,
@@ -43,24 +42,24 @@ arxiv.query(search_query="",
 
 | **Argument**   | **Type**        | **Default**    |
 |----------------|-----------------|----------------|
-| `search_query` | string          | `""`           |
+| `query`        | string          | `""`           |
 | `id_list`      | list of strings | `[]`           |
-| `start`       | int                   |  0              |
 | `max_results`  | int             | 10             |
+| `start`        | int             | 0              |
 | `sort_by`      | string          | `"relevance"`  |
 | `sort_order`   | string          | `"descending"` |
 | `prune`        | boolean         | `True`         |
 | `iterative`    | boolean         | `False`        |
 | `max_chunk_results` | int        | 1000           |
 
-+ `search_query`: an arXiv query string. Format documented [here](https://arxiv.org/help/api/user-manual#Quickstart).
++ `query`: an arXiv query string. Format documented [here](https://arxiv.org/help/api/user-manual#Quickstart).
   + **Note:** multi-field queries must be space-delimited. `au:balents_leon AND cat:cond-mat.str-el` is valid; `au:balents_leon+AND+cat:cond-mat.str-el` is *not* valid.
 
 + `id_list`: list of arXiv record IDs (typically of the format `"0710.5765v1"`).
 
 + `max_results`: the maximum number of results returned by the query.
 
-+ `start`: start defines the offset of the first returned object from the arXiv query results.
++ `start`: the offset of the first returned object from the arXiv query results.
 
 + `sort_by`: the arXiv field by which the result should be sorted.
 
@@ -78,21 +77,21 @@ arxiv.query(search_query="",
 import arxiv
 
 # Keyword queries
-arxiv.query(search_query="quantum", max_results=100)
+arxiv.query(query="quantum", max_results=100)
 # Multi-field queries
-arxiv.query(search_query="au:balents_leon AND cat:cond-mat.str-el")
+arxiv.query(query="au:balents_leon AND cat:cond-mat.str-el")
 # Get single record by ID
 arxiv.query(id_list=["1707.08567"])
 # Get multiple records by ID
 arxiv.query(id_list=["1707.08567", "1707.08567"])
 
 # Get interator over query results
-result = arxiv.query(search_query="quantum", max_chunk_results=10, iterative=True)
+result = arxiv.query(query="quantum", max_chunk_results=10, iterative=True)
 for paper in result():
    print(paper)
 ```
 
-For a more detailed description of the interaction between `search_query` and `id_list`, see [this section of the arXiv documentation](https://arxiv.org/help/api/user-manual#search_query_and_id_list).
+For a more detailed description of the interaction between `query` and `id_list`, see [this section of the arXiv documentation](https://arxiv.org/help/api/user-manual#search_query_and_id_list).
 
 ### Download article PDF
 

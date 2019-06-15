@@ -22,18 +22,18 @@ class Search(object):
 
     Args:
         query (string):
-        id_list (list): List of arXiv IDs to be downloaded
+        id_list (list): List of arXiv object IDs.
         max_results (int): The maximum number of abstracts that should be downloaded. Defaults to
-            infinity, i.e., no limit at all
-        start (int): Start defines the offset of the first returned object from the arXiv query results. 
-        sort_by (string): The arXiv field by which the result should be sorted
+            infinity, i.e., no limit at all.
+        start (int): The offset of the first returned object from the arXiv query results.
+        sort_by (string): The arXiv field by which the result should be sorted.
         sort_order (string): The sorting order, i.e. "ascending", "descending" or None.
         max_chunk_results (int): Internally, a arXiv search query is split up into smaller
-            queries that download the data iteratively in chunks. This parameter sets an upper bound
-            on the number of abstracts to be retrieved in a single internal request.
+            queries that download the data iteratively in chunks. This parameter sets an upper
+            bound on the number of abstracts to be retrieved in a single internal request.
         time_sleep (int): Time (in seconds) between two subsequent arXiv REST calls. Defaults to
             :code:`3`, the recommendation of arXiv.
-        prune (bool): Whether some of the keys in a downloaded arXiv result should be dropped.
+        prune (bool): Whether some of the values in each response object should be dropped.
             Defaults to True.
 
     """
@@ -64,10 +64,9 @@ class Search(object):
         self.prune = prune
         self.max_results = max_results
         self.start = start
-        self.time_sleep = time_sleep
 
         if not self.max_results:
-            logger.info('No maximal number of results given by the user. Download all')
+            logger.info('max_results defaulting to inf.')
             self.max_results = float('inf')
 
     def _get_url(self, start=0, max_results=None):
@@ -99,7 +98,7 @@ class Search(object):
 
     def _prune_result(self, result):
         """
-        Deletes some of the keys from the downloaded result
+        Deletes some of the keys from the downloaded result.
         """
 
         for key in self.prune_keys:
@@ -164,7 +163,7 @@ class Search(object):
             logger.info('Received {} entries'.format(n_fetched))
 
             if n_fetched == 0:
-                logger.info('No more entries left to fetch')
+                logger.info('No more entries left to fetch.')
                 logger.info('Fetching finished.')
                 break
 
@@ -207,22 +206,21 @@ class Search(object):
             return results
 
 
-def query(search_query="", id_list=[], prune=True, max_results=None, start=0, sort_by="relevance",
-          sort_order="descending", max_chunk_results=1000, iterative=False, time_sleep=3):
+def query(query="", id_list=[], prune=True, max_results=None, start=0, sort_by="relevance",
+          sort_order="descending", max_chunk_results=1000, iterative=False):
     """
     See :py:class:`arxiv.Search` for a description of the parameters.
     """
 
     search = Search(
-        query=search_query,
+        query=query,
         id_list=','.join(id_list),
         sort_by=sort_by,
         sort_order=sort_order,
         prune=prune,
         max_results=max_results,
         start = start,
-        max_chunk_results=max_chunk_results,
-        time_sleep=time_sleep)
+        max_chunk_results=max_chunk_results)
 
     return search.download(iterative=iterative)
 
