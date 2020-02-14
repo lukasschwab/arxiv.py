@@ -108,7 +108,7 @@ class TestSearch(unittest.TestCase):
         self.assertTrue(callable(results))
 
     def test_invalid_id(self):
-        self.assertEqual(len(query(id_list=["1912.08031"])),  0)
+        self.assertEqual(len(query(id_list=["0000.0000"])),  0)
 
     def test_query(self):
 
