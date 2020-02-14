@@ -14,10 +14,10 @@ setup(
     install_requires=[
         'feedparser',
         'requests',
-        'pytest-runner',
     ],
     tests_require=[
         "pytest",
+	"numpy",
     ],
     # metadata for upload to PyPI
     author="Lukas Schwab",
