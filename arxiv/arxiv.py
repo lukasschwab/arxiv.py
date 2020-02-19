@@ -233,12 +233,22 @@ def slugify(obj):
     return filename
 
 
-def download(obj, dirpath='./', slugify=slugify):
+def download(obj, dirpath='./', slugify=slugify, source=False):
+    """
+    Download the .pdf ob object. If source==True download the
+    source tar.gz instead
+    """
     if not obj.get('pdf_url', ''):
         print("Object has no PDF URL.")
         return
     if dirpath[-1] != '/':
         dirpath += '/'
-    path = dirpath + slugify(obj) + '.pdf'
-    urlretrieve(obj['pdf_url'], path)
+    if source:
+        url = re.sub(r'/pdf/', r'/e-print/',obj['pdf_url'])
+        path = dirpath + slugify(obj) + '.tar.gz'
+    else:
+        url = obj['pdf_url']
+        path = dirpath + slugify(obj) + '.pdf'
+
+    urlretrieve(url, path)
     return path
