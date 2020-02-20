@@ -63,3 +63,23 @@ class TestDownload(unittest.TestCase):
                         '1605.08386v1.Heat_bath_random_walks_with_Markov_bases.pdf')
                 )
         )
+
+    def test_download_tarfile_from_dict(self):
+        arxiv.download(self.paper_dict, dirpath=self.temp_dir,prefer_source_tarfile=True)
+        self.assertTrue(
+                os.path.exists(
+                    os.path.join(
+                        self.temp_dir,
+                        '1605.08386v1.The_Paper_Title.tar.gz')
+                )
+        )
+
+    def test_download_tarfile_from_query(self):
+        arxiv.download(self.paper_query, dirpath=self.temp_dir,prefer_source_tarfile=True)
+        self.assertTrue(
+                os.path.exists(
+                    os.path.join(
+                        self.temp_dir,
+                        '1605.08386v1.Heat_bath_random_walks_with_Markov_bases.tar.gz')
+                )
+        )
