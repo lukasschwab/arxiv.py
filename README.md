@@ -104,7 +104,7 @@ arxiv.arxiv.download(obj, dirpath='./', slugify=slugify, prefer_source_tarfile=F
 | `obj`                   | dict     | N/A             | Yes           |
 | `dirpath`               | string   | `"./"`          | No            |
 | `slugify`               | function | `arxiv.slugify` | No            |
-| `prefer_source_tarfile` | bool     | `False`         | No
+| `prefer_source_tarfile` | bool     | `False`         | No            |
 
 + `obj` is a result object, one of a list returned by query(). `obj` must at minimum contain values corresponding to `pdf_url` and `title`.
 
@@ -112,7 +112,7 @@ arxiv.arxiv.download(obj, dirpath='./', slugify=slugify, prefer_source_tarfile=F
 
 + `slugify` is a function that processes `obj` into a filename. By default, `arxiv.download(obj)` prepends the object ID to the object title.
 
-+ `prefer_source_tarfile` is a boolean which controls if the source tarfile must be downloaded instead of the PDF. It defaults to `False`, downloading the PDF. If `True`, the tarfile containing the source is downloaded.  
++ `prefer_source_tarfile` is a boolean which controls if the source tarfile must be downloaded instead of the PDF. It defaults to `False`, downloading the PDF. If `True`, the tarfile containing the source is downloaded.
 
 ```python
 import arxiv
