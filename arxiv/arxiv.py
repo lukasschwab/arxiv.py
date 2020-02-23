@@ -235,7 +235,7 @@ def slugify(obj):
 
 def download(obj, dirpath='./', slugify=slugify, prefer_source_tarfile=False):
     """
-    Download the .pdf corresponding to the result object 'obj'. If prefer_source_tarfile==True download the source .tar.gz instead
+    Download the .pdf corresponding to the result object 'obj'. If prefer_source_tarfile==True, download the source .tar.gz instead.
     """
     if not obj.get('pdf_url', ''):
         print("Object has no PDF URL.")
@@ -243,7 +243,7 @@ def download(obj, dirpath='./', slugify=slugify, prefer_source_tarfile=False):
     if dirpath[-1] != '/':
         dirpath += '/'
     if prefer_source_tarfile:
-        url = re.sub(r'/pdf/', r'/src/',obj['pdf_url'])
+        url = re.sub(r'/pdf/', "/src/", obj['pdf_url'])
         path = dirpath + slugify(obj) + '.tar.gz'
     else:
         url = obj['pdf_url']

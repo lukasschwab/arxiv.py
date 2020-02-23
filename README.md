@@ -112,7 +112,7 @@ arxiv.arxiv.download(obj, dirpath='./', slugify=slugify, prefer_source_tarfile=F
 
 + `slugify` is a function that processes `obj` into a filename. By default, `arxiv.download(obj)` prepends the object ID to the object title.
 
-+ `prefer_source_tarfile` is a boolean which controls if the source tarfile must be downloaded instead of the PDF. It defaults to `False`, downloading the PDF. If `True`, the tarfile containing the source is downloaded.
++ If `prefer_source_tarfile` is `True`, this function will download the source files for `obj`––rather than the rendered PDF––in .tar.gz format.
 
 ```python
 import arxiv
