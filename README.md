@@ -93,23 +93,26 @@ for paper in result():
 
 For a more detailed description of the interaction between `query` and `id_list`, see [this section of the arXiv documentation](https://arxiv.org/help/api/user-manual#search_query_and_id_list).
 
-### Download article PDF
+### Download article PDF or source tarfile
 
 ```python
-arxiv.download(obj, dirpath="./", slugify=arxiv.slugify)
+arxiv.arxiv.download(obj, dirpath='./', slugify=slugify, prefer_source_tarfile=False)
 ```
 
-| **Argument** | **Type** | **Default** | **Required?** |
-|--------------|----------|-------------|---------------|
-| `obj`        | dict     | N/A         | Yes           |
-| `dirpath`    | string   | `"./"`      | No            |
-| `slugify`    | function | `arxiv.slugify` | No        |
+| **Argument**            | **Type** | **Default**     | **Required?** |
+|-------------------------|----------|-----------------|---------------|
+| `obj`                   | dict     | N/A             | Yes           |
+| `dirpath`               | string   | `"./"`          | No            |
+| `slugify`               | function | `arxiv.slugify` | No            |
+| `prefer_source_tarfile` | bool     | `False`         | No
 
 + `obj` is a result object, one of a list returned by query(). `obj` must at minimum contain values corresponding to `pdf_url` and `title`.
 
 + `dirpath` is the relative directory path to which the downloaded PDF will be saved. It defaults to the present working directory.
 
 + `slugify` is a function that processes `obj` into a filename. By default, `arxiv.download(obj)` prepends the object ID to the object title.
+
++ `prefer_source_tarfile` is a boolean which controls if the source tarfile must be downloaded instead of the PDF. It defaults to `False`, downloading the PDF. If `True`, the tarfile containing the source is downloaded.  
 
 ```python
 import arxiv
@@ -120,6 +123,9 @@ arxiv.download(paper)
 paper2 = {"pdf_url": "http://arxiv.org/pdf/1707.08567v1",
           "title": "The Paper Title"}
 arxiv.download(paper2)
+
+# Download the gzipped tar file
+arxiv.download(paper,prefer_source_tarfile=True)
 
 # Returns the object id
 def custom_slugify(obj):
