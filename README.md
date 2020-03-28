@@ -29,15 +29,17 @@ import arxiv
 ### Query
 
 ```python
-arxiv.query(query="",
-            id_list=[],
-            max_results=None,
-            start = 0,
-            sort_by="relevance",
-            sort_order="descending",
-            prune=True,
-            iterative=False,
-            max_chunk_results=1000)
+arxiv.query(
+  query="",
+  id_list=[],
+  max_results=None,
+  start = 0,
+  sort_by="relevance",
+  sort_order="descending",
+  prune=True,
+  iterative=False,
+  max_chunk_results=1000
+)
 ```
 
 | **Argument**   | **Type**        | **Default**    |
@@ -57,7 +59,7 @@ arxiv.query(query="",
 
 + `id_list`: list of arXiv record IDs (typically of the format `"0710.5765v1"`).
 
-+ `max_results`: the maximum number of results returned by the query.
++ `max_results`: the maximum number of results returned by the query. Note: if this is unset amd `iterative=False`, the call to `query` can take a long time to resolve.
 
 + `start`: the offset of the first returned object from the arXiv query results.
 
@@ -78,20 +80,29 @@ import arxiv
 
 # Keyword queries
 arxiv.query(query="quantum", max_results=100)
+
 # Multi-field queries
 arxiv.query(query="au:balents_leon AND cat:cond-mat.str-el")
+
 # Get single record by ID
 arxiv.query(id_list=["1707.08567"])
+
 # Get multiple records by ID
 arxiv.query(id_list=["1707.08567", "1707.08567"])
 
-# Get interator over query results
-result = arxiv.query(query="quantum", max_chunk_results=10, iterative=True)
+# Get an interator over query results
+result = arxiv.query(
+  query="quantum",
+  max_chunk_results=10,
+  max_results=100,
+  iterative=True
+)
+
 for paper in result():
    print(paper)
 ```
 
-For a more detailed description of the interaction between `query` and `id_list`, see [this section of the arXiv documentation](https://arxiv.org/help/api/user-manual#search_query_and_id_list).
+For a more detailed description of the interaction between the `query` and `id_list` arguments, see [this section of the arXiv documentation](https://arxiv.org/help/api/user-manual#search_query_and_id_list).
 
 ### Download article PDF or source tarfile
 
@@ -116,23 +127,21 @@ arxiv.arxiv.download(obj, dirpath='./', slugify=slugify, prefer_source_tarfile=F
 
 ```python
 import arxiv
-# Query for a paper of interest, then download
+
+# Query for a paper of interest, then download it.
 paper = arxiv.query(id_list=["1707.08567"])[0]
 arxiv.download(paper)
-# You can skip the query step if you have the paper info!
+
+# You can skip the query step if you have the paper info.
 paper2 = {"pdf_url": "http://arxiv.org/pdf/1707.08567v1",
           "title": "The Paper Title"}
 arxiv.download(paper2)
 
-# Download the gzipped tar file
-arxiv.download(paper,prefer_source_tarfile=True)
+# Use prefer_source_tarfile to download the gzipped tar file.
+arxiv.download(paper, prefer_source_tarfile=True)
 
-# Returns the object id
-def custom_slugify(obj):
-    return obj.get('id').split('/')[-1]
-
-# Download with a specified slugifier function
-arxiv.download(paper, slugify=custom_slugify)
+# Override the default filename format by defining a slugify function.
+arxiv.download(paper, slugify=lambda paper: paper.get('id').split('/')[-1])
 ```
 
 ## Contributors
