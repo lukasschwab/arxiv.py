@@ -1,6 +1,5 @@
-RELEASE-HOWTO.md
-
-#### joe made this: https://goel.io/joe
+ADMIN.md
+release.sh
 
 #####=== Python ===#####
 
@@ -59,4 +58,3 @@ docs/_build/
 
 # PyBuilder
 target/
-
