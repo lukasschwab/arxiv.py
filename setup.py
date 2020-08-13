@@ -14,6 +14,7 @@ setup(
     install_requires=[
         'feedparser',
         'requests',
+        'click',
     ],
     tests_require=[
         "pytest",
@@ -33,4 +34,9 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
+    entry_points={
+        "console_scripts": [
+            "arxiv-download=arxiv.scripts.download:main"
+        ],
+    },
 )
