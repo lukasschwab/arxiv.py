@@ -207,7 +207,8 @@ class Search(object):
 
 
 def query(query="", id_list=[], prune=True, max_results=None, start=0, sort_by="relevance",
-          sort_order="descending", max_chunk_results=1000, iterative=False):
+          sort_order="descending", max_chunk_results=1000, iterative=False,
+          time_sleep=3):
     """
     See :py:class:`arxiv.Search` for a description of the parameters.
     """
@@ -220,7 +221,8 @@ def query(query="", id_list=[], prune=True, max_results=None, start=0, sort_by="
         prune=prune,
         max_results=max_results,
         start = start,
-        max_chunk_results=max_chunk_results)
+        max_chunk_results=max_chunk_results, 
+        time_sleep=time_sleep)
 
     return search.download(iterative=iterative)
 
