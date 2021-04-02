@@ -102,10 +102,8 @@ class Search(object):
         """
 
         for key in self.prune_keys:
-            try:
-                del result['key']
-            except KeyError:
-                pass
+            if key in result:
+                del result[key]
 
         return result
 
