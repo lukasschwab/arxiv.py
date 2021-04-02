@@ -2,16 +2,19 @@
 # TODO: do I want to deprecate pruning/processing and prefer just the raw entries?
 # TODO: docstrings.
 # TODO: retries
+# TODO: generate and host documentation using pdoc: https://pdoc.dev/docs/pdoc.html#invoking-pdoc
 
 import logging, time, feedparser
 
 from urllib.parse import urlencode
 from urllib.request import urlretrieve
+from enum import Enum
 
 logger = logging.getLogger(__name__)
 
 class Client(object):
     query_url_format = 'http://export.arxiv.org/api/query?{}'
+    """The arXiv query API endpoint format."""
     prune_keys = [
         'updated_parsed',
         'published_parsed',
@@ -24,21 +27,33 @@ class Client(object):
         'title_detail',
         'tags',
         'id'
-    ]
+    ] # TODO: reevaluate pruning.
+
+    prune: bool
+    """Whether to remove unhelpful fields from search results."""
+    page_size: int
+    """Maximum number of results fetched in a single API request."""
+    time_sleep: int
+    """Number of seconds to wait between API requests."""
+    num_retries: int
+    """Number of times to retry a failing API request."""
 
     # TODO: implement client
     def __init__(self, prune=True, page_size=1000, time_sleep=3, num_retries=3):
+        """
+        Construct an arXiv API client.
+        """
         self.prune = prune
         self.page_size = page_size
         self.time_sleep = time_sleep
         self.num_retries = num_retries
         return
 
-    def query(search):
-        # TODO
-        return []
-
-    def _iterator(self, search):
+    def query(self, search):
+        """
+        query returns a generator of entries matching search using self's
+        client configuration.
+        """
         offset = 0
         # Placeholder; this may be reduced according to the feed's opensearch:totalResults value.
         total_results = search.max_results
@@ -57,6 +72,10 @@ class Client(object):
                 yield self._process_entry(entry)
 
     def _format_url(self, search, start, page_size):
+        """
+        Construct a request API for search that returns up to `page_size`
+        results starting with the result at index `start`.
+        """
         url_args = search.url_args()
         url_args.update({
             "start": start,
@@ -84,8 +103,51 @@ class Client(object):
                     del entry[key]
         return entry
 
+class SortCriterion(Enum):
+    """
+    A SortCriterion identifies a property by which search results can be
+    sorted. See [the arXiv API User's Manual: sort order for return
+    results](https://arxiv.org/help/api/user-manual#sort).
+    """
+    Relevance = "relevance"
+    LastUpdatedDate = "lastUpdatedDate"
+    SubmittedDate = "submittedDate"
+
+class SortOrder(Enum):
+    """
+    A SortOrder indicates order in which search results are sorted according
+    to the specified arxiv.SortCriterion. See [the arXiv API User's Manual: sort
+    order for return results](https://arxiv.org/help/api/user-manual#sort).
+    """
+    Ascending = "ascending"
+    Descending = "descending"
+
 class Search(object):
-    def __init__(self, query="", id_list=[], max_results=float('inf'), sort_by="relevance", sort_order="descending"):
+    """
+    A specification for a search of arXiv's database. To run a search, use
+    arxiv.query or arxiv.Client.query.
+    """
+
+    query: str
+    """A string query. See [the arXiv API User's Manual: Details of Query
+    Construction](https://arxiv.org/help/api/user-manual#query_details)."""
+    id_list: list
+    """
+    A list of arXiv article IDs to which to limit the search. See [the arXiv
+    API User's Manual](https://arxiv.org/help/api/user-manual#search_query_and_id_list)
+    for documentation of the interaction between `query` and `id_list`.
+    """
+    max_results: float
+    """
+    The maximum number of results to be returned in an execution of this
+    search. To fetch every result available, set `max_results=float('inf')`.
+    """
+    sort_by: SortCriterion
+    """The sort criterion for results."""
+    sort_order: SortOrder
+    """The sort order for results."""
+
+    def __init__(self, query="", id_list=[], max_results=float('inf'), sort_by=SortCriterion.Relevance, sort_order=SortOrder.Descending):
         self.query = query
         self.id_list = id_list
         self.max_results = max_results
@@ -93,19 +155,20 @@ class Search(object):
         self.sort_order = sort_order
     
     def url_args(self):
+        """
+        Returns a dict of search parameters that should be included in an API
+        request for this search.
+        """
         return {
             "search_query": self.query,
             "id_list": ','.join(self.id_list),
-            "sortBy": self.sort_by,
-            "sortOrder": self.sort_order
+            "sortBy": self.sort_by.value,
+            "sortOrder": self.sort_order.value
         }
-    
-    def default():
-        return Search()
 
 def query(search):
     """
-    query returns a generator of entries matching search using a default arxiv.Client.
+    Returns a generator of entries matching search using a default arxiv.Client.
     """
     return Client().query(search)
 
@@ -117,7 +180,8 @@ def to_filename(entry, extension=".pdf"):
 
 def download(entry, dirpath='./', to_filename=to_filename, prefer_source_tarfile=False):
     """
-    Download the .pdf corresponding to the result object 'obj'. If prefer_source_tarfile==True, download the source .tar.gz instead.
+    Download the .pdf corresponding to the result `entry`. If
+    `prefer_source_tarfile`, download the .tar.gz source archive instead.
     """
     url = entry.get('pdf_url')
     if not url:
