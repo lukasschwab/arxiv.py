@@ -17,6 +17,7 @@ setup(
     tests_require=[
         "pytest",
         "pdoc",
+        "flake8"
     ],
     # metadata for upload to PyPI
     author="Lukas Schwab",

@@ -3,7 +3,10 @@ TESTS := ${wildcard tests/*.py}
 
 .PHONY: all test docs clean
 
-all: test docs
+all: lint test docs
+
+lint:
+	flake8 $(SOURCE) $(TESTS) --ignore=E501
 
 test: $(SOURCE) $(TESTS)
 	pytest

@@ -1,4 +1,6 @@
-import arxiv, unittest, re
+import arxiv
+import unittest
+import re
 
 
 class TestAPI(unittest.TestCase):
@@ -9,9 +11,9 @@ class TestAPI(unittest.TestCase):
 
     def assert_valid_author(self, a: arxiv.Result.Author):
         self.assert_nonempty(a.name)
-    
-    def assert_valid_link(self, l: arxiv.Result.Link):
-        self.assert_nonempty(l.href)
+
+    def assert_valid_link(self, link: arxiv.Result.Link):
+        self.assert_nonempty(link.href)
 
     def assert_valid_result(self, result: arxiv.Result):
         self.assert_nonempty(result.entry_id)
@@ -31,13 +33,16 @@ class TestAPI(unittest.TestCase):
 
     def test_result_shape(self):
         max_results = 100
-        results = [r for r in arxiv.Search("testing", max_results=max_results).get()]
+        search = arxiv.Search("testing", max_results=max_results)
+        results = [r for r in search.get()]
         self.assertEqual(len(results), max_results)
         for result in results:
             self.assert_valid_result(result)
-    
+
     def test_from_feed_entry(self):
-        feed = arxiv.Client()._parse_feed("http://export.arxiv.org/api/query?search_query=testing")
+        feed = arxiv.Client()._parse_feed(
+            "http://export.arxiv.org/api/query?search_query=testing"
+        )
         feed_entry = feed.entries[0]
         result = arxiv.Result._from_feed_entry(feed_entry)
         self.assert_valid_result(result)

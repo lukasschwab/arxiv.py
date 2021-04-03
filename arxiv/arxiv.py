@@ -2,7 +2,11 @@
 #   Look into the API behavior; we probably still get 200s, but with feed
 #   entries indicating errors.
 
-import logging, time, feedparser, re, os
+import logging
+import time
+import feedparser
+import re
+import os
 
 from datetime import datetime
 from urllib.parse import urlencode
@@ -26,6 +30,7 @@ class Result(object):
     primary_category: str
     categories: List[str]
     links: list
+
     def __init__(
         self,
         entry_id: str,
@@ -72,7 +77,7 @@ class Result(object):
             categories=[tag.get('term') for tag in entry.tags],
             links=[Result.Link(link) for link in entry.links]
         )
-    
+
     def get_short_id(self) -> str:
         """
         Returns the short ID for this result. If the result URL is
@@ -80,12 +85,12 @@ class Result(object):
         returns `"0201082v1"`.
         """
         return self.entry_id.split('/')[-1]
-    
+
     def get_pdf_url(self) -> str:
         """
         Returns the URL of a PDF version of this result.
         """
-        pdf_links = [l.href for l in self.links if l.title == 'pdf']
+        pdf_links = [link.href for link in self.links if link.title == 'pdf']
         if len(pdf_links) == 0:
             raise ValueError("Result does not have a PDF link")
         elif len(pdf_links) > 1:
@@ -128,12 +133,13 @@ class Result(object):
         source_url = self.get_pdf_url().replace('/pdf/', '/src/')
         written_path, _ = urlretrieve(source_url, path)
         return written_path
-    
+
     class Author(object):
         """
         A light inner class for representing a result's authors.
         """
         name: str
+
         def __init__(self, entry_author: feedparser.FeedParserDict):
             self.name = entry_author.name
 
@@ -145,6 +151,7 @@ class Result(object):
         title: str
         rel: str
         content_type: str
+
         def __init__(self, feed_link: feedparser.FeedParserDict):
             self.href = feed_link.href
             self.title = feed_link.get('title')
@@ -176,7 +183,8 @@ class SortOrder(Enum):
 class Search(object):
     """
     A specification for a search of arXiv's database. To run a search, use
-    `Search.run` to use a default client or `Client.run` with a specific client.
+    `Search.run` to use a default client or `Client.run` with a specific
+    client.
     """
 
     query: str
@@ -202,11 +210,11 @@ class Search(object):
 
     def __init__(
         self,
-        query:str="",
-        id_list:List[str]=[],
-        max_results:float=float('inf'),
-        sort_by:SortCriterion=SortCriterion.Relevance,
-        sort_order:SortOrder=SortOrder.Descending
+        query: str = "",
+        id_list: List[str] = [],
+        max_results: float = float('inf'),
+        sort_by: SortCriterion = SortCriterion.Relevance,
+        sort_order: SortOrder = SortOrder.Descending
     ):
         """
         Construct an arXiv API search.
@@ -216,7 +224,7 @@ class Search(object):
         self.max_results = max_results
         self.sort_by = sort_by
         self.sort_order = sort_order
-    
+
     def _url_args(self) -> Dict[str, str]:
         """
         Returns a dict of search parameters that should be included in an API
@@ -228,7 +236,7 @@ class Search(object):
             "sortBy": self.sort_by.value,
             "sortOrder": self.sort_order.value
         }
-    
+
     def get(self) -> Generator[Result, None, None]:
         """
         Executes the specified search using a default arXiv API client. For
@@ -249,9 +257,9 @@ class Client(object):
 
     def __init__(
         self,
-        page_size:int=100,
-        delay_seconds:int=3,
-        num_retries:int=3
+        page_size: int = 100,
+        delay_seconds: int = 3,
+        num_retries: int = 3
     ):
         """
         Construct an arXiv API client.
@@ -277,7 +285,7 @@ class Client(object):
             if not first_page:
                 time.sleep(self.delay_seconds)
             # Request next page of results.
-            page_size = min(self.page_size, search.max_results-offset)
+            page_size = min(self.page_size, search.max_results - offset)
             page_url = self._format_url(search, offset, page_size)
             feed = self._parse_feed(page_url, first_page)
             if first_page:
@@ -311,8 +319,12 @@ class Client(object):
             "max_results": page_size,
         })
         return self.query_url_format.format(urlencode(url_args))
-    
-    def _parse_feed(self, url: str, first_page: bool = True) -> feedparser.FeedParserDict:
+
+    def _parse_feed(
+        self,
+        url: str,
+        first_page: bool = True
+    ) -> feedparser.FeedParserDict:
         """
         Fetches the specified URL and parses it with feedparser. If a request
         fails or is unexpectedly empty, `_parse_feed` retries the request up to
