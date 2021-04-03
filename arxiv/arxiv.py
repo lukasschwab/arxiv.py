@@ -3,6 +3,7 @@
 # TODO: docstrings.
 # TODO: retries
 # TODO: generate and host documentation using pdoc: https://pdoc.dev/docs/pdoc.html#invoking-pdoc
+# Throw the docs-generating pdoc call into a pre-commit hook.
 
 import logging, time, feedparser
 
@@ -33,26 +34,29 @@ class Client(object):
     """Whether to remove unhelpful fields from search results."""
     page_size: int
     """Maximum number of results fetched in a single API request."""
-    time_sleep: int
+    delay_seconds: int
     """Number of seconds to wait between API requests."""
     num_retries: int
     """Number of times to retry a failing API request."""
 
     # TODO: implement client
-    def __init__(self, prune=True, page_size=1000, time_sleep=3, num_retries=3):
+    def __init__(self, prune=True, page_size=1000, delay_seconds=3, num_retries=3):
         """
         Construct an arXiv API client.
         """
         self.prune = prune
         self.page_size = page_size
-        self.time_sleep = time_sleep
+        self.delay_seconds = delay_seconds
         self.num_retries = num_retries
         return
 
-    def query(self, search):
+    def get(self, search):
         """
-        query returns a generator of entries matching search using self's
-        client configuration.
+        Uses this client configuration to fetch one page of the search at a
+        time, yielding the search results one by one, until `max_results`
+        results have been yielded or there are no more search results.
+
+        For more on using generators, see [Generators](https://wiki.python.org/moin/Generators).
         """
         offset = 0
         # Placeholder; this may be reduced according to the feed's opensearch:totalResults value.
@@ -60,7 +64,7 @@ class Client(object):
         first_page = True
         while offset < total_results:
             if not first_page:
-                time.sleep(self.time_sleep)
+                time.sleep(self.delay_seconds)
             page_size = min(self.page_size, search.max_results-offset)
             page_url = self._format_url(search, offset, page_size)
             feed = self._parse_feed(page_url)
@@ -116,8 +120,8 @@ class SortCriterion(Enum):
 class SortOrder(Enum):
     """
     A SortOrder indicates order in which search results are sorted according
-    to the specified arxiv.SortCriterion. See [the arXiv API User's Manual: sort
-    order for return results](https://arxiv.org/help/api/user-manual#sort).
+    to the specified arxiv.SortCriterion. See [the arXiv API User's Manual:
+    sort order for return results](https://arxiv.org/help/api/user-manual#sort).
     """
     Ascending = "ascending"
     Descending = "descending"
@@ -125,12 +129,14 @@ class SortOrder(Enum):
 class Search(object):
     """
     A specification for a search of arXiv's database. To run a search, use
-    arxiv.query or arxiv.Client.query.
+    `query` or `Client.query`.
     """
 
     query: str
-    """A string query. See [the arXiv API User's Manual: Details of Query
-    Construction](https://arxiv.org/help/api/user-manual#query_details)."""
+    """
+    A string query. See [the arXiv API User's Manual: Details of Query
+    Construction](https://arxiv.org/help/api/user-manual#query_details).
+    """
     id_list: list
     """
     A list of arXiv article IDs to which to limit the search. See [the arXiv
@@ -165,12 +171,13 @@ class Search(object):
             "sortBy": self.sort_by.value,
             "sortOrder": self.sort_order.value
         }
-
-def query(search):
-    """
-    Returns a generator of entries matching search using a default arxiv.Client.
-    """
-    return Client().query(search)
+    
+    def get(self):
+        """
+        Executes the specified search using a default arXiv API client. For
+        info on those defauts see `Client`; see also `Client.get`.
+        """
+        return Client().get(self)
 
 def to_filename(entry, extension=".pdf"):
     entry_id = entry.get('pdf_url').split('/')[-1]
