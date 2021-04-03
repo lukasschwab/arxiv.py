@@ -17,9 +17,6 @@ logger = logging.getLogger(__name__)
 class Client(object):
     query_url_format = 'http://export.arxiv.org/api/query?{}'
     """The arXiv query API endpoint format."""
-
-    prune: bool
-    """Whether to remove unhelpful fields from search results."""
     page_size: int
     """Maximum number of results fetched in a single API request."""
     delay_seconds: int
@@ -27,11 +24,10 @@ class Client(object):
     num_retries: int
     """Number of times to retry a failing API request."""
 
-    def __init__(self, prune=True, page_size=100, delay_seconds=3, num_retries=3):
+    def __init__(self, page_size=100, delay_seconds=3, num_retries=3):
         """
         Construct an arXiv API client.
         """
-        self.prune = prune
         self.page_size = page_size
         self.delay_seconds = delay_seconds
         self.num_retries = num_retries
