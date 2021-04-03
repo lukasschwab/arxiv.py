@@ -52,7 +52,6 @@ class Result(object):
         Converts a feedparser entry for an arXiv search result feed into a
         Result object.
         """
-        print(entry)
         return Result(
             entry_id=entry.id,
             updated=entry.updated_parsed,
@@ -80,9 +79,7 @@ class Result(object):
         """
         pdf_links = [l.href for l in self.links if l.title == 'pdf']
         if len(pdf_links) == 0:
-            logger.warn("%s does not have a PDF link", self.get_short_id())
-            # TODO: raise an error
-            return ""
+            raise ValueError("Result does not have a PDF link")
         elif len(pdf_links) > 1:
             logger.warn("%s has multiple PDF links; using %s", self.get_short_id(), pdf_links[0].href)
         return pdf_links[0]
