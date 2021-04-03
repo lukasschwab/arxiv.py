@@ -75,13 +75,21 @@ class Client(object):
         return self.query_url_format.format(urlencode(url_args))
     
     def _parse_feed(self, url):
-        print("##### GETTING", url)
         for t in range(self.num_retries):
+            logger.info("Requesting feed", extra={'try': t, 'url': url})
             feed = feedparser.parse(url)
-            if feed.status == 200 and len(feed.entries) > 0:
+            if feed.status != 200:
+                logger.error(
+                    "Requesting feed: HTTP error",
+                    extra={'status': feed.status, 'try': t, 'url': url}
+                )
+            elif len(feed_entries) == 0:
+                logger.info(
+                    "Requesting feed: expected entries",
+                    extra={'try': t, 'url': url}
+                )
+            else:
                 return feed
-            logger.error("HTTP Error {} in query on try {}".format(feed.get('status', 'no status'), t))
-            print("##### Retrying", url)
         # TODO: raise an exception. This page really can't be fetched.
         raise Exception("Could not parse feed at URL")
 
