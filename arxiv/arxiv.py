@@ -1,5 +1,3 @@
-# TODO: generate and host documentation using pdoc: https://pdoc.dev/docs/pdoc.html#invoking-pdoc
-#   Throw the docs-generating pdoc call into a pre-commit hook.
 # TODO: errors and error handling, at least for the network calls.
 #   Look into the API behavior; we probably still get 200s, but with feed
 #   entries indicating errors.
@@ -31,8 +29,8 @@ class Result(object):
     def __init__(
         self,
         entry_id: str,
-        updated: datetime =datetime.now(),
-        published: datetime =datetime.now(),
+        updated: datetime = datetime.min,
+        published: datetime = datetime.min,
         title: str = "",
         authors: List['Result.Author'] = [],
         summary: str = "",

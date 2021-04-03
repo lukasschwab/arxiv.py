@@ -240,8 +240,8 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">entry_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">updated</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
-        <span class="n">published</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+        <span class="n">updated</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">min</span><span class="p">,</span>
+        <span class="n">published</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">min</span><span class="p">,</span>
         <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="n">authors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s1">&#39;Result.Author&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
         <span class="n">summary</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -577,8 +577,8 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">entry_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">updated</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
-        <span class="n">published</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+        <span class="n">updated</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">min</span><span class="p">,</span>
+        <span class="n">published</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">min</span><span class="p">,</span>
         <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="n">authors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s1">&#39;Result.Author&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
         <span class="n">summary</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -712,8 +712,8 @@
         
             <span class="name">Result</span><span class="signature">(
     entry_id: str,
-    updated: datetime.datetime = datetime.datetime(2021, 4, 3, 16, 9, 7, 145262),
-    published: datetime.datetime = datetime.datetime(2021, 4, 3, 16, 9, 7, 145280),
+    updated: datetime.datetime = datetime.datetime(1, 1, 1, 0, 0),
+    published: datetime.datetime = datetime.datetime(1, 1, 1, 0, 0),
     title: str = &#39;&#39;,
     authors: list[<a href="#Result.Author">arxiv.arxiv.Result.Author</a>] = [],
     summary: str = &#39;&#39;,
@@ -729,8 +729,8 @@
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">entry_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">updated</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
-        <span class="n">published</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+        <span class="n">updated</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">min</span><span class="p">,</span>
+        <span class="n">published</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">min</span><span class="p">,</span>
         <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="n">authors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s1">&#39;Result.Author&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
         <span class="n">summary</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
