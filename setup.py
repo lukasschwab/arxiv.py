@@ -9,7 +9,6 @@ setup(
     name="arxiv",
     version=version,
     packages=["arxiv"],
-
     # dependencies
     install_requires=[
         'feedparser',
@@ -17,6 +16,7 @@ setup(
     ],
     tests_require=[
         "pytest",
+        "pdoc",
     ],
     # metadata for upload to PyPI
     author="Lukas Schwab",
