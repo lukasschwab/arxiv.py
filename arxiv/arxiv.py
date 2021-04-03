@@ -83,7 +83,7 @@ class Client(object):
                     "Requesting feed: HTTP error",
                     extra={'status': feed.status, 'try': t, 'url': url}
                 )
-            elif len(feed_entries) == 0:
+            elif len(feed.entries) == 0:
                 logger.info(
                     "Requesting feed: expected entries",
                     extra={'try': t, 'url': url}
