@@ -1,34 +1,22 @@
-# TODO: rename this file to arxiv.py
-# TODO: do I want to deprecate pruning/processing and prefer just the raw entries?
 # TODO: docstrings.
-# TODO: retries
 # TODO: generate and host documentation using pdoc: https://pdoc.dev/docs/pdoc.html#invoking-pdoc
-# Throw the docs-generating pdoc call into a pre-commit hook.
+#   Throw the docs-generating pdoc call into a pre-commit hook.
+# TODO: errors and error handling, at least for the network calls.
+#   Look into the API behavior; we probably still get 200s, but with feed
+#   entries indicating errors.
 
 import logging, time, feedparser
 
 from urllib.parse import urlencode
-from urllib.request import urlretrieve
 from enum import Enum
+
+from .result import Result
 
 logger = logging.getLogger(__name__)
 
 class Client(object):
     query_url_format = 'http://export.arxiv.org/api/query?{}'
     """The arXiv query API endpoint format."""
-    prune_keys = [
-        'updated_parsed',
-        'published_parsed',
-        'arxiv_primary_category',
-        'summary_detail',
-        'author',
-        'author_detail',
-        'links',
-        'guidislink',
-        'title_detail',
-        'tags',
-        'id'
-    ] # TODO: reevaluate pruning.
 
     prune: bool
     """Whether to remove unhelpful fields from search results."""
@@ -39,8 +27,7 @@ class Client(object):
     num_retries: int
     """Number of times to retry a failing API request."""
 
-    # TODO: implement client
-    def __init__(self, prune=True, page_size=1000, delay_seconds=3, num_retries=3):
+    def __init__(self, prune=True, page_size=100, delay_seconds=3, num_retries=3):
         """
         Construct an arXiv API client.
         """
@@ -73,7 +60,7 @@ class Client(object):
                 first_page = False
             offset += len(feed.entries)
             for entry in feed.entries:
-                yield self._process_entry(entry)
+                yield Result._from_feed_entry(entry)
 
     def _format_url(self, search, start, page_size):
         """
@@ -97,15 +84,6 @@ class Client(object):
             print("##### Retrying", url)
         # TODO: raise an exception. This page really can't be fetched.
         raise Exception("Could not parse feed at URL")
-    
-    def _process_entry(self, entry):
-        # TODO: there's much more than just pruning in the last one.
-        # Probably actually define a well-typed entry class.
-        if self.prune:
-            for key in Client.prune_keys:
-                if key in entry:
-                    del entry[key]
-        return entry
 
 class SortCriterion(Enum):
     """
@@ -178,28 +156,3 @@ class Search(object):
         info on those defauts see `Client`; see also `Client.get`.
         """
         return Client().get(self)
-
-def to_filename(entry, extension=".pdf"):
-    entry_id = entry.get('pdf_url').split('/')[-1]
-    # Remove special characters from object title
-    title = '_'.join(re.findall(r'\w+', obj.get('title', 'UNTITLED')))
-    return "{}.{}{}".format(entry_id, title, extension)
-
-def download(entry, dirpath='./', to_filename=to_filename, prefer_source_tarfile=False):
-    """
-    Download the .pdf corresponding to the result `entry`. If
-    `prefer_source_tarfile`, download the .tar.gz source archive instead.
-    """
-    url = entry.get('pdf_url')
-    if not url:
-        print("Object has no PDF URL.")
-        return
-    if dirpath[-1] != '/':
-        dirpath += '/'
-    if prefer_source_tarfile:
-        url = re.sub(r'/pdf/', "/src/", url)
-        path = dirpath + to_filename(obj) + '.tar.gz'
-    else:
-        path = dirpath + to_filename(obj) + '.pdf'
-    urlretrieve(url, path)
-    return path
