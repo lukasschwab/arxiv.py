@@ -17,7 +17,6 @@ setup(
     ],
     tests_require=[
         "pytest",
-        "numpy",
     ],
     # metadata for upload to PyPI
     author="Lukas Schwab",

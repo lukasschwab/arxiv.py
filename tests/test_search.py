@@ -5,7 +5,6 @@ except ImportError:
     from mock import patch
 from arxiv import Search
 from arxiv import query
-import numpy as np
 import feedparser
 
 try:
