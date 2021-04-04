@@ -38,7 +38,8 @@ arxiv.query(
   sort_order="descending",
   prune=True,
   iterative=False,
-  max_chunk_results=1000
+  max_chunk_results=1000,
+  time_sleep=3
 )
 ```
 
@@ -53,6 +54,7 @@ arxiv.query(
 | `prune`        | boolean         | `True`         |
 | `iterative`    | boolean         | `False`        |
 | `max_chunk_results` | int        | 1000           |
+| `time_sleep` | int        | 3           |
 
 + `query`: an arXiv query string. Format documented [here](https://arxiv.org/help/api/user-manual#Quickstart).
   + **Note:** multi-field queries must be space-delimited. `au:balents_leon AND cat:cond-mat.str-el` is valid; `au:balents_leon+AND+cat:cond-mat.str-el` is *not* valid.
@@ -72,6 +74,8 @@ arxiv.query(
 + `iterative`: when `True`, `query()` will return an iterator. Otherwise, `query()` iterates internally and returns the full list of results.
 
 + `max_chunk_results`: the maximum number of abstracts ot be retrieved by a single internal request to the arXiv API.
+
++ `time_sleep`: the time between single internal requests to the arXiv API. If using long queries time sleep should be made longer otherwise it may lead to inconsistent results.
 
 **Query examples:**
 
