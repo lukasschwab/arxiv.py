@@ -1,17 +1,23 @@
-SOURCE := ${wildcard ./arxiv/*.py}
-TESTS := ${wildcard tests/*.py}
+source := ${wildcard ./arxiv/*.py}
+tests := ${wildcard tests/*.py}
 
-.PHONY: all test docs clean
+.PHONY: all lint lint-ci test docs clean
 
 all: lint test docs
 
-lint:
-	flake8 $(SOURCE) $(TESTS) --ignore=E501
+lint: $(source) $(tests)
+	flake8 .
 
-test: $(SOURCE) $(TESTS)
+lint-ci: $(source) $(tests)
+	# stop the build if there are Python syntax errors or undefined names.
+	flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+	# exit-zero treats all errors as warnings. Warn about complexity.
+	flake8 . --count --exit-zero --max-complexity=10 --statistics
+
+test: $(source) $(tests)
 	pytest
 
-docs: $(SOURCE)
+docs: $(source)
 	pdoc arxiv -o docs
 	mv docs/arxiv/arxiv.html docs/index.html
 	rm docs/arxiv.html

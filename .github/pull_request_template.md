@@ -2,14 +2,15 @@
 
 # Description
 
-# Breaking changes
-List any changes that break the API usage supported on `master`.
+## Breaking changes
+> List any changes that break the API usage supported on `master`.
 
 # Relevant issues
-List [GitHub issues](https://github.com/lukasschwab/arxiv.py/issues) relevant to this change.
+> List [GitHub issues](https://github.com/lukasschwab/arxiv.py/issues) relevant to this change.
 
 # Checklist
 
-- [ ] All tests pass: run `python setupy.py test`.
-- [ ] All API changes are documented in `README.md`.
-- [ ] Ready for review.
+- [ ] All lint rules are satisfied: run `make lint`.
+- [ ] All tests pass: run `make test`.
+- [ ] All documentation is regenerated: run `make docs`.
+- [ ] (If appropriate) `README.md` example usage has been updated.
