@@ -1,0 +1,6 @@
+feedparser>=6.0.2
+
+# Development dependencies
+pytest>=6.2.2
+flake8>=3.9.0
+pdoc>=6.4.2
