@@ -1,4 +1,4 @@
-# arxiv.py [![Python 3.6](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/) ![PyPI](https://img.shields.io/pypi/v/arxiv)
+# arxiv.py [![Python 3.6](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/) ![PyPI](https://img.shields.io/pypi/v/arxiv) ![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/lukasschwab/arxiv.py/python-lint-test/master)
 
 Python wrapper for [the arXiv API](http://arxiv.org/help/api/index).
 

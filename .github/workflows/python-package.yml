@@ -1,7 +1,5 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
-name: Python package
+# Run `make lint test`: flake8 and pytest.
+name: python-lint-test
 
 on:
   push:
