@@ -1,6 +1,6 @@
 from setuptools import setup
 
-version = "0.5.4"
+version = "1.0.0"
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -9,7 +9,6 @@ setup(
     name="arxiv",
     version=version,
     packages=["arxiv"],
-
     # dependencies
     install_requires=[
         'feedparser',
@@ -17,7 +16,8 @@ setup(
     ],
     tests_require=[
         "pytest",
-        "numpy",
+        "pdoc",
+        "flake8"
     ],
     # metadata for upload to PyPI
     author="Lukas Schwab",
