@@ -1,7 +1,6 @@
 # TODO: errors and error handling, at least for the network calls.
 #   Look into the API behavior; we probably still get 200s, but with feed
 #   entries indicating errors.
-# TODO: update README
 # TODO: add contributor guidelines
 
 import logging

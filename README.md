@@ -1,6 +1,13 @@
-# arxiv.py [![Python 3.6](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/)
+# arxiv.py [![Python 3.6](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/) ![PyPI](https://img.shields.io/pypi/v/arxiv)
 
 Python wrapper for [the arXiv API](http://arxiv.org/help/api/index).
+
+## Quick links
+
++ [Full package documentation](http://lukasschwab.me/arxiv.py/index.html)
++ [Example: fetching results](#example-fetching-results): the most common usage.
++ [Example: downloading papers](#example-downloading-papers)
++ [Example: fetching results with a custom client](#example-fetching-results-with-a-custom-client)
 
 ## About arXiv
 
@@ -17,7 +24,7 @@ $ pip install arxiv
 Verify the installation with
 
 ```bash
-$ python setup.py test
+$ make test
 ```
 
 In your Python script, include the line
@@ -26,126 +33,140 @@ In your Python script, include the line
 import arxiv
 ```
 
-### Query
+### Search
+
+A `Search` specifies a search of arXiv's database.
 
 ```python
-arxiv.query(
-  query="",
-  id_list=[],
-  max_results=None,
-  start = 0,
-  sort_by="relevance",
-  sort_order="descending",
-  prune=True,
-  iterative=False,
-  max_chunk_results=1000,
-  time_sleep=3
+arxiv.Search(
+  query: str = "",
+  id_list: List[str] = [],
+  max_results: float = float('inf'),
+  sort_by: SortCriterion = SortCriterion.Relevanvce,
+  sort_order: SortOrder = SortOrder.Descending
 )
 ```
 
-| **Argument**   | **Type**        | **Default**    |
-|----------------|-----------------|----------------|
-| `query`        | string          | `""`           |
-| `id_list`      | list of strings | `[]`           |
-| `max_results`  | int             | 10             |
-| `start`        | int             | 0              |
-| `sort_by`      | string          | `"relevance"`  |
-| `sort_order`   | string          | `"descending"` |
-| `prune`        | boolean         | `True`         |
-| `iterative`    | boolean         | `False`        |
-| `max_chunk_results` | int        | 1000           |
-| `time_sleep` | int        | 3           |
++ `query`: an arXiv query string. Advanced query formats are documented in the [arXiv API User Manual](https://arxiv.org/help/api/user-manual#query_details).
++ `id_list`: list of arXiv record IDs (typically of the format `"0710.5765v1"`). See [the arXiv API User's Manual](https://arxiv.org/help/api/user-manual#search_query_and_id_list) for documentation of the interaction between `query` and `id_list`.
++ `max_results`: The maximum number of results to be returned in an execution of this search. To fetch every result available, set `max_results=float('inf')` (default); to fetch up to 10 results, set `max_results=10`. The API's limit is 300,000 results.
++ `sort_by`: The sort criterion for results: `relevance`, `lastUpdatedDate`, or `submittedDate`.
++ `sort_order`: The sort order for results: `'descending'` or `'ascending'`.
 
-+ `query`: an arXiv query string. Format documented [here](https://arxiv.org/help/api/user-manual#Quickstart).
-  + **Note:** multi-field queries must be space-delimited. `au:balents_leon AND cat:cond-mat.str-el` is valid; `au:balents_leon+AND+cat:cond-mat.str-el` is *not* valid.
+To fetch arXiv records matching a `Search`, use `search.run()` or `(Client).run(search)` to get a generator yielding `Result`s.
 
-+ `id_list`: list of arXiv record IDs (typically of the format `"0710.5765v1"`).
+#### Example: fetching results
 
-+ `max_results`: the maximum number of results returned by the query. Note: if this is unset amd `iterative=False`, the call to `query` can take a long time to resolve.
-
-+ `start`: the offset of the first returned object from the arXiv query results.
-
-+ `sort_by`: the arXiv field by which the result should be sorted.
-
-+ `sort_order`: the sorting order, i.e. "ascending", "descending" or None.
-
-+ `prune`: when `True`, received abstract objects will be simplified.
-
-+ `iterative`: when `True`, `query()` will return an iterator. Otherwise, `query()` iterates internally and returns the full list of results.
-
-+ `max_chunk_results`: the maximum number of abstracts ot be retrieved by a single internal request to the arXiv API.
-
-+ `time_sleep`: the time between single internal requests to the arXiv API. If using long queries time sleep should be made longer otherwise it may lead to inconsistent results.
-
-**Query examples:**
+Print the titles fo the 10 most recent articles related to the keyword "quantum:"
 
 ```python
 import arxiv
 
-# Keyword queries
-arxiv.query(query="quantum", max_results=100)
-
-# Multi-field queries
-arxiv.query(query="au:balents_leon AND cat:cond-mat.str-el")
-
-# Get single record by ID
-arxiv.query(id_list=["1707.08567"])
-
-# Get multiple records by ID
-arxiv.query(id_list=["1707.08567", "1707.08567"])
-
-# Get an interator over query results
-result = arxiv.query(
-  query="quantum",
-  max_chunk_results=10,
-  max_results=100,
-  iterative=True
+search = arxiv.Search(
+  query = "quantum",
+  max_results = 10,
+  sort_by = arxiv.SortCriterion.SubmittedDate
 )
 
-for paper in result():
-   print(paper)
+for result in search.get():
+  print(result.title)
 ```
 
-For a more detailed description of the interaction between the `query` and `id_list` arguments, see [this section of the arXiv documentation](https://arxiv.org/help/api/user-manual#search_query_and_id_list).
-
-### Download article PDF or source tarfile
-
-```python
-arxiv.arxiv.download(obj, dirpath='./', slugify=slugify, prefer_source_tarfile=False)
-```
-
-| **Argument**            | **Type** | **Default**     | **Required?** |
-|-------------------------|----------|-----------------|---------------|
-| `obj`                   | dict     | N/A             | Yes           |
-| `dirpath`               | string   | `"./"`          | No            |
-| `slugify`               | function | `arxiv.slugify` | No            |
-| `prefer_source_tarfile` | bool     | `False`         | No            |
-
-+ `obj` is a result object, one of a list returned by query(). `obj` must at minimum contain values corresponding to `pdf_url` and `title`.
-
-+ `dirpath` is the relative directory path to which the downloaded PDF will be saved. It defaults to the present working directory.
-
-+ `slugify` is a function that processes `obj` into a filename. By default, `arxiv.download(obj)` prepends the object ID to the object title.
-
-+ If `prefer_source_tarfile` is `True`, this function will download the source files for `obj`––rather than the rendered PDF––in .tar.gz format.
+Fetch and print the title of the paper with ID "1605.08386v1:"
 
 ```python
 import arxiv
 
-# Query for a paper of interest, then download it.
-paper = arxiv.query(id_list=["1707.08567"])[0]
-arxiv.download(paper)
+search = arxiv.Search(id_list=["1605.08386v1"])
+paper = next(search.get())
+print(paper.title)
+```
 
-# You can skip the query step if you have the paper info.
-paper2 = {"pdf_url": "http://arxiv.org/pdf/1707.08567v1",
-          "title": "The Paper Title"}
-arxiv.download(paper2)
+### Result
 
-# Use prefer_source_tarfile to download the gzipped tar file.
-arxiv.download(paper, prefer_source_tarfile=True)
+<!-- TODO: improve this section. -->
 
-# Override the default filename format by defining a slugify function.
-arxiv.download(paper, slugify=lambda paper: paper.get('id').split('/')[-1])
+The `Result` objects yielded by `(Search).get()` include metadata about each paper and some helper functions for downloading their content.
+
+The meaning of the underlying raw data is documented in the [arXiv API User Manual: Details of Atom Results Returned](https://arxiv.org/help/api/user-manual#_details_of_atom_results_returned).
+
++ `result.entry_id`: A url `http://arxiv.org/abs/{id}`.
++ `result.updated`: When the result was last updated.
++ `result.published`: When the result was originally published.
++ `result.title`: The title of the result.
++ `result.authors`: The result's authors, as `arxiv.Author`s.
++ `result.summary`: The result abstract.
++ `result.comment`: The authors' comment if present.
++ `result.primary_category`: The result's primary arXiv category. See [arXiv: Category Taxonomy](https://arxiv.org/category_taxonomy).
++ `result.categories`: All of the result's categories. See [arXiv: Category Taxonomy](https://arxiv.org/category_taxonomy).
++ `result.links`: Up to 3 given url's associated with this article, as `arxiv.Link`s.
+
+They also expose helper methods for downloading papers: `(Result).download_pdf()` and `(Result).download_source()`.
+
+#### Example: downloading papers
+
+To download a PDF of the paper with ID "1605.08386v1," run a `Search` and then use `(Result).download_pdf()`:
+
+```python
+import arxiv
+
+paper = next(arxiv.Search(id_list=["1605.08386v1"]).get())
+# Download the PDF to the PWD with a default filename.
+paper.download_pdf()
+# Download the PDF to the PWD with a custom filename.
+paper.download_pdf(filename="downloaded-paper.pdf")
+# Download the PDF to a specified directory with a custom filename.
+paper.download_pdf(dirpath="./mydir", filename="downloaded-paper.pdf")
+```
+
+The same interface is available for downloading .tar.gz files of the paper source:
+
+```python
+import arxiv
+
+paper = next(arxiv.Search(id_list=["1605.08386v1"]).get())
+# Download the archive to the PWD with a default filename.
+paper.download_source()
+# Download the archive to the PWD with a custom filename.
+paper.download_source(filename="downloaded-paper.tar.gz")
+# Download the archive to a specified directory with a custom filename.
+paper.download_source(dirpath="./mydir", filename="downloaded-paper.tar.gz")
+```
+
+### Client
+
+A `Client` specifies a strategy for fetching results from arXiv's API; it obscures pagination and retry logic.
+
+For most use cases the default client should suffice. You can construct it explicitly with `arxiv.Client()`, or use it via the `(Search).get()` method.
+
+```python
+arxiv.Client(
+  page_size: int = 100,
+  delay_seconds: int = 3,
+  num_retries: int = 3
+)
+```
+
++ `page_size`: the number of papers to fetch from arXiv per page of results. Smaller pages can be retrieved faster, but may require more round-trips. The API's limit is 2000 results.
++ `delay_seconds`: the number of seconds to wait between requests for pages. [arXiv's Terms of Use](https://arxiv.org/help/api/tou) ask that you "make no more than one request every three seconds."
++ `num_retries`: The number of times the client will retry a request that fails, either with a non-200 HTTP status code or with an unexpected number of results given the search parameters.
+
+#### Example: fetching results with a custom client
+
+`(Search).get()` uses the default client settings. If you want to use a client you've defined instead of the defaults, use `(Client).get(...)`:
+
+```python
+import arxiv
+
+big_slow_client = arxiv.Client(
+  page_size = 1000,
+  delay_seconds = 10,
+  num_retries = 5
+)
+
+# Prints 1000 titles before needing to make another request.
+for result in big_slow_client.get(arxiv.Search(query="quantum")):
+  print(result.title)
 ```
 
 ## Contributors
