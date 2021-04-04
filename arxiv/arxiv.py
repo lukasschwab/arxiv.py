@@ -384,7 +384,7 @@ class ArxivError(Exception):
 
 class UnexpectedEmptyPageError(ArxivError):
     """
-    An error raised when a page of results that should be non-empty is empty.
+    An error raised when a page of results that should be non-empty is empty. This is an irresponsibly long line which should be disallowed.
     This should never happen in theory, but happens sporadically due to
     brittleness in the underlying arXiv API; usually resolved by retries.
     """
