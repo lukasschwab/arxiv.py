@@ -28,3 +28,21 @@ class TestClient(unittest.TestCase):
         for r in search.get():
             self.assertFalse(r.entry_id in ids)
             ids.add(r.entry_id)
+
+    def test_retry(self):
+        num_retries = 2
+        broken_client = arxiv.Client(num_retries=num_retries)
+        # Always returns a 500 status.
+        broken_client.query_url_format = "https://httpstat.us/500?{}"
+
+        def broken_get():
+            search = arxiv.Search(query="quantum")
+            return next(broken_client.get(search))
+
+        self.assertRaises(arxiv.HTTPError, broken_get)
+        for num_retries in [2, 5]:
+            broken_client.num_retries = num_retries
+            try:
+                broken_get()
+            except arxiv.HTTPError as e:
+                self.assertEqual(e.retry, broken_client.num_retries - 1)

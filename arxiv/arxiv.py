@@ -1,8 +1,3 @@
-# TODO: errors and error handling, at least for the network calls.
-#   Look into the API behavior; we probably still get 200s, but with feed
-#   entries indicating errors.
-# TODO: add contributor guidelines
-
 import logging
 import time
 import feedparser
@@ -14,7 +9,7 @@ from urllib.parse import urlencode
 from urllib.request import urlretrieve
 
 from enum import Enum
-from typing import Generator, Dict, List
+from typing import Any, Dict, Generator, List
 
 logger = logging.getLogger(__name__)
 
@@ -261,12 +256,17 @@ class Search(object):
     def get(self) -> Generator[Result, None, None]:
         """
         Executes the specified search using a default arXiv API client. For
-        info on those defauts see `Client`; see also `Client.get`.
+        info on those defauts see `Client`; see also `(Client).get`.
         """
         return Client().get(self)
 
 
 class Client(object):
+    """
+    Specifies a strategy for fetching results from arXiv's API; it obscures
+    pagination and retry logic, and exposes `(Client).get`.
+    """
+
     query_url_format = 'http://export.arxiv.org/api/query?{}'
     """The arXiv query API endpoint format."""
     page_size: int
@@ -294,6 +294,8 @@ class Client(object):
         Uses this client configuration to fetch one page of the search at a
         time, yielding the search results one by one, until `max_results`
         results have been yielded or there are no more search results.
+
+        If all tries fail, raises an `UnexpectedEmptyPageError` or `HTTPError`.
 
         For more on using generators, see [Generators](https://wiki.python.org/moin/Generators).
         """
@@ -351,19 +353,65 @@ class Client(object):
         fails or is unexpectedly empty, `_parse_feed` retries the request up to
         `self.num_retries` times.
         """
-        for t in range(self.num_retries):
-            logger.info("Requesting feed", extra={'try': t, 'url': url})
+        err = None
+        for retry in range(self.num_retries):
+            logger.info("Requesting feed", extra={'retry': retry, 'url': url})
             feed = feedparser.parse(url)
             if feed.status != 200:
-                logger.error(
-                    "Requesting feed: HTTP error",
-                    extra={'status': feed.status, 'try': t, 'url': url}
-                )
+                err = HTTPError(url, retry, feed.status)
             elif len(feed.entries) == 0 and not first_page:
-                logger.info(
-                    "Requesting feed: expected entries",
-                    extra={'try': t, 'url': url}
-                )
+                err = UnexpectedEmptyPageError(url, retry)
             else:
                 return feed
-        raise Exception("Could not parse feed at URL")
+        # Raise the last exception encountered.
+        raise err
+
+
+class ArxivError(Exception):
+    url: str
+    """The feed URL that could not be fetched."""
+    message: str
+    """Message explaining what went wrong."""
+    extra: Dict[str, Any]
+    """Extra logging context."""
+    def __init__(self, url, message, extra={}):
+        self.url = url
+        self.message = message
+        self.extra = extra
+        logger.warning(self.message, extra=self.extra)
+        super().__init__(self.message)
+
+
+class UnexpectedEmptyPageError(ArxivError):
+    """
+    An error raised when a page of results that should be non-empty is empty.
+    This should never happen in theory, but happens sporadically due to
+    brittleness in the underlying arXiv API; usually resolved by retries.
+    """
+    retry: int
+    """The request retry number which encountered this error, zero-indexed."""
+    def __init__(self, url: str, retry: int):
+        self.url = url
+        self.retry = retry
+        super().__init__(
+            url,
+            "Page of results was unexpectedly empty",
+            extra={'retry': self.retry, 'url': self.url}
+        )
+
+
+class HTTPError(ArxivError):
+    """A non-200 status encountered while fetching a page of results."""
+    retry: int
+    """The request retry number which encountered this error, zero-indexed."""
+    status: int
+    """The HTTP status reported by feedparser."""
+    def __init__(self, url: str, retry: int, status: int):
+        self.retry = retry
+        self.url = url
+        self.status = status
+        super().__init__(
+            url,
+            "Page request resulted in HTTP {}".format(self.status),
+            extra={'status': self.status, 'retry': self.retry, 'url': self.url}
+        )
