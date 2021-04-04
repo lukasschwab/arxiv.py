@@ -21,12 +21,6 @@ Python wrapper for [the arXiv API](http://arxiv.org/help/api/index).
 $ pip install arxiv
 ```
 
-Verify the installation with
-
-```bash
-$ make test
-```
-
 In your Python script, include the line
 
 ```python

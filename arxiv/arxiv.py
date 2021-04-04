@@ -4,14 +4,15 @@ import feedparser
 import re
 import os
 
-from datetime import datetime
 from urllib.parse import urlencode
 from urllib.request import urlretrieve
 
 from enum import Enum
-from typing import Any, Dict, Generator, List
+from typing import Dict, Generator, List
 
 logger = logging.getLogger(__name__)
+
+_DEFAULT_TIME = time.struct_time((0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
 
 
 class Result(object):
@@ -23,9 +24,9 @@ class Result(object):
 
     entry_id: str
     """A url `http://arxiv.org/abs/{id}`."""
-    updated: datetime
+    updated: time.struct_time
     """When the result was last updated."""
-    published: datetime
+    published: time.struct_time
     """When the result was originally published."""
     title: str
     """The title of the result."""
@@ -51,8 +52,8 @@ class Result(object):
     def __init__(
         self,
         entry_id: str,
-        updated: datetime = datetime.min,
-        published: datetime = datetime.min,
+        updated: time.struct_time = _DEFAULT_TIME,
+        published: time.struct_time = _DEFAULT_TIME,
         title: str = "",
         authors: List['Result.Author'] = [],
         summary: str = "",
@@ -372,13 +373,10 @@ class ArxivError(Exception):
     """The feed URL that could not be fetched."""
     message: str
     """Message explaining what went wrong."""
-    extra: Dict[str, Any]
-    """Extra logging context."""
     def __init__(self, url, message, extra={}):
         self.url = url
         self.message = message
-        self.extra = extra
-        logger.warning(self.message, extra=self.extra)
+        logger.warning(self.message, extra=extra)
         super().__init__(self.message)
 
 
