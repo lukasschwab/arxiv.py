@@ -229,17 +229,38 @@
 
 
 <span class="k">class</span> <span class="nc">Result</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;An entry in an arXiv query results feed.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An entry in an arXiv query results feed.</span>
+<span class="sd">    See [the arXiv API User&#39;s Manual: Details of Atom Results</span>
+<span class="sd">    Returned](https://arxiv.org/help/api/user-manual#_details_of_atom_results_returned).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">entry_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="sd">&quot;&quot;&quot;A url `http://arxiv.org/abs/{id}`.&quot;&quot;&quot;</span>
     <span class="n">updated</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="sd">&quot;&quot;&quot;When the result was last updated.&quot;&quot;&quot;</span>
     <span class="n">published</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="sd">&quot;&quot;&quot;When the result was originally published.&quot;&quot;&quot;</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="sd">&quot;&quot;&quot;The title of the result.&quot;&quot;&quot;</span>
     <span class="n">authors</span><span class="p">:</span> <span class="nb">list</span>
+    <span class="sd">&quot;&quot;&quot;The result&#39;s authors.&quot;&quot;&quot;</span>
     <span class="n">summary</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="sd">&quot;&quot;&quot;The result abstrace.&quot;&quot;&quot;</span>
     <span class="n">comment</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="sd">&quot;&quot;&quot;The authors&#39; comment if present.&quot;&quot;&quot;</span>
     <span class="n">primary_category</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The result&#39;s primary arXiv category. See [arXiv: Category</span>
+<span class="sd">    Taxonomy](https://arxiv.org/category_taxonomy).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">categories</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    All of the result&#39;s categories. See [arXiv: Category</span>
+<span class="sd">    Taxonomy](https://arxiv.org/category_taxonomy).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">links</span><span class="p">:</span> <span class="nb">list</span>
+    <span class="sd">&quot;&quot;&quot;Up to three URLs associated with this result.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -255,9 +276,8 @@
         <span class="n">links</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s1">&#39;Result.Link&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Constructs an arXiv search result item. In most cases, prefer</span>
-<span class="sd">        `_from_feed_entry` for parsing raw search results rather than parsing</span>
-<span class="sd">        feed items yourself.</span>
+<span class="sd">        Constructs an arXiv search result item. In most cases, prefer using</span>
+<span class="sd">        `_from_feed_entry` to parsing and constructing feed items yourself.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span> <span class="o">=</span> <span class="n">entry_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="n">updated</span>
@@ -555,7 +575,6 @@
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">feed</span>
-        <span class="c1"># TODO: raise an exception. This page really can&#39;t be fetched.</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Could not parse feed at URL&quot;</span><span class="p">)</span>
 </pre></div>
 
@@ -574,17 +593,38 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Result</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;An entry in an arXiv query results feed.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An entry in an arXiv query results feed.</span>
+<span class="sd">    See [the arXiv API User&#39;s Manual: Details of Atom Results</span>
+<span class="sd">    Returned](https://arxiv.org/help/api/user-manual#_details_of_atom_results_returned).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">entry_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="sd">&quot;&quot;&quot;A url `http://arxiv.org/abs/{id}`.&quot;&quot;&quot;</span>
     <span class="n">updated</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="sd">&quot;&quot;&quot;When the result was last updated.&quot;&quot;&quot;</span>
     <span class="n">published</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="sd">&quot;&quot;&quot;When the result was originally published.&quot;&quot;&quot;</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="sd">&quot;&quot;&quot;The title of the result.&quot;&quot;&quot;</span>
     <span class="n">authors</span><span class="p">:</span> <span class="nb">list</span>
+    <span class="sd">&quot;&quot;&quot;The result&#39;s authors.&quot;&quot;&quot;</span>
     <span class="n">summary</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="sd">&quot;&quot;&quot;The result abstrace.&quot;&quot;&quot;</span>
     <span class="n">comment</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="sd">&quot;&quot;&quot;The authors&#39; comment if present.&quot;&quot;&quot;</span>
     <span class="n">primary_category</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The result&#39;s primary arXiv category. See [arXiv: Category</span>
+<span class="sd">    Taxonomy](https://arxiv.org/category_taxonomy).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">categories</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    All of the result&#39;s categories. See [arXiv: Category</span>
+<span class="sd">    Taxonomy](https://arxiv.org/category_taxonomy).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">links</span><span class="p">:</span> <span class="nb">list</span>
+    <span class="sd">&quot;&quot;&quot;Up to three URLs associated with this result.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -600,9 +640,8 @@
         <span class="n">links</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s1">&#39;Result.Link&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Constructs an arXiv search result item. In most cases, prefer</span>
-<span class="sd">        `_from_feed_entry` for parsing raw search results rather than parsing</span>
-<span class="sd">        feed items yourself.</span>
+<span class="sd">        Constructs an arXiv search result item. In most cases, prefer using</span>
+<span class="sd">        `_from_feed_entry` to parsing and constructing feed items yourself.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span> <span class="o">=</span> <span class="n">entry_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="n">updated</span>
@@ -716,7 +755,9 @@
 
         </details>
 
-            <div class="docstring"><p>An entry in an arXiv query results feed.</p>
+            <div class="docstring"><p>An entry in an arXiv query results feed.
+See <a href="https://arxiv.org/help/api/user-manual#_details_of_atom_results_returned">the arXiv API User's Manual: Details of Atom Results
+Returned</a>.</p>
 </div>
 
 
@@ -754,9 +795,8 @@
         <span class="n">links</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s1">&#39;Result.Link&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Constructs an arXiv search result item. In most cases, prefer</span>
-<span class="sd">        `_from_feed_entry` for parsing raw search results rather than parsing</span>
-<span class="sd">        feed items yourself.</span>
+<span class="sd">        Constructs an arXiv search result item. In most cases, prefer using</span>
+<span class="sd">        `_from_feed_entry` to parsing and constructing feed items yourself.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span> <span class="o">=</span> <span class="n">entry_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="n">updated</span>
@@ -772,9 +812,8 @@
 
         </details>
 
-            <div class="docstring"><p>Constructs an arXiv search result item. In most cases, prefer
-<code>_from_feed_entry</code> for parsing raw search results rather than parsing
-feed items yourself.</p>
+            <div class="docstring"><p>Constructs an arXiv search result item. In most cases, prefer using
+<code>_from_feed_entry</code> to parsing and constructing feed items yourself.</p>
 </div>
 
 
@@ -785,7 +824,9 @@ feed items yourself.</p>
         <span class="name">entry_id</span><span class="annotation">: str</span>
     </div>
 
-    
+            <div class="docstring"><p>A url <code>http://arxiv.org/abs/{id}</code>.</p>
+</div>
+
 
                             </div>
                             <div id="Result.updated" class="classattr">
@@ -794,7 +835,9 @@ feed items yourself.</p>
         <span class="name">updated</span><span class="annotation">: datetime.datetime</span>
     </div>
 
-    
+            <div class="docstring"><p>When the result was last updated.</p>
+</div>
+
 
                             </div>
                             <div id="Result.published" class="classattr">
@@ -803,7 +846,9 @@ feed items yourself.</p>
         <span class="name">published</span><span class="annotation">: datetime.datetime</span>
     </div>
 
-    
+            <div class="docstring"><p>When the result was originally published.</p>
+</div>
+
 
                             </div>
                             <div id="Result.title" class="classattr">
@@ -812,7 +857,9 @@ feed items yourself.</p>
         <span class="name">title</span><span class="annotation">: str</span>
     </div>
 
-    
+            <div class="docstring"><p>The title of the result.</p>
+</div>
+
 
                             </div>
                             <div id="Result.authors" class="classattr">
@@ -821,7 +868,9 @@ feed items yourself.</p>
         <span class="name">authors</span><span class="annotation">: list</span>
     </div>
 
-    
+            <div class="docstring"><p>The result's authors.</p>
+</div>
+
 
                             </div>
                             <div id="Result.summary" class="classattr">
@@ -830,7 +879,9 @@ feed items yourself.</p>
         <span class="name">summary</span><span class="annotation">: str</span>
     </div>
 
-    
+            <div class="docstring"><p>The result abstrace.</p>
+</div>
+
 
                             </div>
                             <div id="Result.comment" class="classattr">
@@ -839,7 +890,9 @@ feed items yourself.</p>
         <span class="name">comment</span><span class="annotation">: str</span>
     </div>
 
-    
+            <div class="docstring"><p>The authors' comment if present.</p>
+</div>
+
 
                             </div>
                             <div id="Result.primary_category" class="classattr">
@@ -848,7 +901,10 @@ feed items yourself.</p>
         <span class="name">primary_category</span><span class="annotation">: str</span>
     </div>
 
-    
+            <div class="docstring"><p>The result's primary arXiv category. See <a href="https://arxiv.org/category_taxonomy">arXiv: Category
+Taxonomy</a>.</p>
+</div>
+
 
                             </div>
                             <div id="Result.categories" class="classattr">
@@ -857,7 +913,10 @@ feed items yourself.</p>
         <span class="name">categories</span><span class="annotation">: List[str]</span>
     </div>
 
-    
+            <div class="docstring"><p>All of the result's categories. See <a href="https://arxiv.org/category_taxonomy">arXiv: Category
+Taxonomy</a>.</p>
+</div>
+
 
                             </div>
                             <div id="Result.links" class="classattr">
@@ -866,7 +925,9 @@ feed items yourself.</p>
         <span class="name">links</span><span class="annotation">: list</span>
     </div>
 
-    
+            <div class="docstring"><p>Up to three URLs associated with this result.</p>
+</div>
+
 
                             </div>
                             <div id="Result.get_short_id" class="classattr">
@@ -1586,7 +1647,6 @@ info on those defauts see <code><a href="#Client">Client</a></code>; see also <c
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">feed</span>
-        <span class="c1"># TODO: raise an exception. This page really can&#39;t be fetched.</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Could not parse feed at URL&quot;</span><span class="p">)</span>
 </pre></div>
 

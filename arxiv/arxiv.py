@@ -20,17 +20,38 @@ logger = logging.getLogger(__name__)
 
 
 class Result(object):
-    """An entry in an arXiv query results feed."""
+    """
+    An entry in an arXiv query results feed.
+    See [the arXiv API User's Manual: Details of Atom Results
+    Returned](https://arxiv.org/help/api/user-manual#_details_of_atom_results_returned).
+    """
+
     entry_id: str
+    """A url `http://arxiv.org/abs/{id}`."""
     updated: datetime
+    """When the result was last updated."""
     published: datetime
+    """When the result was originally published."""
     title: str
+    """The title of the result."""
     authors: list
+    """The result's authors."""
     summary: str
+    """The result abstrace."""
     comment: str
+    """The authors' comment if present."""
     primary_category: str
+    """
+    The result's primary arXiv category. See [arXiv: Category
+    Taxonomy](https://arxiv.org/category_taxonomy).
+    """
     categories: List[str]
+    """
+    All of the result's categories. See [arXiv: Category
+    Taxonomy](https://arxiv.org/category_taxonomy).
+    """
     links: list
+    """Up to three URLs associated with this result."""
 
     def __init__(
         self,
@@ -46,9 +67,8 @@ class Result(object):
         links: List['Result.Link'] = []
     ):
         """
-        Constructs an arXiv search result item. In most cases, prefer
-        `_from_feed_entry` for parsing raw search results rather than parsing
-        feed items yourself.
+        Constructs an arXiv search result item. In most cases, prefer using
+        `_from_feed_entry` to parsing and constructing feed items yourself.
         """
         self.entry_id = entry_id
         self.updated = updated
@@ -346,5 +366,4 @@ class Client(object):
                 )
             else:
                 return feed
-        # TODO: raise an exception. This page really can't be fetched.
         raise Exception("Could not parse feed at URL")

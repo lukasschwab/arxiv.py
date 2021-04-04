@@ -99,7 +99,7 @@ The meaning of the underlying raw data is documented in the [arXiv API User Manu
 + `result.comment`: The authors' comment if present.
 + `result.primary_category`: The result's primary arXiv category. See [arXiv: Category Taxonomy](https://arxiv.org/category_taxonomy).
 + `result.categories`: All of the result's categories. See [arXiv: Category Taxonomy](https://arxiv.org/category_taxonomy).
-+ `result.links`: Up to 3 given url's associated with this article, as `arxiv.Link`s.
++ `result.links`: Up to three URLs associated with this result, as `arxiv.Link`s.
 
 They also expose helper methods for downloading papers: `(Result).download_pdf()` and `(Result).download_source()`.
 
