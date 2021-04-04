@@ -1,18 +1,12 @@
 source := ${wildcard ./arxiv/*.py}
 tests := ${wildcard tests/*.py}
 
-.PHONY: all lint lint-ci test docs clean
+.PHONY: all lint test docs clean
 
 all: lint test docs
 
 lint: $(source) $(tests)
-	flake8 .
-
-lint-ci: $(source) $(tests)
-	# stop the build if there are Python syntax errors or undefined names.
-	flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-	# exit-zero treats all errors as warnings. Warn about complexity.
-	flake8 . --count --exit-zero --max-complexity=10 --statistics
+	flake8 . --count --max-complexity=10 --statistics
 
 test: $(source) $(tests)
 	pytest
