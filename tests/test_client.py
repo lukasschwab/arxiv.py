@@ -46,7 +46,7 @@ class TestClient(unittest.TestCase):
             try:
                 broken_get()
             except arxiv.HTTPError as e:
-                self.assertEqual(e.retry, broken_client.num_retries - 1)
+                self.assertEqual(e.retry, broken_client.num_retries)
 
     @patch('time.sleep', return_value=None)
     def test_sleep_standard(self, patched_time_sleep):

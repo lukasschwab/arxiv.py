@@ -233,6 +233,9 @@
                                 <a class="variable" href="#ArxivError.url">url</a>
                         </li>
                         <li>
+                                <a class="variable" href="#ArxivError.retry">retry</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#ArxivError.message">message</a>
                         </li>
                 </ul>
@@ -244,9 +247,6 @@
                         <li>
                                 <a class="function" href="#UnexpectedEmptyPageError.__init__">UnexpectedEmptyPageError</a>
                         </li>
-                        <li>
-                                <a class="variable" href="#UnexpectedEmptyPageError.retry">retry</a>
-                        </li>
                 </ul>
 
             </li>
@@ -255,9 +255,6 @@
                             <ul class="memberlist">
                         <li>
                                 <a class="function" href="#HTTPError.__init__">HTTPError</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#HTTPError.retry">retry</a>
                         </li>
                         <li>
                                 <a class="variable" href="#HTTPError.status">status</a>
@@ -1064,9 +1061,6 @@ arxiv<wbr>.arxiv    </h1>
         <span class="p">})</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_url_format</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">urlencode</span><span class="p">(</span><span class="n">url_args</span><span class="p">))</span>
 
-    <span class="c1"># NOTE: if erroneous outcomes are so common that it&#39;s necessary to sleep</span>
-    <span class="c1"># after requests that return errors, _parse_feed can be rewritten</span>
-    <span class="c1"># recursively.</span>
     <span class="k">def</span> <span class="nf">_parse_feed</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1077,11 +1071,27 @@ arxiv<wbr>.arxiv    </h1>
 
 <span class="sd">        If a request fails or is unexpectedly empty, retries the request up to</span>
 <span class="sd">        `self.num_retries` times.</span>
-
-<span class="sd">        Enforces `self.delay_seconds`: if that number of seconds has not passed</span>
-<span class="sd">        since `_parse_feed` was last called, sleeps until delay_seconds seconds</span>
-<span class="sd">        have passed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Invoke the recursive helper with initial available retries.</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_feed_r</span><span class="p">(</span>
+            <span class="n">url</span><span class="p">,</span>
+            <span class="n">first_page</span><span class="o">=</span><span class="n">first_page</span><span class="p">,</span>
+            <span class="n">retries_left</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_retries</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_parse_feed_r</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">first_page</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">retries_left</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">last_err</span><span class="p">:</span> <span class="ne">Exception</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">FeedParserDict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recursive helper for _parse_feed. Enforces `self.delay_seconds`: if that</span>
+<span class="sd">        number of seconds has not passed since `_parse_feed` was last called,</span>
+<span class="sd">        sleeps until delay_seconds seconds have passed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">retry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_retries</span> <span class="o">-</span> <span class="n">retries_left</span>
         <span class="c1"># If this call would violate the rate limit, sleep until it doesn&#39;t.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_request_dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">required</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delay_seconds</span><span class="p">)</span>
@@ -1090,26 +1100,31 @@ arxiv<wbr>.arxiv    </h1>
                 <span class="n">to_sleep</span> <span class="o">=</span> <span class="p">(</span><span class="n">required</span> <span class="o">-</span> <span class="n">since_last_request</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Sleeping for </span><span class="si">%f</span><span class="s2"> seconds&quot;</span><span class="p">,</span> <span class="n">to_sleep</span><span class="p">)</span>
                 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">to_sleep</span><span class="p">)</span>
-        <span class="c1"># self.delay_seconds seconds have passed since last call. Fetch results.</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Requesting page of results&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">url</span><span class="p">,</span>
+            <span class="s1">&#39;first_page&#39;</span><span class="p">:</span> <span class="n">first_page</span><span class="p">,</span>
+            <span class="s1">&#39;retry&#39;</span><span class="p">:</span> <span class="n">retry</span><span class="p">,</span>
+            <span class="s1">&#39;last_err&#39;</span><span class="p">:</span> <span class="n">last_err</span><span class="o">.</span><span class="n">message</span> <span class="k">if</span> <span class="n">last_err</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">})</span>
+        <span class="n">feed</span> <span class="o">=</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_request_dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
         <span class="n">err</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">for</span> <span class="n">retry</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_retries</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Requesting page of results&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
-                <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">url</span><span class="p">,</span>
-                <span class="s1">&#39;first_page&#39;</span><span class="p">:</span> <span class="n">first_page</span><span class="p">,</span>
-                <span class="s1">&#39;retry&#39;</span><span class="p">:</span> <span class="n">retry</span><span class="p">,</span>
-                <span class="s1">&#39;last_err&#39;</span><span class="p">:</span> <span class="n">err</span><span class="o">.</span><span class="n">message</span> <span class="k">if</span> <span class="n">err</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="p">})</span>
-            <span class="n">feed</span> <span class="o">=</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_last_request_dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">feed</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
-                <span class="n">err</span> <span class="o">=</span> <span class="n">HTTPError</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">retry</span><span class="p">,</span> <span class="n">feed</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">feed</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first_page</span><span class="p">:</span>
-                <span class="n">err</span> <span class="o">=</span> <span class="n">UnexpectedEmptyPageError</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">retry</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">feed</span>
-        <span class="c1"># Feed was never returned in self.num_retries tries. Raise the last</span>
-        <span class="c1"># exception encountered.</span>
-        <span class="k">raise</span> <span class="n">err</span>
+        <span class="k">if</span> <span class="n">feed</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="n">HTTPError</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">retry</span><span class="p">,</span> <span class="n">feed</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">feed</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first_page</span><span class="p">:</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="n">UnexpectedEmptyPageError</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">retry</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">err</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">retries_left</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_feed_r</span><span class="p">(</span>
+                    <span class="n">url</span><span class="p">,</span>
+                    <span class="n">first_page</span><span class="o">=</span><span class="n">first_page</span><span class="p">,</span>
+                    <span class="n">retries_left</span><span class="o">=</span><span class="n">retries_left</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="n">last_err</span><span class="o">=</span><span class="n">err</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="c1"># Feed was never returned in self.num_retries tries. Raise the last</span>
+            <span class="c1"># exception encountered.</span>
+            <span class="k">raise</span> <span class="n">err</span>
+        <span class="k">return</span> <span class="n">feed</span>
 
 
 <span class="k">class</span> <span class="nc">ArxivError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -1117,14 +1132,20 @@ arxiv<wbr>.arxiv    </h1>
 
     <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
     <span class="sd">&quot;&quot;&quot;The feed URL that could not be fetched.&quot;&quot;&quot;</span>
+    <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The request try number which encountered this error; 1 for the initial try,</span>
+<span class="sd">    2 for the first retry, and so on.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">message</span><span class="p">:</span> <span class="nb">str</span>
     <span class="sd">&quot;&quot;&quot;Message describing what caused this error.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructs an `ArxivError` encountered while fetching the specified URL.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">retry</span> <span class="o">=</span> <span class="n">retry</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
         <span class="c1"># logger.info(self.message, extra=extra)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
@@ -1142,18 +1163,13 @@ arxiv<wbr>.arxiv    </h1>
 
 <span class="sd">    See `Client.results` for usage.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="sd">&quot;&quot;&quot;The request retry number which encountered this error, zero-indexed.&quot;&quot;&quot;</span>
-
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructs an `UnexpectedEmptyPageError` encountered for the specified</span>
 <span class="sd">        API URL after `retry` tries.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">retry</span> <span class="o">=</span> <span class="n">retry</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s2">&quot;Page of results was unexpectedly empty&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">retry</span><span class="p">,</span> <span class="s2">&quot;Page of results was unexpectedly empty&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -1170,8 +1186,6 @@ arxiv<wbr>.arxiv    </h1>
 <span class="sd">    See `Client.results` for usage.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="sd">&quot;&quot;&quot;The request retry number which encountered this error, zero-indexed.&quot;&quot;&quot;</span>
     <span class="n">status</span><span class="p">:</span> <span class="nb">int</span>
     <span class="sd">&quot;&quot;&quot;The HTTP status reported by feedparser.&quot;&quot;&quot;</span>
     <span class="n">entry</span><span class="p">:</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">FeedParserDict</span>
@@ -1182,7 +1196,6 @@ arxiv<wbr>.arxiv    </h1>
 <span class="sd">        Constructs an `HTTPError` for the specified status code, encountered for</span>
 <span class="sd">        the specified API URL after `retry` tries.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">retry</span> <span class="o">=</span> <span class="n">retry</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">feed</span><span class="o">.</span><span class="n">status</span>
         <span class="c1"># If the feed is valid and includes a single entry, trust it&#39;s an</span>
@@ -1193,6 +1206,7 @@ arxiv<wbr>.arxiv    </h1>
             <span class="bp">self</span><span class="o">.</span><span class="n">entry</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">url</span><span class="p">,</span>
+            <span class="n">retry</span><span class="p">,</span>
             <span class="s2">&quot;Page request resulted in HTTP </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">summary</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
@@ -2720,9 +2734,6 @@ search.</p>
         <span class="p">})</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_url_format</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">urlencode</span><span class="p">(</span><span class="n">url_args</span><span class="p">))</span>
 
-    <span class="c1"># NOTE: if erroneous outcomes are so common that it&#39;s necessary to sleep</span>
-    <span class="c1"># after requests that return errors, _parse_feed can be rewritten</span>
-    <span class="c1"># recursively.</span>
     <span class="k">def</span> <span class="nf">_parse_feed</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -2733,11 +2744,27 @@ search.</p>
 
 <span class="sd">        If a request fails or is unexpectedly empty, retries the request up to</span>
 <span class="sd">        `self.num_retries` times.</span>
-
-<span class="sd">        Enforces `self.delay_seconds`: if that number of seconds has not passed</span>
-<span class="sd">        since `_parse_feed` was last called, sleeps until delay_seconds seconds</span>
-<span class="sd">        have passed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Invoke the recursive helper with initial available retries.</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_feed_r</span><span class="p">(</span>
+            <span class="n">url</span><span class="p">,</span>
+            <span class="n">first_page</span><span class="o">=</span><span class="n">first_page</span><span class="p">,</span>
+            <span class="n">retries_left</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_retries</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_parse_feed_r</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">first_page</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">retries_left</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">last_err</span><span class="p">:</span> <span class="ne">Exception</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">FeedParserDict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recursive helper for _parse_feed. Enforces `self.delay_seconds`: if that</span>
+<span class="sd">        number of seconds has not passed since `_parse_feed` was last called,</span>
+<span class="sd">        sleeps until delay_seconds seconds have passed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">retry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_retries</span> <span class="o">-</span> <span class="n">retries_left</span>
         <span class="c1"># If this call would violate the rate limit, sleep until it doesn&#39;t.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_request_dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">required</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delay_seconds</span><span class="p">)</span>
@@ -2746,26 +2773,31 @@ search.</p>
                 <span class="n">to_sleep</span> <span class="o">=</span> <span class="p">(</span><span class="n">required</span> <span class="o">-</span> <span class="n">since_last_request</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Sleeping for </span><span class="si">%f</span><span class="s2"> seconds&quot;</span><span class="p">,</span> <span class="n">to_sleep</span><span class="p">)</span>
                 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">to_sleep</span><span class="p">)</span>
-        <span class="c1"># self.delay_seconds seconds have passed since last call. Fetch results.</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Requesting page of results&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">url</span><span class="p">,</span>
+            <span class="s1">&#39;first_page&#39;</span><span class="p">:</span> <span class="n">first_page</span><span class="p">,</span>
+            <span class="s1">&#39;retry&#39;</span><span class="p">:</span> <span class="n">retry</span><span class="p">,</span>
+            <span class="s1">&#39;last_err&#39;</span><span class="p">:</span> <span class="n">last_err</span><span class="o">.</span><span class="n">message</span> <span class="k">if</span> <span class="n">last_err</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">})</span>
+        <span class="n">feed</span> <span class="o">=</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_request_dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
         <span class="n">err</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">for</span> <span class="n">retry</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_retries</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Requesting page of results&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
-                <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">url</span><span class="p">,</span>
-                <span class="s1">&#39;first_page&#39;</span><span class="p">:</span> <span class="n">first_page</span><span class="p">,</span>
-                <span class="s1">&#39;retry&#39;</span><span class="p">:</span> <span class="n">retry</span><span class="p">,</span>
-                <span class="s1">&#39;last_err&#39;</span><span class="p">:</span> <span class="n">err</span><span class="o">.</span><span class="n">message</span> <span class="k">if</span> <span class="n">err</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="p">})</span>
-            <span class="n">feed</span> <span class="o">=</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_last_request_dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">feed</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
-                <span class="n">err</span> <span class="o">=</span> <span class="n">HTTPError</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">retry</span><span class="p">,</span> <span class="n">feed</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">feed</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first_page</span><span class="p">:</span>
-                <span class="n">err</span> <span class="o">=</span> <span class="n">UnexpectedEmptyPageError</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">retry</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">feed</span>
-        <span class="c1"># Feed was never returned in self.num_retries tries. Raise the last</span>
-        <span class="c1"># exception encountered.</span>
-        <span class="k">raise</span> <span class="n">err</span>
+        <span class="k">if</span> <span class="n">feed</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="n">HTTPError</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">retry</span><span class="p">,</span> <span class="n">feed</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">feed</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first_page</span><span class="p">:</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="n">UnexpectedEmptyPageError</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">retry</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">err</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">retries_left</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_feed_r</span><span class="p">(</span>
+                    <span class="n">url</span><span class="p">,</span>
+                    <span class="n">first_page</span><span class="o">=</span><span class="n">first_page</span><span class="p">,</span>
+                    <span class="n">retries_left</span><span class="o">=</span><span class="n">retries_left</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="n">last_err</span><span class="o">=</span><span class="n">err</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="c1"># Feed was never returned in self.num_retries tries. Raise the last</span>
+            <span class="c1"># exception encountered.</span>
+            <span class="k">raise</span> <span class="n">err</span>
+        <span class="k">return</span> <span class="n">feed</span>
 </pre></div>
 
         </details>
@@ -2988,14 +3020,20 @@ have been yielded or there are no more search results.</p>
 
     <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
     <span class="sd">&quot;&quot;&quot;The feed URL that could not be fetched.&quot;&quot;&quot;</span>
+    <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The request try number which encountered this error; 1 for the initial try,</span>
+<span class="sd">    2 for the first retry, and so on.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">message</span><span class="p">:</span> <span class="nb">str</span>
     <span class="sd">&quot;&quot;&quot;Message describing what caused this error.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructs an `ArxivError` encountered while fetching the specified URL.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">retry</span> <span class="o">=</span> <span class="n">retry</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
         <span class="c1"># logger.info(self.message, extra=extra)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
@@ -3014,16 +3052,17 @@ have been yielded or there are no more search results.</p>
                                         <div class="attr function"><a class="headerlink" href="#ArxivError.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">ArxivError</span><span class="signature">(url: str, message: str)</span>
+            <span class="name">ArxivError</span><span class="signature">(url: str, retry: int, message: str)</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructs an `ArxivError` encountered while fetching the specified URL.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">retry</span> <span class="o">=</span> <span class="n">retry</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
         <span class="c1"># logger.info(self.message, extra=extra)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
@@ -3043,6 +3082,18 @@ have been yielded or there are no more search results.</p>
     </div>
 
             <div class="docstring"><p>The feed URL that could not be fetched.</p>
+</div>
+
+
+                            </div>
+                            <div id="ArxivError.retry" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#ArxivError.retry">#&nbsp;&nbsp</a>
+
+        <span class="name">retry</span><span class="annotation">: int</span>
+    </div>
+
+            <div class="docstring"><p>The request try number which encountered this error; 1 for the initial try,
+2 for the first retry, and so on.</p>
 </div>
 
 
@@ -3089,18 +3140,13 @@ have been yielded or there are no more search results.</p>
 
 <span class="sd">    See `Client.results` for usage.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="sd">&quot;&quot;&quot;The request retry number which encountered this error, zero-indexed.&quot;&quot;&quot;</span>
-
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructs an `UnexpectedEmptyPageError` encountered for the specified</span>
 <span class="sd">        API URL after `retry` tries.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">retry</span> <span class="o">=</span> <span class="n">retry</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s2">&quot;Page of results was unexpectedly empty&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">retry</span><span class="p">,</span> <span class="s2">&quot;Page of results was unexpectedly empty&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -3136,8 +3182,7 @@ brittleness in the underlying arXiv API; usually resolved by retries.</p>
 <span class="sd">        API URL after `retry` tries.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">retry</span> <span class="o">=</span> <span class="n">retry</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s2">&quot;Page of results was unexpectedly empty&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">retry</span><span class="p">,</span> <span class="s2">&quot;Page of results was unexpectedly empty&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -3148,22 +3193,12 @@ API URL after <code><a href="#UnexpectedEmptyPageError.retry">retry</a></code> t
 
 
                             </div>
-                            <div id="UnexpectedEmptyPageError.retry" class="classattr">
-                                            <div class="attr variable"><a class="headerlink" href="#UnexpectedEmptyPageError.retry">#&nbsp;&nbsp</a>
-
-        <span class="name">retry</span><span class="annotation">: int</span>
-    </div>
-
-            <div class="docstring"><p>The request retry number which encountered this error, zero-indexed.</p>
-</div>
-
-
-                            </div>
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
                                     <div><dt><a href="#ArxivError">ArxivError</a></dt>
                                 <dd id="UnexpectedEmptyPageError.url" class="variable"><a href="#ArxivError.url">url</a></dd>
+                <dd id="UnexpectedEmptyPageError.retry" class="variable"><a href="#ArxivError.retry">retry</a></dd>
                 <dd id="UnexpectedEmptyPageError.message" class="variable"><a href="#ArxivError.message">message</a></dd>
 
             </div>
@@ -3193,8 +3228,6 @@ API URL after <code><a href="#UnexpectedEmptyPageError.retry">retry</a></code> t
 <span class="sd">    See `Client.results` for usage.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="sd">&quot;&quot;&quot;The request retry number which encountered this error, zero-indexed.&quot;&quot;&quot;</span>
     <span class="n">status</span><span class="p">:</span> <span class="nb">int</span>
     <span class="sd">&quot;&quot;&quot;The HTTP status reported by feedparser.&quot;&quot;&quot;</span>
     <span class="n">entry</span><span class="p">:</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">FeedParserDict</span>
@@ -3205,7 +3238,6 @@ API URL after <code><a href="#UnexpectedEmptyPageError.retry">retry</a></code> t
 <span class="sd">        Constructs an `HTTPError` for the specified status code, encountered for</span>
 <span class="sd">        the specified API URL after `retry` tries.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">retry</span> <span class="o">=</span> <span class="n">retry</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">feed</span><span class="o">.</span><span class="n">status</span>
         <span class="c1"># If the feed is valid and includes a single entry, trust it&#39;s an</span>
@@ -3216,6 +3248,7 @@ API URL after <code><a href="#UnexpectedEmptyPageError.retry">retry</a></code> t
             <span class="bp">self</span><span class="o">.</span><span class="n">entry</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">url</span><span class="p">,</span>
+            <span class="n">retry</span><span class="p">,</span>
             <span class="s2">&quot;Page request resulted in HTTP </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">summary</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
@@ -3253,7 +3286,6 @@ API URL after <code><a href="#UnexpectedEmptyPageError.retry">retry</a></code> t
 <span class="sd">        Constructs an `HTTPError` for the specified status code, encountered for</span>
 <span class="sd">        the specified API URL after `retry` tries.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">retry</span> <span class="o">=</span> <span class="n">retry</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">feed</span><span class="o">.</span><span class="n">status</span>
         <span class="c1"># If the feed is valid and includes a single entry, trust it&#39;s an</span>
@@ -3264,6 +3296,7 @@ API URL after <code><a href="#UnexpectedEmptyPageError.retry">retry</a></code> t
             <span class="bp">self</span><span class="o">.</span><span class="n">entry</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">url</span><span class="p">,</span>
+            <span class="n">retry</span><span class="p">,</span>
             <span class="s2">&quot;Page request resulted in HTTP </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">summary</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
@@ -3275,17 +3308,6 @@ API URL after <code><a href="#UnexpectedEmptyPageError.retry">retry</a></code> t
 
             <div class="docstring"><p>Constructs an <code><a href="#HTTPError">HTTPError</a></code> for the specified status code, encountered for
 the specified API URL after <code><a href="#HTTPError.retry">retry</a></code> tries.</p>
-</div>
-
-
-                            </div>
-                            <div id="HTTPError.retry" class="classattr">
-                                            <div class="attr variable"><a class="headerlink" href="#HTTPError.retry">#&nbsp;&nbsp</a>
-
-        <span class="name">retry</span><span class="annotation">: int</span>
-    </div>
-
-            <div class="docstring"><p>The request retry number which encountered this error, zero-indexed.</p>
 </div>
 
 
@@ -3317,6 +3339,7 @@ the specified API URL after <code><a href="#HTTPError.retry">retry</a></code> tr
                                 <dl>
                                     <div><dt><a href="#ArxivError">ArxivError</a></dt>
                                 <dd id="HTTPError.url" class="variable"><a href="#ArxivError.url">url</a></dd>
+                <dd id="HTTPError.retry" class="variable"><a href="#ArxivError.retry">retry</a></dd>
                 <dd id="HTTPError.message" class="variable"><a href="#ArxivError.message">message</a></dd>
 
             </div>
