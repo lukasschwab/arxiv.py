@@ -257,6 +257,7 @@
 
 <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlencode</span>
 <span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">urlretrieve</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
 
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">List</span>
@@ -527,6 +528,7 @@
     <span class="sd">&quot;&quot;&quot;Number of seconds to wait between API requests.&quot;&quot;&quot;</span>
     <span class="n">num_retries</span><span class="p">:</span> <span class="nb">int</span>
     <span class="sd">&quot;&quot;&quot;Number of times to retry a failing API request.&quot;&quot;&quot;</span>
+    <span class="n">_last_request_dt</span><span class="p">:</span> <span class="n">datetime</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -540,6 +542,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">page_size</span> <span class="o">=</span> <span class="n">page_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">delay_seconds</span> <span class="o">=</span> <span class="n">delay_seconds</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_retries</span> <span class="o">=</span> <span class="n">num_retries</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_request_dt</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search</span><span class="p">:</span> <span class="n">Search</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Result</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -552,14 +555,11 @@
 <span class="sd">        For more on using generators, see [Generators](https://wiki.python.org/moin/Generators).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="c1"># Placeholder; this may be reduced according to the feed&#39;s</span>
+        <span class="c1"># total_results may be reduced according to the feed&#39;s</span>
         <span class="c1"># opensearch:totalResults value.</span>
         <span class="n">total_results</span> <span class="o">=</span> <span class="n">search</span><span class="o">.</span><span class="n">max_results</span>
         <span class="n">first_page</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">while</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="n">total_results</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">first_page</span><span class="p">:</span>
-                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delay_seconds</span><span class="p">)</span>
-            <span class="c1"># Request next page of results.</span>
             <span class="n">page_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page_size</span><span class="p">,</span> <span class="n">search</span><span class="o">.</span><span class="n">max_results</span> <span class="o">-</span> <span class="n">offset</span><span class="p">)</span>
             <span class="n">page_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_url</span><span class="p">(</span><span class="n">search</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">page_size</span><span class="p">)</span>
             <span class="n">feed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_feed</span><span class="p">(</span><span class="n">page_url</span><span class="p">,</span> <span class="n">first_page</span><span class="p">)</span>
@@ -595,6 +595,9 @@
         <span class="p">})</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_url_format</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">urlencode</span><span class="p">(</span><span class="n">url_args</span><span class="p">))</span>
 
+    <span class="c1"># NOTE: if erroneous outcomes are so common that it&#39;s necessary to sleep</span>
+    <span class="c1"># after requests that return errors, _parse_feed can be rewritten</span>
+    <span class="c1"># recursively.</span>
     <span class="k">def</span> <span class="nf">_parse_feed</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -604,11 +607,25 @@
 <span class="sd">        Fetches the specified URL and parses it with feedparser. If a request</span>
 <span class="sd">        fails or is unexpectedly empty, `_parse_feed` retries the request up to</span>
 <span class="sd">        `self.num_retries` times.</span>
+
+<span class="sd">        Enforces `self.delay_seconds`: if that number of seconds has not passed</span>
+<span class="sd">        since `_parse_feed` was last called, sleeps until delay_seconds seconds</span>
+<span class="sd">        have passed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If this call would violate the rate limit, sleep until it doesn&#39;t.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_request_dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">required</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delay_seconds</span><span class="p">)</span>
+            <span class="n">since_last_request</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_request_dt</span>
+            <span class="k">if</span> <span class="n">since_last_request</span> <span class="o">&lt;</span> <span class="n">required</span><span class="p">:</span>
+                <span class="n">to_sleep</span> <span class="o">=</span> <span class="p">(</span><span class="n">required</span> <span class="o">-</span> <span class="n">since_last_request</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Sleeping for </span><span class="si">%f</span><span class="s2"> seconds&quot;</span><span class="p">,</span> <span class="n">to_sleep</span><span class="p">)</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">to_sleep</span><span class="p">)</span>
+        <span class="c1"># self.delay_seconds seconds have passed since last call. Fetch results.</span>
         <span class="n">err</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">retry</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_retries</span><span class="p">):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Requesting feed&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;retry&#39;</span><span class="p">:</span> <span class="n">retry</span><span class="p">,</span> <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">url</span><span class="p">})</span>
             <span class="n">feed</span> <span class="o">=</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_request_dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">feed</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
                 <span class="n">err</span> <span class="o">=</span> <span class="n">HTTPError</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">retry</span><span class="p">,</span> <span class="n">feed</span><span class="o">.</span><span class="n">status</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">feed</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first_page</span><span class="p">:</span>
@@ -1649,6 +1666,7 @@ info on those defauts see <code><a href="#Client">Client</a></code>; see also <c
     <span class="sd">&quot;&quot;&quot;Number of seconds to wait between API requests.&quot;&quot;&quot;</span>
     <span class="n">num_retries</span><span class="p">:</span> <span class="nb">int</span>
     <span class="sd">&quot;&quot;&quot;Number of times to retry a failing API request.&quot;&quot;&quot;</span>
+    <span class="n">_last_request_dt</span><span class="p">:</span> <span class="n">datetime</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1662,6 +1680,7 @@ info on those defauts see <code><a href="#Client">Client</a></code>; see also <c
         <span class="bp">self</span><span class="o">.</span><span class="n">page_size</span> <span class="o">=</span> <span class="n">page_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">delay_seconds</span> <span class="o">=</span> <span class="n">delay_seconds</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_retries</span> <span class="o">=</span> <span class="n">num_retries</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_request_dt</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search</span><span class="p">:</span> <span class="n">Search</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Result</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1674,14 +1693,11 @@ info on those defauts see <code><a href="#Client">Client</a></code>; see also <c
 <span class="sd">        For more on using generators, see [Generators](https://wiki.python.org/moin/Generators).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="c1"># Placeholder; this may be reduced according to the feed&#39;s</span>
+        <span class="c1"># total_results may be reduced according to the feed&#39;s</span>
         <span class="c1"># opensearch:totalResults value.</span>
         <span class="n">total_results</span> <span class="o">=</span> <span class="n">search</span><span class="o">.</span><span class="n">max_results</span>
         <span class="n">first_page</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">while</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="n">total_results</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">first_page</span><span class="p">:</span>
-                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delay_seconds</span><span class="p">)</span>
-            <span class="c1"># Request next page of results.</span>
             <span class="n">page_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page_size</span><span class="p">,</span> <span class="n">search</span><span class="o">.</span><span class="n">max_results</span> <span class="o">-</span> <span class="n">offset</span><span class="p">)</span>
             <span class="n">page_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_url</span><span class="p">(</span><span class="n">search</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">page_size</span><span class="p">)</span>
             <span class="n">feed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_feed</span><span class="p">(</span><span class="n">page_url</span><span class="p">,</span> <span class="n">first_page</span><span class="p">)</span>
@@ -1717,6 +1733,9 @@ info on those defauts see <code><a href="#Client">Client</a></code>; see also <c
         <span class="p">})</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_url_format</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">urlencode</span><span class="p">(</span><span class="n">url_args</span><span class="p">))</span>
 
+    <span class="c1"># NOTE: if erroneous outcomes are so common that it&#39;s necessary to sleep</span>
+    <span class="c1"># after requests that return errors, _parse_feed can be rewritten</span>
+    <span class="c1"># recursively.</span>
     <span class="k">def</span> <span class="nf">_parse_feed</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1726,11 +1745,25 @@ info on those defauts see <code><a href="#Client">Client</a></code>; see also <c
 <span class="sd">        Fetches the specified URL and parses it with feedparser. If a request</span>
 <span class="sd">        fails or is unexpectedly empty, `_parse_feed` retries the request up to</span>
 <span class="sd">        `self.num_retries` times.</span>
+
+<span class="sd">        Enforces `self.delay_seconds`: if that number of seconds has not passed</span>
+<span class="sd">        since `_parse_feed` was last called, sleeps until delay_seconds seconds</span>
+<span class="sd">        have passed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If this call would violate the rate limit, sleep until it doesn&#39;t.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_request_dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">required</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delay_seconds</span><span class="p">)</span>
+            <span class="n">since_last_request</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_request_dt</span>
+            <span class="k">if</span> <span class="n">since_last_request</span> <span class="o">&lt;</span> <span class="n">required</span><span class="p">:</span>
+                <span class="n">to_sleep</span> <span class="o">=</span> <span class="p">(</span><span class="n">required</span> <span class="o">-</span> <span class="n">since_last_request</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Sleeping for </span><span class="si">%f</span><span class="s2"> seconds&quot;</span><span class="p">,</span> <span class="n">to_sleep</span><span class="p">)</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">to_sleep</span><span class="p">)</span>
+        <span class="c1"># self.delay_seconds seconds have passed since last call. Fetch results.</span>
         <span class="n">err</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">retry</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_retries</span><span class="p">):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Requesting feed&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;retry&#39;</span><span class="p">:</span> <span class="n">retry</span><span class="p">,</span> <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">url</span><span class="p">})</span>
             <span class="n">feed</span> <span class="o">=</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_request_dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">feed</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
                 <span class="n">err</span> <span class="o">=</span> <span class="n">HTTPError</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">retry</span><span class="p">,</span> <span class="n">feed</span><span class="o">.</span><span class="n">status</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">feed</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first_page</span><span class="p">:</span>
@@ -1769,6 +1802,7 @@ pagination and retry logic, and exposes <code>(Client).get</code>.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">page_size</span> <span class="o">=</span> <span class="n">page_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">delay_seconds</span> <span class="o">=</span> <span class="n">delay_seconds</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_retries</span> <span class="o">=</span> <span class="n">num_retries</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_request_dt</span> <span class="o">=</span> <span class="kc">None</span>
 </pre></div>
 
         </details>
@@ -1846,14 +1880,11 @@ pagination and retry logic, and exposes <code>(Client).get</code>.</p>
 <span class="sd">        For more on using generators, see [Generators](https://wiki.python.org/moin/Generators).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="c1"># Placeholder; this may be reduced according to the feed&#39;s</span>
+        <span class="c1"># total_results may be reduced according to the feed&#39;s</span>
         <span class="c1"># opensearch:totalResults value.</span>
         <span class="n">total_results</span> <span class="o">=</span> <span class="n">search</span><span class="o">.</span><span class="n">max_results</span>
         <span class="n">first_page</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">while</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="n">total_results</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">first_page</span><span class="p">:</span>
-                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delay_seconds</span><span class="p">)</span>
-            <span class="c1"># Request next page of results.</span>
             <span class="n">page_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page_size</span><span class="p">,</span> <span class="n">search</span><span class="o">.</span><span class="n">max_results</span> <span class="o">-</span> <span class="n">offset</span><span class="p">)</span>
             <span class="n">page_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_url</span><span class="p">(</span><span class="n">search</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">page_size</span><span class="p">)</span>
             <span class="n">feed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_feed</span><span class="p">(</span><span class="n">page_url</span><span class="p">,</span> <span class="n">first_page</span><span class="p">)</span>

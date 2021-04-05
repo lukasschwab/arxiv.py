@@ -6,6 +6,7 @@ import os
 
 from urllib.parse import urlencode
 from urllib.request import urlretrieve
+from datetime import datetime, timedelta
 
 from enum import Enum
 from typing import Dict, Generator, List
@@ -276,6 +277,7 @@ class Client(object):
     """Number of seconds to wait between API requests."""
     num_retries: int
     """Number of times to retry a failing API request."""
+    _last_request_dt: datetime
 
     def __init__(
         self,
@@ -289,6 +291,7 @@ class Client(object):
         self.page_size = page_size
         self.delay_seconds = delay_seconds
         self.num_retries = num_retries
+        self._last_request_dt = None
 
     def get(self, search: Search) -> Generator[Result, None, None]:
         """
@@ -301,14 +304,11 @@ class Client(object):
         For more on using generators, see [Generators](https://wiki.python.org/moin/Generators).
         """
         offset = 0
-        # Placeholder; this may be reduced according to the feed's
+        # total_results may be reduced according to the feed's
         # opensearch:totalResults value.
         total_results = search.max_results
         first_page = True
         while offset < total_results:
-            if not first_page:
-                time.sleep(self.delay_seconds)
-            # Request next page of results.
             page_size = min(self.page_size, search.max_results - offset)
             page_url = self._format_url(search, offset, page_size)
             feed = self._parse_feed(page_url, first_page)
@@ -344,6 +344,9 @@ class Client(object):
         })
         return self.query_url_format.format(urlencode(url_args))
 
+    # NOTE: if erroneous outcomes are so common that it's necessary to sleep
+    # after requests that return errors, _parse_feed can be rewritten
+    # recursively.
     def _parse_feed(
         self,
         url: str,
@@ -353,11 +356,25 @@ class Client(object):
         Fetches the specified URL and parses it with feedparser. If a request
         fails or is unexpectedly empty, `_parse_feed` retries the request up to
         `self.num_retries` times.
+
+        Enforces `self.delay_seconds`: if that number of seconds has not passed
+        since `_parse_feed` was last called, sleeps until delay_seconds seconds
+        have passed.
         """
+        # If this call would violate the rate limit, sleep until it doesn't.
+        if self._last_request_dt is not None:
+            required = timedelta(seconds=self.delay_seconds)
+            since_last_request = datetime.now() - self._last_request_dt
+            if since_last_request < required:
+                to_sleep = (required - since_last_request).total_seconds()
+                logger.info("Sleeping for %f seconds", to_sleep)
+                time.sleep(to_sleep)
+        # self.delay_seconds seconds have passed since last call. Fetch results.
         err = None
         for retry in range(self.num_retries):
             logger.info("Requesting feed", extra={'retry': retry, 'url': url})
             feed = feedparser.parse(url)
+            self._last_request_dt = datetime.now()
             if feed.status != 200:
                 err = HTTPError(url, retry, feed.status)
             elif len(feed.entries) == 0 and not first_page:
