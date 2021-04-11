@@ -2,27 +2,27 @@
 name: Bug report
 about: Create a report to help us improve
 title: ''
-labels: ''
-assignees: ''
+labels: bug
+assignees: lukasschwab
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+# Description
+> A clear and concise description of what the bug is.
 
-**To Reproduce**
-Steps to reproduce the behavior; ideally, include a code snippet.
+## Steps to reproduce
+> Steps to reproduce the behavior; ideally, include a code snippet.
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+## Expected behavior
+> A clear and concise description of what you expected to happen.
 
-**Versions**
+# Versions
 
+<!-- Run `python --version`. -->
 + `python` version:
-    + Run `python --version`.
 
+<!-- Run `pip freeze | grep arxiv`. -->
 + `arxiv.py` version:
-    + Run `pip freeze | grep arxiv`.
 
-**Additional context**
-Add any other context about the problem here.
+# Additional context
+> Add any other context about the problem here.
