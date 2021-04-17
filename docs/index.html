@@ -70,6 +70,9 @@
                                 <a class="variable" href="#Result.links">links</a>
                         </li>
                         <li>
+                                <a class="variable" href="#Result.pdf_url">pdf_url</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#Result.get_short_id">get_short_id</a>
                         </li>
                         <li>
@@ -310,6 +313,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">links</span><span class="p">:</span> <span class="nb">list</span>
     <span class="sd">&quot;&quot;&quot;Up to three URLs associated with this result.&quot;&quot;&quot;</span>
+    <span class="n">pdf_url</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="sd">&quot;&quot;&quot;The URL of a PDF version of this result if present among links.&quot;&quot;&quot;</span>
     <span class="n">_raw</span><span class="p">:</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">FeedParserDict</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The raw feedparser result object if this Result was constructed with</span>
@@ -348,6 +353,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">primary_category</span> <span class="o">=</span> <span class="n">primary_category</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">categories</span> <span class="o">=</span> <span class="n">categories</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">links</span> <span class="o">=</span> <span class="n">links</span>
+        <span class="c1"># Calculated members</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pdf_url</span> <span class="o">=</span> <span class="n">Result</span><span class="o">.</span><span class="n">_get_pdf_url</span><span class="p">(</span><span class="n">links</span><span class="p">)</span>
+        <span class="c1"># Debugging</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_raw</span> <span class="o">=</span> <span class="n">_raw</span>
 
     <span class="k">def</span> <span class="nf">_from_feed_entry</span><span class="p">(</span><span class="n">entry</span><span class="p">:</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">FeedParserDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Result&#39;</span><span class="p">:</span>
@@ -382,17 +390,11 @@
     <span class="k">def</span> <span class="nf">get_pdf_url</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the URL of a PDF version of this result.</span>
+
+<span class="sd">        NOTE: deprecated v1.0.3. User Result.pdf_url member variable.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">pdf_links</span> <span class="o">=</span> <span class="p">[</span><span class="n">link</span><span class="o">.</span><span class="n">href</span> <span class="k">for</span> <span class="n">link</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">links</span> <span class="k">if</span> <span class="n">link</span><span class="o">.</span><span class="n">title</span> <span class="o">==</span> <span class="s1">&#39;pdf&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdf_links</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Result does not have a PDF link&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdf_links</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> has multiple PDF links; using </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">get_short_id</span><span class="p">(),</span>
-                <span class="n">pdf_links</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">href</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="n">pdf_links</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Result.get_pdf_url() is deprecated; use Result.pdf_url&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdf_url</span>
 
     <span class="k">def</span> <span class="nf">_get_default_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extension</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;pdf&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -411,7 +413,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span>
             <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_default_filename</span><span class="p">()</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
-        <span class="n">written_path</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">urlretrieve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_pdf_url</span><span class="p">(),</span> <span class="n">path</span><span class="p">)</span>
+        <span class="n">written_path</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">urlretrieve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdf_url</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">written_path</span>
 
     <span class="k">def</span> <span class="nf">download_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dirpath</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;./&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -423,9 +425,24 @@
             <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_default_filename</span><span class="p">(</span><span class="s1">&#39;tar.gz&#39;</span><span class="p">)</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
         <span class="c1"># Bodge: construct the source URL from the PDF URL.</span>
-        <span class="n">source_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pdf_url</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/pdf/&#39;</span><span class="p">,</span> <span class="s1">&#39;/src/&#39;</span><span class="p">)</span>
+        <span class="n">source_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdf_url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/pdf/&#39;</span><span class="p">,</span> <span class="s1">&#39;/src/&#39;</span><span class="p">)</span>
         <span class="n">written_path</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">urlretrieve</span><span class="p">(</span><span class="n">source_url</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">written_path</span>
+
+    <span class="k">def</span> <span class="nf">_get_pdf_url</span><span class="p">(</span><span class="n">links</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds the PDF link among a result&#39;s links and returns its URL. Called</span>
+<span class="sd">        once from Result constructors.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pdf_urls</span> <span class="o">=</span> <span class="p">[</span><span class="n">link</span><span class="o">.</span><span class="n">href</span> <span class="k">for</span> <span class="n">link</span> <span class="ow">in</span> <span class="n">links</span> <span class="k">if</span> <span class="n">link</span><span class="o">.</span><span class="n">title</span> <span class="o">==</span> <span class="s1">&#39;pdf&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdf_urls</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdf_urls</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Result has multiple PDF links; using </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">pdf_urls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">pdf_urls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="k">class</span> <span class="nc">Author</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -768,6 +785,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">links</span><span class="p">:</span> <span class="nb">list</span>
     <span class="sd">&quot;&quot;&quot;Up to three URLs associated with this result.&quot;&quot;&quot;</span>
+    <span class="n">pdf_url</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="sd">&quot;&quot;&quot;The URL of a PDF version of this result if present among links.&quot;&quot;&quot;</span>
     <span class="n">_raw</span><span class="p">:</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">FeedParserDict</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The raw feedparser result object if this Result was constructed with</span>
@@ -806,6 +825,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">primary_category</span> <span class="o">=</span> <span class="n">primary_category</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">categories</span> <span class="o">=</span> <span class="n">categories</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">links</span> <span class="o">=</span> <span class="n">links</span>
+        <span class="c1"># Calculated members</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pdf_url</span> <span class="o">=</span> <span class="n">Result</span><span class="o">.</span><span class="n">_get_pdf_url</span><span class="p">(</span><span class="n">links</span><span class="p">)</span>
+        <span class="c1"># Debugging</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_raw</span> <span class="o">=</span> <span class="n">_raw</span>
 
     <span class="k">def</span> <span class="nf">_from_feed_entry</span><span class="p">(</span><span class="n">entry</span><span class="p">:</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">FeedParserDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Result&#39;</span><span class="p">:</span>
@@ -840,17 +862,11 @@
     <span class="k">def</span> <span class="nf">get_pdf_url</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the URL of a PDF version of this result.</span>
+
+<span class="sd">        NOTE: deprecated v1.0.3. User Result.pdf_url member variable.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">pdf_links</span> <span class="o">=</span> <span class="p">[</span><span class="n">link</span><span class="o">.</span><span class="n">href</span> <span class="k">for</span> <span class="n">link</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">links</span> <span class="k">if</span> <span class="n">link</span><span class="o">.</span><span class="n">title</span> <span class="o">==</span> <span class="s1">&#39;pdf&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdf_links</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Result does not have a PDF link&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdf_links</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> has multiple PDF links; using </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">get_short_id</span><span class="p">(),</span>
-                <span class="n">pdf_links</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">href</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="n">pdf_links</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Result.get_pdf_url() is deprecated; use Result.pdf_url&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdf_url</span>
 
     <span class="k">def</span> <span class="nf">_get_default_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extension</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;pdf&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -869,7 +885,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span>
             <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_default_filename</span><span class="p">()</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
-        <span class="n">written_path</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">urlretrieve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_pdf_url</span><span class="p">(),</span> <span class="n">path</span><span class="p">)</span>
+        <span class="n">written_path</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">urlretrieve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdf_url</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">written_path</span>
 
     <span class="k">def</span> <span class="nf">download_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dirpath</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;./&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -881,9 +897,24 @@
             <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_default_filename</span><span class="p">(</span><span class="s1">&#39;tar.gz&#39;</span><span class="p">)</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
         <span class="c1"># Bodge: construct the source URL from the PDF URL.</span>
-        <span class="n">source_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pdf_url</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/pdf/&#39;</span><span class="p">,</span> <span class="s1">&#39;/src/&#39;</span><span class="p">)</span>
+        <span class="n">source_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdf_url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/pdf/&#39;</span><span class="p">,</span> <span class="s1">&#39;/src/&#39;</span><span class="p">)</span>
         <span class="n">written_path</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">urlretrieve</span><span class="p">(</span><span class="n">source_url</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">written_path</span>
+
+    <span class="k">def</span> <span class="nf">_get_pdf_url</span><span class="p">(</span><span class="n">links</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds the PDF link among a result&#39;s links and returns its URL. Called</span>
+<span class="sd">        once from Result constructors.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pdf_urls</span> <span class="o">=</span> <span class="p">[</span><span class="n">link</span><span class="o">.</span><span class="n">href</span> <span class="k">for</span> <span class="n">link</span> <span class="ow">in</span> <span class="n">links</span> <span class="k">if</span> <span class="n">link</span><span class="o">.</span><span class="n">title</span> <span class="o">==</span> <span class="s1">&#39;pdf&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdf_urls</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdf_urls</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Result has multiple PDF links; using </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">pdf_urls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">pdf_urls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="k">class</span> <span class="nc">Author</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -973,6 +1004,9 @@ Returned</a>.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">primary_category</span> <span class="o">=</span> <span class="n">primary_category</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">categories</span> <span class="o">=</span> <span class="n">categories</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">links</span> <span class="o">=</span> <span class="n">links</span>
+        <span class="c1"># Calculated members</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pdf_url</span> <span class="o">=</span> <span class="n">Result</span><span class="o">.</span><span class="n">_get_pdf_url</span><span class="p">(</span><span class="n">links</span><span class="p">)</span>
+        <span class="c1"># Debugging</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_raw</span> <span class="o">=</span> <span class="n">_raw</span>
 </pre></div>
 
@@ -1118,6 +1152,17 @@ Taxonomy</a>.</p>
 
 
                             </div>
+                            <div id="Result.pdf_url" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#Result.pdf_url">#&nbsp;&nbsp</a>
+
+        <span class="name">pdf_url</span><span class="annotation">: str</span>
+    </div>
+
+            <div class="docstring"><p>The URL of a PDF version of this result if present among links.</p>
+</div>
+
+
+                            </div>
                             <div id="Result.get_short_id" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#Result.get_short_id">#&nbsp;&nbsp</a>
 
@@ -1159,22 +1204,18 @@ returns <code>"0201082v1"</code>.</p>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_pdf_url</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the URL of a PDF version of this result.</span>
+
+<span class="sd">        NOTE: deprecated v1.0.3. User Result.pdf_url member variable.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">pdf_links</span> <span class="o">=</span> <span class="p">[</span><span class="n">link</span><span class="o">.</span><span class="n">href</span> <span class="k">for</span> <span class="n">link</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">links</span> <span class="k">if</span> <span class="n">link</span><span class="o">.</span><span class="n">title</span> <span class="o">==</span> <span class="s1">&#39;pdf&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdf_links</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Result does not have a PDF link&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdf_links</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> has multiple PDF links; using </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">get_short_id</span><span class="p">(),</span>
-                <span class="n">pdf_links</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">href</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="n">pdf_links</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Result.get_pdf_url() is deprecated; use Result.pdf_url&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdf_url</span>
 </pre></div>
 
         </details>
 
             <div class="docstring"><p>Returns the URL of a PDF version of this result.</p>
+
+<p>NOTE: deprecated v1.0.3. User <a href="#Result.pdf_url">Result.pdf_url</a> member variable.</p>
 </div>
 
 
@@ -1197,7 +1238,7 @@ returns <code>"0201082v1"</code>.</p>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span>
             <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_default_filename</span><span class="p">()</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
-        <span class="n">written_path</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">urlretrieve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_pdf_url</span><span class="p">(),</span> <span class="n">path</span><span class="p">)</span>
+        <span class="n">written_path</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">urlretrieve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdf_url</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">written_path</span>
 </pre></div>
 
@@ -1228,7 +1269,7 @@ filename is generated by calling <code>to_filename(self)</code>.</p>
             <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_default_filename</span><span class="p">(</span><span class="s1">&#39;tar.gz&#39;</span><span class="p">)</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
         <span class="c1"># Bodge: construct the source URL from the PDF URL.</span>
-        <span class="n">source_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pdf_url</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/pdf/&#39;</span><span class="p">,</span> <span class="s1">&#39;/src/&#39;</span><span class="p">)</span>
+        <span class="n">source_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdf_url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/pdf/&#39;</span><span class="p">,</span> <span class="s1">&#39;/src/&#39;</span><span class="p">)</span>
         <span class="n">written_path</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">urlretrieve</span><span class="p">(</span><span class="n">source_url</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">written_path</span>
 </pre></div>
