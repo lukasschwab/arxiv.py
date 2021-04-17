@@ -6,14 +6,15 @@ import os
 
 from urllib.parse import urlencode
 from urllib.request import urlretrieve
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from time import mktime
 
 from enum import Enum
 from typing import Dict, Generator, List
 
 logger = logging.getLogger(__name__)
 
-_DEFAULT_TIME = time.struct_time((0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+_DEFAULT_TIME = datetime.min
 
 
 class Result(object):
@@ -64,8 +65,8 @@ class Result(object):
     def __init__(
         self,
         entry_id: str,
-        updated: time.struct_time = _DEFAULT_TIME,
-        published: time.struct_time = _DEFAULT_TIME,
+        updated: datetime = _DEFAULT_TIME,
+        published: datetime = _DEFAULT_TIME,
         title: str = "",
         authors: List['Result.Author'] = [],
         summary: str = "",
@@ -105,8 +106,8 @@ class Result(object):
         """
         return Result(
             entry_id=entry.id,
-            updated=entry.updated_parsed,
-            published=entry.published_parsed,
+            updated=Result._to_datetime(entry.updated_parsed),
+            published=Result._to_datetime(entry.published_parsed),
             title=re.sub(r'\s+', ' ', entry.title),
             authors=[Result.Author._from_feed_author(a) for a in entry.authors],
             summary=entry.summary,
@@ -118,6 +119,8 @@ class Result(object):
             links=[Result.Link._from_feed_link(link) for link in entry.links],
             _raw=entry
         )
+
+    
 
     def __str__(self) -> str:
         return self.entry_id
@@ -198,6 +201,14 @@ class Result(object):
                 pdf_urls[0]
             )
         return pdf_urls[0]
+
+    def _to_datetime(ts: time.struct_time) -> datetime:
+        """
+        Converts a UTC time.struct_time into a time-zone-aware datetime. This
+        will be replaced with feedparser functionality when it becomes
+        available: https://github.com/kurtmckee/feedparser/issues/212
+        """
+        return datetime.fromtimestamp(mktime(ts), tz=timezone.utc)
 
     class Author(object):
         """
