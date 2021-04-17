@@ -310,6 +310,10 @@ class Client(object):
         first_page = True
         while offset < total_results:
             page_size = min(self.page_size, search.max_results - offset)
+            logger.info("Requesting {} results at offset {}".format(
+                page_size,
+                offset,
+            ))
             page_url = self._format_url(search, offset, page_size)
             feed = self._parse_feed(page_url, first_page)
             if first_page:
@@ -318,12 +322,17 @@ class Client(object):
                 # bug is fixed, we can remove this conditional and always set
                 # `total_results = min(...)`.
                 if len(feed.entries) == 0:
+                    logger.info("Got empty results; stopping generation")
                     total_results = 0
                 else:
                     total_results = min(
                         total_results,
                         int(feed.feed.opensearch_totalresults)
                     )
+                    logger.info("Got first page; {} of {} results available".format(
+                        total_results,
+                        search.max_results
+                    ))
                 # Subsequent pages are not the first page.
                 first_page = False
             # Update offset for next request: account for received results.
@@ -372,7 +381,12 @@ class Client(object):
         # self.delay_seconds seconds have passed since last call. Fetch results.
         err = None
         for retry in range(self.num_retries):
-            logger.info("Requesting feed", extra={'retry': retry, 'url': url})
+            logger.info("Requesting page of results", extra={
+                'url': url,
+                'first_page': first_page,
+                'retry': retry,
+                'last_err': err.message if err is not None else None,
+            })
             feed = feedparser.parse(url)
             self._last_request_dt = datetime.now()
             if feed.status != 200:
@@ -381,7 +395,8 @@ class Client(object):
                 err = UnexpectedEmptyPageError(url, retry)
             else:
                 return feed
-        # Raise the last exception encountered.
+        # Feed was never returned in self.num_retries tries. Raise the last
+        # exception encountered.
         raise err
 
 
@@ -390,10 +405,10 @@ class ArxivError(Exception):
     """The feed URL that could not be fetched."""
     message: str
     """Message explaining what went wrong."""
-    def __init__(self, url, message, extra={}):
+    def __init__(self, url, message):
         self.url = url
         self.message = message
-        logger.warning(self.message, extra=extra)
+        # logger.info(self.message, extra=extra)
         super().__init__(self.message)
 
 
@@ -408,11 +423,7 @@ class UnexpectedEmptyPageError(ArxivError):
     def __init__(self, url: str, retry: int):
         self.url = url
         self.retry = retry
-        super().__init__(
-            url,
-            "Page of results was unexpectedly empty",
-            extra={'retry': self.retry, 'url': self.url}
-        )
+        super().__init__(url, "Page of results was unexpectedly empty")
 
 
 class HTTPError(ArxivError):
@@ -428,5 +439,4 @@ class HTTPError(ArxivError):
         super().__init__(
             url,
             "Page request resulted in HTTP {}".format(self.status),
-            extra={'status': self.status, 'retry': self.retry, 'url': self.url}
         )

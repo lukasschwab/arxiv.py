@@ -561,6 +561,10 @@
         <span class="n">first_page</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">while</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="n">total_results</span><span class="p">:</span>
             <span class="n">page_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page_size</span><span class="p">,</span> <span class="n">search</span><span class="o">.</span><span class="n">max_results</span> <span class="o">-</span> <span class="n">offset</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Requesting </span><span class="si">{}</span><span class="s2"> results at offset </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">page_size</span><span class="p">,</span>
+                <span class="n">offset</span><span class="p">,</span>
+            <span class="p">))</span>
             <span class="n">page_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_url</span><span class="p">(</span><span class="n">search</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">page_size</span><span class="p">)</span>
             <span class="n">feed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_feed</span><span class="p">(</span><span class="n">page_url</span><span class="p">,</span> <span class="n">first_page</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">first_page</span><span class="p">:</span>
@@ -569,12 +573,17 @@
                 <span class="c1"># bug is fixed, we can remove this conditional and always set</span>
                 <span class="c1"># `total_results = min(...)`.</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">feed</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Got empty results; stopping generation&quot;</span><span class="p">)</span>
                     <span class="n">total_results</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">total_results</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
                         <span class="n">total_results</span><span class="p">,</span>
                         <span class="nb">int</span><span class="p">(</span><span class="n">feed</span><span class="o">.</span><span class="n">feed</span><span class="o">.</span><span class="n">opensearch_totalresults</span><span class="p">)</span>
                     <span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Got first page; </span><span class="si">{}</span><span class="s2"> of </span><span class="si">{}</span><span class="s2"> results available&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">total_results</span><span class="p">,</span>
+                        <span class="n">search</span><span class="o">.</span><span class="n">max_results</span>
+                    <span class="p">))</span>
                 <span class="c1"># Subsequent pages are not the first page.</span>
                 <span class="n">first_page</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="c1"># Update offset for next request: account for received results.</span>
@@ -623,7 +632,12 @@
         <span class="c1"># self.delay_seconds seconds have passed since last call. Fetch results.</span>
         <span class="n">err</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">retry</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_retries</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Requesting feed&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;retry&#39;</span><span class="p">:</span> <span class="n">retry</span><span class="p">,</span> <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">url</span><span class="p">})</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Requesting page of results&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">url</span><span class="p">,</span>
+                <span class="s1">&#39;first_page&#39;</span><span class="p">:</span> <span class="n">first_page</span><span class="p">,</span>
+                <span class="s1">&#39;retry&#39;</span><span class="p">:</span> <span class="n">retry</span><span class="p">,</span>
+                <span class="s1">&#39;last_err&#39;</span><span class="p">:</span> <span class="n">err</span><span class="o">.</span><span class="n">message</span> <span class="k">if</span> <span class="n">err</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">})</span>
             <span class="n">feed</span> <span class="o">=</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_last_request_dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">feed</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
@@ -632,7 +646,8 @@
                 <span class="n">err</span> <span class="o">=</span> <span class="n">UnexpectedEmptyPageError</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">retry</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">feed</span>
-        <span class="c1"># Raise the last exception encountered.</span>
+        <span class="c1"># Feed was never returned in self.num_retries tries. Raise the last</span>
+        <span class="c1"># exception encountered.</span>
         <span class="k">raise</span> <span class="n">err</span>
 
 
@@ -641,10 +656,10 @@
     <span class="sd">&quot;&quot;&quot;The feed URL that could not be fetched.&quot;&quot;&quot;</span>
     <span class="n">message</span><span class="p">:</span> <span class="nb">str</span>
     <span class="sd">&quot;&quot;&quot;Message explaining what went wrong.&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="n">extra</span><span class="p">)</span>
+        <span class="c1"># logger.info(self.message, extra=extra)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
 
 
@@ -659,11 +674,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">retry</span> <span class="o">=</span> <span class="n">retry</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">url</span><span class="p">,</span>
-            <span class="s2">&quot;Page of results was unexpectedly empty&quot;</span><span class="p">,</span>
-            <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;retry&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry</span><span class="p">,</span> <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">}</span>
-        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s2">&quot;Page of results was unexpectedly empty&quot;</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">HTTPError</span><span class="p">(</span><span class="n">ArxivError</span><span class="p">):</span>
@@ -679,7 +690,6 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">url</span><span class="p">,</span>
             <span class="s2">&quot;Page request resulted in HTTP </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">),</span>
-            <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="s1">&#39;retry&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry</span><span class="p">,</span> <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">}</span>
         <span class="p">)</span>
 </pre></div>
 
@@ -1699,6 +1709,10 @@ info on those defauts see <code><a href="#Client">Client</a></code>; see also <c
         <span class="n">first_page</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">while</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="n">total_results</span><span class="p">:</span>
             <span class="n">page_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page_size</span><span class="p">,</span> <span class="n">search</span><span class="o">.</span><span class="n">max_results</span> <span class="o">-</span> <span class="n">offset</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Requesting </span><span class="si">{}</span><span class="s2"> results at offset </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">page_size</span><span class="p">,</span>
+                <span class="n">offset</span><span class="p">,</span>
+            <span class="p">))</span>
             <span class="n">page_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_url</span><span class="p">(</span><span class="n">search</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">page_size</span><span class="p">)</span>
             <span class="n">feed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_feed</span><span class="p">(</span><span class="n">page_url</span><span class="p">,</span> <span class="n">first_page</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">first_page</span><span class="p">:</span>
@@ -1707,12 +1721,17 @@ info on those defauts see <code><a href="#Client">Client</a></code>; see also <c
                 <span class="c1"># bug is fixed, we can remove this conditional and always set</span>
                 <span class="c1"># `total_results = min(...)`.</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">feed</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Got empty results; stopping generation&quot;</span><span class="p">)</span>
                     <span class="n">total_results</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">total_results</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
                         <span class="n">total_results</span><span class="p">,</span>
                         <span class="nb">int</span><span class="p">(</span><span class="n">feed</span><span class="o">.</span><span class="n">feed</span><span class="o">.</span><span class="n">opensearch_totalresults</span><span class="p">)</span>
                     <span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Got first page; </span><span class="si">{}</span><span class="s2"> of </span><span class="si">{}</span><span class="s2"> results available&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">total_results</span><span class="p">,</span>
+                        <span class="n">search</span><span class="o">.</span><span class="n">max_results</span>
+                    <span class="p">))</span>
                 <span class="c1"># Subsequent pages are not the first page.</span>
                 <span class="n">first_page</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="c1"># Update offset for next request: account for received results.</span>
@@ -1761,7 +1780,12 @@ info on those defauts see <code><a href="#Client">Client</a></code>; see also <c
         <span class="c1"># self.delay_seconds seconds have passed since last call. Fetch results.</span>
         <span class="n">err</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">retry</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_retries</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Requesting feed&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;retry&#39;</span><span class="p">:</span> <span class="n">retry</span><span class="p">,</span> <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">url</span><span class="p">})</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Requesting page of results&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">url</span><span class="p">,</span>
+                <span class="s1">&#39;first_page&#39;</span><span class="p">:</span> <span class="n">first_page</span><span class="p">,</span>
+                <span class="s1">&#39;retry&#39;</span><span class="p">:</span> <span class="n">retry</span><span class="p">,</span>
+                <span class="s1">&#39;last_err&#39;</span><span class="p">:</span> <span class="n">err</span><span class="o">.</span><span class="n">message</span> <span class="k">if</span> <span class="n">err</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">})</span>
             <span class="n">feed</span> <span class="o">=</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_last_request_dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">feed</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
@@ -1770,7 +1794,8 @@ info on those defauts see <code><a href="#Client">Client</a></code>; see also <c
                 <span class="n">err</span> <span class="o">=</span> <span class="n">UnexpectedEmptyPageError</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">retry</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">feed</span>
-        <span class="c1"># Raise the last exception encountered.</span>
+        <span class="c1"># Feed was never returned in self.num_retries tries. Raise the last</span>
+        <span class="c1"># exception encountered.</span>
         <span class="k">raise</span> <span class="n">err</span>
 </pre></div>
 
@@ -1886,6 +1911,10 @@ pagination and retry logic, and exposes <code>(Client).get</code>.</p>
         <span class="n">first_page</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">while</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="n">total_results</span><span class="p">:</span>
             <span class="n">page_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page_size</span><span class="p">,</span> <span class="n">search</span><span class="o">.</span><span class="n">max_results</span> <span class="o">-</span> <span class="n">offset</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Requesting </span><span class="si">{}</span><span class="s2"> results at offset </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">page_size</span><span class="p">,</span>
+                <span class="n">offset</span><span class="p">,</span>
+            <span class="p">))</span>
             <span class="n">page_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_url</span><span class="p">(</span><span class="n">search</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">page_size</span><span class="p">)</span>
             <span class="n">feed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_feed</span><span class="p">(</span><span class="n">page_url</span><span class="p">,</span> <span class="n">first_page</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">first_page</span><span class="p">:</span>
@@ -1894,12 +1923,17 @@ pagination and retry logic, and exposes <code>(Client).get</code>.</p>
                 <span class="c1"># bug is fixed, we can remove this conditional and always set</span>
                 <span class="c1"># `total_results = min(...)`.</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">feed</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Got empty results; stopping generation&quot;</span><span class="p">)</span>
                     <span class="n">total_results</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">total_results</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
                         <span class="n">total_results</span><span class="p">,</span>
                         <span class="nb">int</span><span class="p">(</span><span class="n">feed</span><span class="o">.</span><span class="n">feed</span><span class="o">.</span><span class="n">opensearch_totalresults</span><span class="p">)</span>
                     <span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Got first page; </span><span class="si">{}</span><span class="s2"> of </span><span class="si">{}</span><span class="s2"> results available&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">total_results</span><span class="p">,</span>
+                        <span class="n">search</span><span class="o">.</span><span class="n">max_results</span>
+                    <span class="p">))</span>
                 <span class="c1"># Subsequent pages are not the first page.</span>
                 <span class="n">first_page</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="c1"># Update offset for next request: account for received results.</span>
@@ -1939,10 +1973,10 @@ results have been yielded or there are no more search results.</p>
     <span class="sd">&quot;&quot;&quot;The feed URL that could not be fetched.&quot;&quot;&quot;</span>
     <span class="n">message</span><span class="p">:</span> <span class="nb">str</span>
     <span class="sd">&quot;&quot;&quot;Message explaining what went wrong.&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="n">extra</span><span class="p">)</span>
+        <span class="c1"># logger.info(self.message, extra=extra)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
 </pre></div>
 
@@ -1956,15 +1990,15 @@ results have been yielded or there are no more search results.</p>
                                         <div class="attr function"><a class="headerlink" href="#ArxivError.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">ArxivError</span><span class="signature">(url, message, extra={})</span>
+            <span class="name">ArxivError</span><span class="signature">(url, message)</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{}):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="n">extra</span><span class="p">)</span>
+        <span class="c1"># logger.info(self.message, extra=extra)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
 </pre></div>
 
@@ -2028,11 +2062,7 @@ results have been yielded or there are no more search results.</p>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">retry</span> <span class="o">=</span> <span class="n">retry</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">url</span><span class="p">,</span>
-            <span class="s2">&quot;Page of results was unexpectedly empty&quot;</span><span class="p">,</span>
-            <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;retry&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry</span><span class="p">,</span> <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">}</span>
-        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s2">&quot;Page of results was unexpectedly empty&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -2055,11 +2085,7 @@ brittleness in the underlying arXiv API; usually resolved by retries.</p>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">retry</span> <span class="o">=</span> <span class="n">retry</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">url</span><span class="p">,</span>
-            <span class="s2">&quot;Page of results was unexpectedly empty&quot;</span><span class="p">,</span>
-            <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;retry&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry</span><span class="p">,</span> <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">}</span>
-        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s2">&quot;Page of results was unexpectedly empty&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -2118,7 +2144,6 @@ brittleness in the underlying arXiv API; usually resolved by retries.</p>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">url</span><span class="p">,</span>
             <span class="s2">&quot;Page request resulted in HTTP </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">),</span>
-            <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="s1">&#39;retry&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry</span><span class="p">,</span> <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">}</span>
         <span class="p">)</span>
 </pre></div>
 
@@ -2144,7 +2169,6 @@ brittleness in the underlying arXiv API; usually resolved by retries.</p>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">url</span><span class="p">,</span>
             <span class="s2">&quot;Page request resulted in HTTP </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">),</span>
-            <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="s1">&#39;retry&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry</span><span class="p">,</span> <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">}</span>
         <span class="p">)</span>
 </pre></div>
 
