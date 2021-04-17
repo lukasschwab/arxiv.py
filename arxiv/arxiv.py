@@ -37,6 +37,10 @@ class Result(object):
     """The result abstrace."""
     comment: str
     """The authors' comment if present."""
+    journal_ref: str
+    """A journal reference if present."""
+    doi: str
+    """A URL for the resolved DOI to an external resource if present."""
     primary_category: str
     """
     The result's primary arXiv category. See [arXiv: Category
@@ -49,6 +53,11 @@ class Result(object):
     """
     links: list
     """Up to three URLs associated with this result."""
+    _raw: feedparser.FeedParserDict
+    """
+    The raw feedparser result object if this Result was constructed with
+    Result._from_feed_entry.
+    """
 
     def __init__(
         self,
@@ -59,9 +68,12 @@ class Result(object):
         authors: List['Result.Author'] = [],
         summary: str = "",
         comment: str = "",
+        journal_ref: str = "",
+        doi: str = "",
         primary_category: str = "",
         categories: List[str] = [],
-        links: List['Result.Link'] = []
+        links: List['Result.Link'] = [],
+        _raw: feedparser.FeedParserDict = None,
     ):
         """
         Constructs an arXiv search result item. In most cases, prefer using
@@ -74,9 +86,12 @@ class Result(object):
         self.authors = authors
         self.summary = summary
         self.comment = comment
+        self.journal_ref = journal_ref
+        self.doi = doi
         self.primary_category = primary_category
         self.categories = categories
         self.links = links
+        self._raw = _raw
 
     def _from_feed_entry(entry: feedparser.FeedParserDict) -> 'Result':
         """
@@ -91,9 +106,12 @@ class Result(object):
             authors=[Result.Author(a) for a in entry.authors],
             summary=entry.summary,
             comment=entry.get('comment'),
+            journal_ref=entry.get('arxiv_journal_ref'),
+            doi=entry.get('arxiv_doi'),
             primary_category=entry.arxiv_primary_category.get('term'),
             categories=[tag.get('term') for tag in entry.tags],
-            links=[Result.Link(link) for link in entry.links]
+            links=[Result.Link(link) for link in entry.links],
+            _raw=entry
         )
 
     def get_short_id(self) -> str:

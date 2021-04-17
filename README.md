@@ -91,6 +91,8 @@ The meaning of the underlying raw data is documented in the [arXiv API User Manu
 + `result.authors`: The result's authors, as `arxiv.Author`s.
 + `result.summary`: The result abstract.
 + `result.comment`: The authors' comment if present.
++ `result.journal_ref`: A journal reference if present.
++ `result.doi`: A URL for the resolved DOI to an external resource if present.
 + `result.primary_category`: The result's primary arXiv category. See [arXiv: Category Taxonomy](https://arxiv.org/category_taxonomy).
 + `result.categories`: All of the result's categories. See [arXiv: Category Taxonomy](https://arxiv.org/category_taxonomy).
 + `result.links`: Up to three URLs associated with this result, as `arxiv.Link`s.
