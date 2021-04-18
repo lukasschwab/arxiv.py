@@ -108,15 +108,39 @@ class Result(object):
             updated=entry.updated_parsed,
             published=entry.published_parsed,
             title=re.sub(r'\s+', ' ', entry.title),
-            authors=[Result.Author(a) for a in entry.authors],
+            authors=[Result.Author._from_feed_author(a) for a in entry.authors],
             summary=entry.summary,
             comment=entry.get('comment'),
             journal_ref=entry.get('arxiv_journal_ref'),
             doi=entry.get('arxiv_doi'),
             primary_category=entry.arxiv_primary_category.get('term'),
             categories=[tag.get('term') for tag in entry.tags],
-            links=[Result.Link(link) for link in entry.links],
+            links=[Result.Link._from_feed_link(link) for link in entry.links],
             _raw=entry
+        )
+
+    def __str__(self) -> str:
+        return self.entry_id
+
+    def __repr__(self) -> str:
+        return (
+            '{}(entry_id={}, updated={}, published={}, title={}, authors={}, '
+            'summary={}, comment={}, journal_ref={}, doi={}, '
+            'primary_category={}, categories={}, links={})'
+        ).format(
+            _classname(self),
+            self.entry_id,
+            self.updated,
+            self.published,
+            self.title,
+            self.authors,
+            self.summary,
+            self.comment,
+            self.journal_ref,
+            self.doi,
+            self.primary_category,
+            self.categories,
+            self.links
         )
 
     def get_short_id(self) -> str:
@@ -181,8 +205,19 @@ class Result(object):
         """
         name: str
 
-        def __init__(self, entry_author: feedparser.FeedParserDict):
-            self.name = entry_author.name
+        def __init__(self, name: str):
+            self.name = name
+
+        def _from_feed_author(
+            feed_author: feedparser.FeedParserDict
+        ) -> 'Result.Author':
+            return Result.Author(feed_author.name)
+
+        def __str__(self) -> str:
+            return self.name
+
+        def __repr__(self) -> str:
+            return '{}({})'.format(_classname(self), self.name)
 
     class Link(object):
         """
@@ -193,11 +228,39 @@ class Result(object):
         rel: str
         content_type: str
 
-        def __init__(self, feed_link: feedparser.FeedParserDict):
-            self.href = feed_link.href
-            self.title = feed_link.get('title')
-            self.rel = feed_link.get('rel')
-            self.content_type = feed_link.get('content_type')
+        def __init__(
+            self,
+            href: str,
+            title: str = None,
+            rel: str = None,
+            content_type: str = None
+        ):
+            self.href = href
+            self.title = title
+            self.rel = rel
+            self.content_type = content_type
+
+        def _from_feed_link(
+            feed_link: feedparser.FeedParserDict
+        ) -> 'Result.Link':
+            return Result.Link(
+                href=feed_link.href,
+                title=feed_link.get('title'),
+                rel=feed_link.get('rel'),
+                content_type=feed_link.get('content_type')
+            )
+
+        def __str__(self) -> str:
+            return self.href
+
+        def __repr__(self) -> str:
+            return '{}({}, title={}, rel={}, content_type={})'.format(
+                _classname(self),
+                self.href,
+                self.title,
+                self.rel,
+                self.content_type
+            )
 
 
 class SortCriterion(Enum):
@@ -266,6 +329,23 @@ class Search(object):
         self.sort_by = sort_by
         self.sort_order = sort_order
 
+    def __str__(self) -> str:
+        # TODO: develop a more informative string representation.
+        return repr(self)
+
+    def __repr__(self) -> str:
+        return (
+            '{}(query={}, id_list={}, max_results={}, sort_by={}, '
+            'sort_order={})'
+        ).format(
+            _classname(self),
+            self.query,
+            self.id_list,
+            self.max_results,
+            self.sort_by,
+            self.sort_order
+        )
+
     def _url_args(self) -> Dict[str, str]:
         """
         Returns a dict of search parameters that should be included in an API
@@ -315,6 +395,18 @@ class Client(object):
         self.delay_seconds = delay_seconds
         self.num_retries = num_retries
         self._last_request_dt = None
+
+    def __str__(self) -> str:
+        # TODO: develop a more informative string representation.
+        return repr(self)
+
+    def __repr__(self) -> str:
+        return '{}(page_size={}, delay_seconds={}, num_retries={})'.format(
+            _classname(self),
+            self.page_size,
+            self.delay_seconds,
+            self.num_retries
+        )
 
     def get(self, search: Search) -> Generator[Result, None, None]:
         """
@@ -434,6 +526,9 @@ class ArxivError(Exception):
         # logger.info(self.message, extra=extra)
         super().__init__(self.message)
 
+    def __str__(self) -> str:
+        return '{}({})'.format(_classname(self), self.message)
+
 
 class UnexpectedEmptyPageError(ArxivError):
     """
@@ -447,6 +542,9 @@ class UnexpectedEmptyPageError(ArxivError):
         self.url = url
         self.retry = retry
         super().__init__(url, "Page of results was unexpectedly empty")
+
+    def __repr__(self) -> str:
+        return '{}({}, {})'.format(_classname(self), self.url, self.retry)
 
 
 class HTTPError(ArxivError):
@@ -463,3 +561,16 @@ class HTTPError(ArxivError):
             url,
             "Page request resulted in HTTP {}".format(self.status),
         )
+
+    def __repr__(self) -> str:
+        return '{}({}, {}, {})'.format(
+            _classname(self),
+            self.url,
+            self.retry,
+            self.status
+        )
+
+
+def _classname(o):
+    """A helper function for use in __repr__ methods: arxiv.Result.Link."""
+    return 'arxiv.{}'.format(o.__class__.__qualname__)
