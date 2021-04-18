@@ -96,6 +96,7 @@ The meaning of the underlying raw data is documented in the [arXiv API User Manu
 + `result.primary_category`: The result's primary arXiv category. See [arXiv: Category Taxonomy](https://arxiv.org/category_taxonomy).
 + `result.categories`: All of the result's categories. See [arXiv: Category Taxonomy](https://arxiv.org/category_taxonomy).
 + `result.links`: Up to three URLs associated with this result, as `arxiv.Link`s.
++ `result.pdf_url`: A URL for the result's PDF if present. Note: this URL also appears among `result.links`.
 
 They also expose helper methods for downloading papers: `(Result).download_pdf()` and `(Result).download_source()`.
 
