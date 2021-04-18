@@ -53,6 +53,8 @@ class Result(object):
     """
     links: list
     """Up to three URLs associated with this result."""
+    pdf_url: str
+    """The URL of a PDF version of this result if present among links."""
     _raw: feedparser.FeedParserDict
     """
     The raw feedparser result object if this Result was constructed with
@@ -91,6 +93,9 @@ class Result(object):
         self.primary_category = primary_category
         self.categories = categories
         self.links = links
+        # Calculated members
+        self.pdf_url = Result._get_pdf_url(links)
+        # Debugging
         self._raw = _raw
 
     def _from_feed_entry(entry: feedparser.FeedParserDict) -> 'Result':
@@ -122,21 +127,6 @@ class Result(object):
         """
         return self.entry_id.split('/')[-1]
 
-    def get_pdf_url(self) -> str:
-        """
-        Returns the URL of a PDF version of this result.
-        """
-        pdf_links = [link.href for link in self.links if link.title == 'pdf']
-        if len(pdf_links) == 0:
-            raise ValueError("Result does not have a PDF link")
-        elif len(pdf_links) > 1:
-            logger.warn(
-                "%s has multiple PDF links; using %s",
-                self.get_short_id(),
-                pdf_links[0].href
-            )
-        return pdf_links[0]
-
     def _get_default_filename(self, extension: str = "pdf") -> str:
         """
         A default `to_filename` function for the extension given.
@@ -154,7 +144,7 @@ class Result(object):
         if not filename:
             filename = self._get_default_filename()
         path = os.path.join(dirpath, filename)
-        written_path, _ = urlretrieve(self.get_pdf_url(), path)
+        written_path, _ = urlretrieve(self.pdf_url, path)
         return written_path
 
     def download_source(self, dirpath: str = './', filename: str = '') -> str:
@@ -166,9 +156,24 @@ class Result(object):
             filename = self._get_default_filename('tar.gz')
         path = os.path.join(dirpath, filename)
         # Bodge: construct the source URL from the PDF URL.
-        source_url = self.get_pdf_url().replace('/pdf/', '/src/')
+        source_url = self.pdf_url.replace('/pdf/', '/src/')
         written_path, _ = urlretrieve(source_url, path)
         return written_path
+
+    def _get_pdf_url(links: list) -> str:
+        """
+        Finds the PDF link among a result's links and returns its URL. Called
+        once from Result constructors.
+        """
+        pdf_urls = [link.href for link in links if link.title == 'pdf']
+        if len(pdf_urls) == 0:
+            return None
+        elif len(pdf_urls) > 1:
+            logger.warn(
+                "Result has multiple PDF links; using %s",
+                pdf_urls[0]
+            )
+        return pdf_urls[0]
 
     class Author(object):
         """
