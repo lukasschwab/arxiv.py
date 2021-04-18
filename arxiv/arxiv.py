@@ -127,15 +127,6 @@ class Result(object):
         """
         return self.entry_id.split('/')[-1]
 
-    def get_pdf_url(self) -> str:
-        """
-        Returns the URL of a PDF version of this result.
-
-        NOTE: deprecated v1.0.3. User Result.pdf_url member variable.
-        """
-        logger.warn("Result.get_pdf_url() is deprecated; use Result.pdf_url")
-        return self.pdf_url
-
     def _get_default_filename(self, extension: str = "pdf") -> str:
         """
         A default `to_filename` function for the extension given.

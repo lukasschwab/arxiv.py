@@ -76,9 +76,6 @@
                                 <a class="function" href="#Result.get_short_id">get_short_id</a>
                         </li>
                         <li>
-                                <a class="function" href="#Result.get_pdf_url">get_pdf_url</a>
-                        </li>
-                        <li>
                                 <a class="function" href="#Result.download_pdf">download_pdf</a>
                         </li>
                         <li>
@@ -386,15 +383,6 @@
 <span class="sd">        returns `&quot;0201082v1&quot;`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-
-    <span class="k">def</span> <span class="nf">get_pdf_url</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the URL of a PDF version of this result.</span>
-
-<span class="sd">        NOTE: deprecated v1.0.3. User Result.pdf_url member variable.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Result.get_pdf_url() is deprecated; use Result.pdf_url&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdf_url</span>
 
     <span class="k">def</span> <span class="nf">_get_default_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extension</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;pdf&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -859,15 +847,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">get_pdf_url</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the URL of a PDF version of this result.</span>
-
-<span class="sd">        NOTE: deprecated v1.0.3. User Result.pdf_url member variable.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Result.get_pdf_url() is deprecated; use Result.pdf_url&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdf_url</span>
-
     <span class="k">def</span> <span class="nf">_get_default_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extension</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;pdf&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A default `to_filename` function for the extension given.</span>
@@ -1187,35 +1166,6 @@ Taxonomy</a>.</p>
             <div class="docstring"><p>Returns the short ID for this result. If the result URL is
 <code>"http://arxiv.org/abs/quant-ph/0201082v1"</code>, <code>result.get_short_id()</code>
 returns <code>"0201082v1"</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="Result.get_pdf_url" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#Result.get_pdf_url">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">get_pdf_url</span><span class="signature">(self) -&gt; str</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_pdf_url</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the URL of a PDF version of this result.</span>
-
-<span class="sd">        NOTE: deprecated v1.0.3. User Result.pdf_url member variable.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Result.get_pdf_url() is deprecated; use Result.pdf_url&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdf_url</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Returns the URL of a PDF version of this result.</p>
-
-<p>NOTE: deprecated v1.0.3. User <a href="#Result.pdf_url">Result.pdf_url</a> member variable.</p>
 </div>
 
 
