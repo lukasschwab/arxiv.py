@@ -103,7 +103,7 @@ class Result(object):
             updated=entry.updated_parsed,
             published=entry.published_parsed,
             title=re.sub(r'\s+', ' ', entry.title),
-            authors=[Result.Author(a) for a in entry.authors],
+            authors=[Result.Author._from_feed_author(a) for a in entry.authors],
             summary=entry.summary,
             comment=entry.get('comment'),
             journal_ref=entry.get('arxiv_journal_ref'),
@@ -114,10 +114,10 @@ class Result(object):
             _raw=entry
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.entry_id
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             '{}(entry_id={}, updated={}, published={}, title={}, authors={}, '
             'summary={}, comment={}, journal_ref={}, doi={}, '
@@ -200,14 +200,19 @@ class Result(object):
         """
         name: str
 
-        def __init__(self, entry_author: feedparser.FeedParserDict):
-            self.name = entry_author.name
+        def __init__(self, name: str):
+            self.name = name
 
-        def __str__(self):
+        def _from_feed_author(
+            feed_author: feedparser.FeedParserDict
+        ) -> 'Result.Author':
+            return Result.Author(feed_author.name)
+
+        def __str__(self) -> str:
             return self.name
 
-        def __repr__(self):
-            return '{}(name={})'.format(_classname(self), self.name)
+        def __repr__(self) -> str:
+            return '{}({})'.format(_classname(self), self.name)
 
     class Link(object):
         """
@@ -230,7 +235,9 @@ class Result(object):
             self.rel = rel
             self.content_type = content_type
 
-        def _from_feed_link(feed_link: feedparser.FeedParserDict) -> 'Result.Link':
+        def _from_feed_link(
+            feed_link: feedparser.FeedParserDict
+        ) -> 'Result.Link':
             return Result.Link(
                 href=feed_link.href,
                 title=feed_link.get('title'),
@@ -238,10 +245,10 @@ class Result(object):
                 content_type=feed_link.get('content_type')
             )
 
-        def __str__(self):
+        def __str__(self) -> str:
             return self.href
 
-        def __repr__(self):
+        def __repr__(self) -> str:
             return '{}({}, title={}, rel={}, content_type={})'.format(
                 _classname(self),
                 self.href,
@@ -317,11 +324,11 @@ class Search(object):
         self.sort_by = sort_by
         self.sort_order = sort_order
 
-    def __str__(self):
+    def __str__(self) -> str:
         # TODO: develop a more informative string representation.
         return repr(self)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             '{}(query={}, id_list={}, max_results={}, sort_by={}, '
             'sort_order={})'
@@ -384,11 +391,11 @@ class Client(object):
         self.num_retries = num_retries
         self._last_request_dt = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         # TODO: develop a more informative string representation.
         return repr(self)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '{}(page_size={}, delay_seconds={}, num_retries={})'.format(
             _classname(self),
             self.page_size,
@@ -514,7 +521,7 @@ class ArxivError(Exception):
         # logger.info(self.message, extra=extra)
         super().__init__(self.message)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return '{}({})'.format(_classname(self), self.message)
 
 
@@ -531,7 +538,7 @@ class UnexpectedEmptyPageError(ArxivError):
         self.retry = retry
         super().__init__(url, "Page of results was unexpectedly empty")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '{}({}, {})'.format(_classname(self), self.url, self.retry)
 
 
@@ -550,7 +557,7 @@ class HTTPError(ArxivError):
             "Page request resulted in HTTP {}".format(self.status),
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '{}({}, {}, {})'.format(
             _classname(self),
             self.url,
