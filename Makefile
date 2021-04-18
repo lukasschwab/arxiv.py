@@ -9,7 +9,7 @@ lint: $(source) $(tests)
 	flake8 . --count --max-complexity=10 --statistics
 
 test: $(source) $(tests)
-	pytest
+	pytest -n 3
 
 docs: docs/index.html
 docs/index.html: $(source)
