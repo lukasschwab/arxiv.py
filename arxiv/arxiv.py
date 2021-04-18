@@ -7,7 +7,7 @@ import os
 from urllib.parse import urlencode
 from urllib.request import urlretrieve
 from datetime import datetime, timedelta, timezone
-from time import mktime
+from calendar import timegm
 
 from enum import Enum
 from typing import Dict, Generator, List
@@ -208,7 +208,7 @@ class Result(object):
         will be replaced with feedparser functionality when it becomes
         available: https://github.com/kurtmckee/feedparser/issues/212
         """
-        return datetime.fromtimestamp(mktime(ts), tz=timezone.utc)
+        return datetime.fromtimestamp(timegm(ts), tz=timezone.utc)
 
     class Author(object):
         """
