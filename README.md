@@ -169,10 +169,10 @@ for result in big_slow_client.get(arxiv.Search(query="quantum")):
 
 To inspect this package's network behavior and API logic, configure an `INFO`-level logger.
 
-```python
+```pycon
 >>> import logging, arxiv
 >>> logging.basicConfig(level=logging.INFO)
->>> paper = next(arxiv.Search(id_list=["1605.08386v1"]).get()) # Logs:
+>>> paper = next(arxiv.Search(id_list=["1605.08386v1"]).get())
 INFO:arxiv.arxiv:Requesting 100 results at offset 0
 INFO:arxiv.arxiv:Requesting page of results
 INFO:arxiv.arxiv:Got first page; 1 of inf results available
