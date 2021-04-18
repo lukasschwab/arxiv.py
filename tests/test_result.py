@@ -30,6 +30,7 @@ class TestAPI(unittest.TestCase):
             self.assert_nonempty(category)
         for link in result.links:
             self.assert_valid_link(link)
+        self.assert_nonempty(result.pdf_url)
 
     def test_result_shape(self):
         max_results = 100
