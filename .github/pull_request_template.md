@@ -10,7 +10,5 @@
 
 # Checklist
 
-- [ ] All lint rules are satisfied: run `make lint`.
-- [ ] All tests pass: run `make test`.
 - [ ] All documentation is regenerated: run `make docs`.
 - [ ] (If appropriate) `README.md` example usage has been updated.
