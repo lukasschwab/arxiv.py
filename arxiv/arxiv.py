@@ -120,8 +120,6 @@ class Result(object):
             _raw=entry
         )
 
-    
-
     def __str__(self) -> str:
         return self.entry_id
 
