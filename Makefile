@@ -11,7 +11,8 @@ lint: $(source) $(tests)
 test: $(source) $(tests)
 	pytest
 
-docs: $(source)
+docs: docs/index.html
+docs/index.html: $(source)
 	pdoc arxiv -o docs
 	mv docs/arxiv/arxiv.html docs/index.html
 	rm docs/arxiv.html
