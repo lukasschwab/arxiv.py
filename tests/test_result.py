@@ -69,3 +69,29 @@ class TestAPI(unittest.TestCase):
         actual = arxiv.Result._to_datetime(paper_published_parsed)
         self.assertEqual(actual, expected)
         self.assertEqual(actual.strftime("%Y-%m-%dT%H:%M:%SZ"), paper_published)
+
+    def test_eq(self):
+        # Results
+        id = "some-result"
+        result = arxiv.Result(entry_id=id)
+        self.assertTrue(result == result)
+        self.assertTrue(result == arxiv.Result(entry_id=id))
+        self.assertTrue(arxiv.Result(entry_id=id) == result)
+        self.assertFalse(result == arxiv.Result(entry_id="other"))
+        self.assertFalse(result == id)
+        # Authors
+        name = "some-name"
+        author = arxiv.Result.Author(name)
+        self.assertTrue(author == author)
+        self.assertTrue(author == arxiv.Result.Author(name))
+        self.assertTrue(arxiv.Result.Author(name) == author)
+        self.assertFalse(author == arxiv.Result.Author("other"))
+        self.assertFalse(author == id)
+        # Links
+        href = "some-href"
+        link = arxiv.Result.Link(href)
+        self.assertTrue(link == link)
+        self.assertTrue(link == arxiv.Result.Link(href))
+        self.assertTrue(arxiv.Result.Link(href) == link)
+        self.assertFalse(link == arxiv.Result.Link("other"))
+        self.assertFalse(link == id)

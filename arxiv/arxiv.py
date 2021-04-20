@@ -144,6 +144,11 @@ class Result(object):
             self.links
         )
 
+    def __eq__(self, other) -> bool:
+        if isinstance(other, Result):
+            return self.entry_id == other.entry_id
+        return False
+
     def get_short_id(self) -> str:
         """
         Returns the short ID for this result. If the result URL is
@@ -228,6 +233,11 @@ class Result(object):
         def __repr__(self) -> str:
             return '{}({})'.format(_classname(self), self.name)
 
+        def __eq__(self, other) -> bool:
+            if isinstance(other, Result.Author):
+                return self.name == other.name
+            return False
+
     class Link(object):
         """
         A light inner class for representing a result's links.
@@ -270,6 +280,11 @@ class Result(object):
                 self.rel,
                 self.content_type
             )
+
+        def __eq__(self, other) -> bool:
+            if isinstance(other, Result.Link):
+                return self.href == other.href
+            return False
 
 
 class SortCriterion(Enum):
