@@ -25,7 +25,7 @@ class Result(object):
     """
 
     entry_id: str
-    """A url `http://arxiv.org/abs/{id}`."""
+    """A url of the form `http://arxiv.org/abs/{id}`."""
     updated: time.struct_time
     """When the result was last updated."""
     published: time.struct_time
