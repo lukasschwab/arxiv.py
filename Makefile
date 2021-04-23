@@ -13,7 +13,7 @@ test: $(source) $(tests)
 
 docs: docs/index.html
 docs/index.html: $(source)
-	pdoc arxiv -o docs
+	pdoc ./arxiv -o docs
 	mv docs/arxiv/arxiv.html docs/index.html
 	rm docs/arxiv.html
 	rmdir docs/arxiv
