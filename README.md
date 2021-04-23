@@ -47,7 +47,7 @@ arxiv.Search(
 + `sort_by`: The sort criterion for results: `relevance`, `lastUpdatedDate`, or `submittedDate`.
 + `sort_order`: The sort order for results: `'descending'` or `'ascending'`.
 
-To fetch arXiv records matching a `Search`, use `search.run()` or `(Client).run(search)` to get a generator yielding `Result`s.
+To fetch arXiv records matching a `Search`, use `search.get()` or `(Client).get(search)` to get a generator yielding `Result`s.
 
 #### Example: fetching results
 
