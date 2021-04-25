@@ -282,7 +282,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">entry_id</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="sd">&quot;&quot;&quot;A url `http://arxiv.org/abs/{id}`.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;A url of the form `http://arxiv.org/abs/{id}`.&quot;&quot;&quot;</span>
     <span class="n">updated</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">struct_time</span>
     <span class="sd">&quot;&quot;&quot;When the result was last updated.&quot;&quot;&quot;</span>
     <span class="n">published</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">struct_time</span>
@@ -387,19 +387,24 @@
             <span class="s1">&#39;primary_category=</span><span class="si">{}</span><span class="s1">, categories=</span><span class="si">{}</span><span class="s1">, links=</span><span class="si">{}</span><span class="s1">)&#39;</span>
         <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">updated</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">published</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">authors</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">journal_ref</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">doi</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">primary_category</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">links</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">updated</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">published</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">authors</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">journal_ref</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doi</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">primary_category</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">links</span><span class="p">)</span>
         <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Result</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">entry_id</span>
+        <span class="k">return</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="nf">get_short_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -483,7 +488,12 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
 
         <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+
+        <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Result</span><span class="o">.</span><span class="n">Author</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">return</span> <span class="kc">False</span>
 
     <span class="k">class</span> <span class="nc">Link</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -522,11 +532,16 @@
         <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
             <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(</span><span class="si">{}</span><span class="s1">, title=</span><span class="si">{}</span><span class="s1">, rel=</span><span class="si">{}</span><span class="s1">, content_type=</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">href</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">rel</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">content_type</span>
+                <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">href</span><span class="p">),</span>
+                <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">),</span>
+                <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rel</span><span class="p">),</span>
+                <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content_type</span><span class="p">)</span>
             <span class="p">)</span>
+
+        <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Result</span><span class="o">.</span><span class="n">Link</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">href</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">href</span>
+            <span class="k">return</span> <span class="kc">False</span>
 
 
 <span class="k">class</span> <span class="nc">SortCriterion</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
@@ -605,11 +620,11 @@
             <span class="s1">&#39;sort_order=</span><span class="si">{}</span><span class="s1">)&#39;</span>
         <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">id_list</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">max_results</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sort_by</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sort_order</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id_list</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_results</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sort_by</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sort_order</span><span class="p">)</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_url_args</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
@@ -669,9 +684,9 @@
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(page_size=</span><span class="si">{}</span><span class="s1">, delay_seconds=</span><span class="si">{}</span><span class="s1">, num_retries=</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">page_size</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">delay_seconds</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">num_retries</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page_size</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delay_seconds</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_retries</span><span class="p">)</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search</span><span class="p">:</span> <span class="n">Search</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Result</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
@@ -810,7 +825,11 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s2">&quot;Page of results was unexpectedly empty&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">retry</span><span class="p">)</span>
+        <span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">HTTPError</span><span class="p">(</span><span class="n">ArxivError</span><span class="p">):</span>
@@ -831,9 +850,9 @@
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">retry</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">status</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">retry</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">)</span>
         <span class="p">)</span>
 
 
@@ -864,7 +883,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">entry_id</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="sd">&quot;&quot;&quot;A url `http://arxiv.org/abs/{id}`.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;A url of the form `http://arxiv.org/abs/{id}`.&quot;&quot;&quot;</span>
     <span class="n">updated</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">struct_time</span>
     <span class="sd">&quot;&quot;&quot;When the result was last updated.&quot;&quot;&quot;</span>
     <span class="n">published</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">struct_time</span>
@@ -969,19 +988,24 @@
             <span class="s1">&#39;primary_category=</span><span class="si">{}</span><span class="s1">, categories=</span><span class="si">{}</span><span class="s1">, links=</span><span class="si">{}</span><span class="s1">)&#39;</span>
         <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">updated</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">published</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">authors</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">journal_ref</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">doi</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">primary_category</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">links</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">updated</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">published</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">authors</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">journal_ref</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doi</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">primary_category</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">links</span><span class="p">)</span>
         <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Result</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">entry_id</span>
+        <span class="k">return</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="nf">get_short_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1065,7 +1089,12 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
 
         <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+
+        <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Result</span><span class="o">.</span><span class="n">Author</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">return</span> <span class="kc">False</span>
 
     <span class="k">class</span> <span class="nc">Link</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1104,11 +1133,16 @@
         <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
             <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(</span><span class="si">{}</span><span class="s1">, title=</span><span class="si">{}</span><span class="s1">, rel=</span><span class="si">{}</span><span class="s1">, content_type=</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">href</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">rel</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">content_type</span>
+                <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">href</span><span class="p">),</span>
+                <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">),</span>
+                <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rel</span><span class="p">),</span>
+                <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content_type</span><span class="p">)</span>
             <span class="p">)</span>
+
+        <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Result</span><span class="o">.</span><span class="n">Link</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">href</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">href</span>
+            <span class="k">return</span> <span class="kc">False</span>
 </pre></div>
 
         </details>
@@ -1194,7 +1228,7 @@ Returned</a>.</p>
         <span class="name">entry_id</span><span class="annotation">: str</span>
     </div>
 
-            <div class="docstring"><p>A url <code>http://arxiv.org/abs/{id}</code>.</p>
+            <div class="docstring"><p>A url of the form <code>http://arxiv.org/abs/{id}</code>.</p>
 </div>
 
 
@@ -1453,7 +1487,12 @@ directory. The filename is generated by calling <code>to_filename(self)</code>.<
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
 
         <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+
+        <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Result</span><span class="o">.</span><span class="n">Author</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">return</span> <span class="kc">False</span>
 </pre></div>
 
         </details>
@@ -1538,11 +1577,16 @@ directory. The filename is generated by calling <code>to_filename(self)</code>.<
         <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
             <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(</span><span class="si">{}</span><span class="s1">, title=</span><span class="si">{}</span><span class="s1">, rel=</span><span class="si">{}</span><span class="s1">, content_type=</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">href</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">rel</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">content_type</span>
+                <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">href</span><span class="p">),</span>
+                <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">),</span>
+                <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rel</span><span class="p">),</span>
+                <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content_type</span><span class="p">)</span>
             <span class="p">)</span>
+
+        <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Result</span><span class="o">.</span><span class="n">Link</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">href</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">href</span>
+            <span class="k">return</span> <span class="kc">False</span>
 </pre></div>
 
         </details>
@@ -1812,11 +1856,11 @@ sort order for return results</a>.</p>
             <span class="s1">&#39;sort_order=</span><span class="si">{}</span><span class="s1">)&#39;</span>
         <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">id_list</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">max_results</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sort_by</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sort_order</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id_list</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_results</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sort_by</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sort_order</span><span class="p">)</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_url_args</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
@@ -2021,9 +2065,9 @@ info on those defauts see <code><a href="#Client">Client</a></code>; see also <c
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(page_size=</span><span class="si">{}</span><span class="s1">, delay_seconds=</span><span class="si">{}</span><span class="s1">, num_retries=</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">page_size</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">delay_seconds</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">num_retries</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page_size</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delay_seconds</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_retries</span><span class="p">)</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search</span><span class="p">:</span> <span class="n">Search</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Result</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
@@ -2402,7 +2446,11 @@ results have been yielded or there are no more search results.</p>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s2">&quot;Page of results was unexpectedly empty&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">retry</span><span class="p">)</span>
+        <span class="p">)</span>
 </pre></div>
 
         </details>
@@ -2489,9 +2537,9 @@ brittleness in the underlying arXiv API; usually resolved by retries.</p>
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">retry</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">status</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">retry</span><span class="p">),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">)</span>
         <span class="p">)</span>
 </pre></div>
 

@@ -25,7 +25,7 @@ class Result(object):
     """
 
     entry_id: str
-    """A url `http://arxiv.org/abs/{id}`."""
+    """A url of the form `http://arxiv.org/abs/{id}`."""
     updated: time.struct_time
     """When the result was last updated."""
     published: time.struct_time
@@ -130,19 +130,24 @@ class Result(object):
             'primary_category={}, categories={}, links={})'
         ).format(
             _classname(self),
-            self.entry_id,
-            self.updated,
-            self.published,
-            self.title,
-            self.authors,
-            self.summary,
-            self.comment,
-            self.journal_ref,
-            self.doi,
-            self.primary_category,
-            self.categories,
-            self.links
+            repr(self.entry_id),
+            repr(self.updated),
+            repr(self.published),
+            repr(self.title),
+            repr(self.authors),
+            repr(self.summary),
+            repr(self.comment),
+            repr(self.journal_ref),
+            repr(self.doi),
+            repr(self.primary_category),
+            repr(self.categories),
+            repr(self.links)
         )
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, Result):
+            return self.entry_id == other.entry_id
+        return False
 
     def get_short_id(self) -> str:
         """
@@ -226,7 +231,12 @@ class Result(object):
             return self.name
 
         def __repr__(self) -> str:
-            return '{}({})'.format(_classname(self), self.name)
+            return '{}({})'.format(_classname(self), repr(self.name))
+
+        def __eq__(self, other) -> bool:
+            if isinstance(other, Result.Author):
+                return self.name == other.name
+            return False
 
     class Link(object):
         """
@@ -265,11 +275,16 @@ class Result(object):
         def __repr__(self) -> str:
             return '{}({}, title={}, rel={}, content_type={})'.format(
                 _classname(self),
-                self.href,
-                self.title,
-                self.rel,
-                self.content_type
+                repr(self.href),
+                repr(self.title),
+                repr(self.rel),
+                repr(self.content_type)
             )
+
+        def __eq__(self, other) -> bool:
+            if isinstance(other, Result.Link):
+                return self.href == other.href
+            return False
 
 
 class SortCriterion(Enum):
@@ -348,11 +363,11 @@ class Search(object):
             'sort_order={})'
         ).format(
             _classname(self),
-            self.query,
-            self.id_list,
-            self.max_results,
-            self.sort_by,
-            self.sort_order
+            repr(self.query),
+            repr(self.id_list),
+            repr(self.max_results),
+            repr(self.sort_by),
+            repr(self.sort_order)
         )
 
     def _url_args(self) -> Dict[str, str]:
@@ -412,9 +427,9 @@ class Client(object):
     def __repr__(self) -> str:
         return '{}(page_size={}, delay_seconds={}, num_retries={})'.format(
             _classname(self),
-            self.page_size,
-            self.delay_seconds,
-            self.num_retries
+            repr(self.page_size),
+            repr(self.delay_seconds),
+            repr(self.num_retries)
         )
 
     def get(self, search: Search) -> Generator[Result, None, None]:
@@ -553,7 +568,11 @@ class UnexpectedEmptyPageError(ArxivError):
         super().__init__(url, "Page of results was unexpectedly empty")
 
     def __repr__(self) -> str:
-        return '{}({}, {})'.format(_classname(self), self.url, self.retry)
+        return '{}({}, {})'.format(
+            _classname(self),
+            repr(self.url),
+            repr(self.retry)
+        )
 
 
 class HTTPError(ArxivError):
@@ -574,9 +593,9 @@ class HTTPError(ArxivError):
     def __repr__(self) -> str:
         return '{}({}, {}, {})'.format(
             _classname(self),
-            self.url,
-            self.retry,
-            self.status
+            repr(self.url),
+            repr(self.retry),
+            repr(self.status)
         )
 
 
