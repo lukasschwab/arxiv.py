@@ -30,7 +30,7 @@ jobs:
       uses: rbialon/flake8-annotations@v1
     - name: Lint with flake8
       run: |
-        make lint
+        make -B lint
     - name: Test with pytest
       run: |
-        make test
+        make -B test

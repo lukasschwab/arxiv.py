@@ -20,5 +20,5 @@ jobs:
       - name: Check for docs diff
         run: |
           cp docs/index.html docs/committed.html
-          make docs
+          make -B docs
           diff docs/index.html docs/committed.html
