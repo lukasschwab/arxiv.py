@@ -19,8 +19,6 @@ _DEFAULT_TIME = datetime.min
 
 class Result(object):
     """
-    This changes the docstring for testing #66; do not merge this change to master.
-
     An entry in an arXiv query results feed.
     See [the arXiv API User's Manual: Details of Atom Results
     Returned](https://arxiv.org/help/api/user-manual#_details_of_atom_results_returned).
