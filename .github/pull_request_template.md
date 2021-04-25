@@ -10,5 +10,4 @@
 
 # Checklist
 
-- [ ] All documentation is regenerated: run `make docs`.
 - [ ] (If appropriate) `README.md` example usage has been updated.
