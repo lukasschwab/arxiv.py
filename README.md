@@ -178,9 +178,3 @@ INFO:arxiv.arxiv:Requesting 100 results at offset 0
 INFO:arxiv.arxiv:Requesting page of results
 INFO:arxiv.arxiv:Got first page; 1 of inf results available
 ```
-
-## Contributors
-
-<a href="https://github.com/lukasschwab/arxiv.py/graphs/contributors">
-  <img src="https://contributors-img.firebaseapp.com/image?repo=lukasschwab/arxiv.py" />
-</a>
