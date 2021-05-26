@@ -18,7 +18,7 @@ docs/index.html: $(source)
 	rm docs/arxiv.html
 	rmdir docs/arxiv
 	# Fixup relative path.
-	sed -i '' 's/\.\./\./g' docs/index.html
+	sed -i.bak 's/\.\./\./g' docs/index.html; rm docs/*.bak
 
 clean:
 	rm -rf build dist
