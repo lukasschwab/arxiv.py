@@ -13,12 +13,10 @@ test: $(source) $(tests)
 
 docs: docs/index.html
 docs/index.html: $(source)
-	pdoc ./arxiv -o docs
+	pdoc ./arxiv/arxiv.py -o docs
 	mv docs/arxiv/arxiv.html docs/index.html
-	rm docs/arxiv.html
 	rmdir docs/arxiv
-	# Fixup relative path.
-	sed -i.bak 's/\.\./\./g' docs/index.html; rm docs/*.bak
+	rm docs/search.json
 
 clean:
 	rm -rf build dist
