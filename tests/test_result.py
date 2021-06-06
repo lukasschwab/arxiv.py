@@ -37,7 +37,7 @@ class TestAPI(unittest.TestCase):
     def test_result_shape(self):
         max_results = 100
         search = arxiv.Search("testing", max_results=max_results)
-        results = [r for r in search.get()]
+        results = [r for r in search.results()]
         self.assertEqual(len(results), max_results)
         for result in results:
             self.assert_valid_result(result)
@@ -52,7 +52,7 @@ class TestAPI(unittest.TestCase):
 
     def test_get_short_id(self):
         result_id = "1707.08567"
-        result = next(arxiv.Search(id_list=[result_id]).get())
+        result = next(arxiv.Search(id_list=[result_id]).results())
         got = result.get_short_id()
         self.assertTrue(got.startswith(result_id))
         # Should be of form `1707.08567v1`.

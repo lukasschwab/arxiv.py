@@ -9,7 +9,7 @@ class TestDownload(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        self.fetched_result = next(arxiv.Search(id_list=["1605.08386"]).get())
+        self.fetched_result = next(arxiv.Search(id_list=["1605.08386"]).results())
 
     @classmethod
     def setUp(self):

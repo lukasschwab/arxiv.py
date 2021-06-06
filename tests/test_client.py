@@ -7,19 +7,19 @@ from pytest import approx
 
 class TestClient(unittest.TestCase):
     def test_invalid_id(self):
-        results = list(arxiv.Search(id_list=["0000.0000"]).get())
+        results = list(arxiv.Search(id_list=["0000.0000"]).results())
         self.assertEqual(len(results), 0)
 
     def test_max_results(self):
         client = arxiv.Client(page_size=10, delay_seconds=0)
         search = arxiv.Search(query="testing", max_results=2)
-        results = [r for r in client.get(search)]
+        results = [r for r in client.results(search)]
         self.assertEqual(len(results), 2)
 
     def test_query_page_count(self):
         client = arxiv.Client(page_size=10, delay_seconds=0)
         client._parse_feed = MagicMock(wraps=client._parse_feed)
-        generator = client.get(arxiv.Search(query="testing", max_results=55))
+        generator = client.results(arxiv.Search(query="testing", max_results=55))
         results = [r for r in generator]
         self.assertEqual(len(results), 55)
         self.assertEqual(client._parse_feed.call_count, 6)
@@ -27,7 +27,7 @@ class TestClient(unittest.TestCase):
     def test_no_duplicates(self):
         search = arxiv.Search("testing", max_results=100)
         ids = set()
-        for r in search.get():
+        for r in search.results():
             self.assertFalse(r.entry_id in ids)
             ids.add(r.entry_id)
 
@@ -38,7 +38,7 @@ class TestClient(unittest.TestCase):
 
         def broken_get():
             search = arxiv.Search(query="quantum")
-            return next(broken_client.get(search))
+            return next(broken_client.results(search))
 
         self.assertRaises(arxiv.HTTPError, broken_get)
         for num_retries in [2, 5]:
