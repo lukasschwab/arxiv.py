@@ -384,14 +384,14 @@ class Search(object):
 
     def get(self) -> Generator[Result, None, None]:
         """
-        Deprecated; use `(Search).results`.
+        **Deprecated** after 1.2.0; use `Search.results`.
         """
         return self.results()
 
     def results(self) -> Generator[Result, None, None]:
         """
         Executes the specified search using a default arXiv API client. For
-        info on those defauts see `Client`; see also `(Client).results`.
+        info on those defauts see `Client`; see also `Client.results`.
         """
         return Client().results(self)
 
@@ -399,7 +399,7 @@ class Search(object):
 class Client(object):
     """
     Specifies a strategy for fetching results from arXiv's API; it obscures
-    pagination and retry logic, and exposes `(Client).get`.
+    pagination and retry logic, and exposes `Client.get`.
     """
 
     query_url_format = 'http://export.arxiv.org/api/query?{}'
@@ -440,7 +440,7 @@ class Client(object):
 
     def get(self, search: Search) -> Generator[Result, None, None]:
         """
-        Deprecated; use `(Client).results`.
+        **Deprecated** after 1.2.0; use `Client.results`.
         """
         return self.results(search)
 
