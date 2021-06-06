@@ -19,6 +19,32 @@
 
 
 
+                    <h2>Contents</h2>
+                    <ul>
+  <li><a href="#arxivpy-python-36httpsimgshieldsiobadgepython-37-bluesvghttpswwwpythonorgdownloadsreleasepython-370-pypihttpsimgshieldsiopypivarxivhttpspypiorgprojectarxiv-github-workflow-status-branchhttpsimgshieldsiogithubworkflowstatuslukasschwabarxivpypython-lint-testmasterhttpsgithubcomlukasschwabarxivpyactionsquerybranch3amaster">arxiv.py <a href="https://www.python.org/downloads/release/python-370/"><img src="https://img.shields.io/badge/python-3.7-blue.svg" alt="Python 3.6" /></a> <a href="https://pypi.org/project/arxiv/"><img src="https://img.shields.io/pypi/v/arxiv" alt="PyPI" /></a> <a href="https://github.com/lukasschwab/arxiv.py/actions?query=branch%3Amaster"><img src="https://img.shields.io/github/workflow/status/lukasschwab/arxiv.py/python-lint-test/master" alt="GitHub Workflow Status (branch)" /></a></a>
+  <ul>
+    <li><a href="#quick-links">Quick links</a></li>
+    <li><a href="#about-arxiv">About arXiv</a></li>
+    <li><a href="#usage">Usage</a>
+    <ul>
+      <li><a href="#installation">Installation</a></li>
+      <li><a href="#search">Search</a>
+      <ul>
+        <li><a href="#example-fetching-results">Example: fetching results</a></li>
+      </ul></li>
+      <li><a href="#result">Result</a>
+      <ul>
+        <li><a href="#example-downloading-papers">Example: downloading papers</a></li>
+      </ul></li>
+      <li><a href="#client">Client</a>
+      <ul>
+        <li><a href="#example-fetching-results-with-a-custom-client">Example: fetching results with a custom client</a></li>
+        <li><a href="#example-logging">Example: logging</a></li>
+      </ul></li>
+    </ul></li>
+  </ul></li>
+</ul>
+
 
 
                     <h2>API Documentation</h2>
@@ -248,10 +274,193 @@
                     <h1 class="modulename">
 arxiv<wbr>.arxiv    </h1>
 
-                
+                        <div class="docstring"><h1 id="arxivpy-python-36httpsimgshieldsiobadgepython-37-bluesvghttpswwwpythonorgdownloadsreleasepython-370-pypihttpsimgshieldsiopypivarxivhttpspypiorgprojectarxiv-github-workflow-status-branchhttpsimgshieldsiogithubworkflowstatuslukasschwabarxivpypython-lint-testmasterhttpsgithubcomlukasschwabarxivpyactionsquerybranch3amaster">arxiv.py <a href="https://www.python.org/downloads/release/python-370/"><img src="https://img.shields.io/badge/python-3.7-blue.svg" alt="Python 3.6" /></a> <a href="https://pypi.org/project/arxiv/"><img src="https://img.shields.io/pypi/v/arxiv" alt="PyPI" /></a> <a href="https://github.com/lukasschwab/arxiv.py/actions?query=branch%3Amaster"><img src="https://img.shields.io/github/workflow/status/lukasschwab/arxiv.py/python-lint-test/master" alt="GitHub Workflow Status (branch)" /></a></h1>
+
+<p>Python wrapper for <a href="http://arxiv.org/help/api/index">the arXiv API</a>.</p>
+
+<h2 id="quick-links">Quick links</h2>
+
+<ul>
+<li><a href="http://lukasschwab.me/arxiv.py/index.html">Full package documentation</a></li>
+<li><a href="#example-fetching-results">Example: fetching results</a>: the most common usage.</li>
+<li><a href="#example-downloading-papers">Example: downloading papers</a></li>
+<li><a href="#example-fetching-results-with-a-custom-client">Example: fetching results with a custom client</a></li>
+</ul>
+
+<h2 id="about-arxiv">About arXiv</h2>
+
+<p><a href="http://arxiv.org/">arXiv</a> is a project by the Cornell University Library that provides open access to 1,000,000+ articles in Physics, Mathematics, Computer Science, Quantitative Biology, Quantitative Finance, and Statistics.</p>
+
+<h2 id="usage">Usage</h2>
+
+<h3 id="installation">Installation</h3>
+
+<div class="codehilite"><pre><span></span><code>$ pip install arxiv
+</code></pre></div>
+
+<p>In your Python script, include the line</p>
+
+<div class="codehilite"><pre><span></span><code><span class="kn">import</span> <span class="nn">arxiv</span>
+</code></pre></div>
+
+<h3 id="search">Search</h3>
+
+<p>A <code><a href="#Search">Search</a></code> specifies a search of arXiv's database.</p>
+
+<div class="codehilite"><pre><span></span><code><span class="n">arxiv</span><span class="o">.</span><span class="n">Search</span><span class="p">(</span>
+  <span class="n">query</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+  <span class="n">id_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
+  <span class="n">max_results</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">),</span>
+  <span class="n">sort_by</span><span class="p">:</span> <span class="n">SortCriterion</span> <span class="o">=</span> <span class="n">SortCriterion</span><span class="o">.</span><span class="n">Relevanvce</span><span class="p">,</span>
+  <span class="n">sort_order</span><span class="p">:</span> <span class="n">SortOrder</span> <span class="o">=</span> <span class="n">SortOrder</span><span class="o">.</span><span class="n">Descending</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<ul>
+<li><code>query</code>: an arXiv query string. Advanced query formats are documented in the <a href="https://arxiv.org/help/api/user-manual#query_details">arXiv API User Manual</a>.</li>
+<li><code>id_list</code>: list of arXiv record IDs (typically of the format <code>"0710.5765v1"</code>). See <a href="https://arxiv.org/help/api/user-manual#search_query_and_id_list">the arXiv API User's Manual</a> for documentation of the interaction between <code>query</code> and <code>id_list</code>.</li>
+<li><code>max_results</code>: The maximum number of results to be returned in an execution of this search. To fetch every result available, set <code>max_results=float('inf')</code> (default); to fetch up to 10 results, set <code>max_results=10</code>. The API's limit is 300,000 results.</li>
+<li><code>sort_by</code>: The sort criterion for results: <code>relevance</code>, <code>lastUpdatedDate</code>, or <code>submittedDate</code>.</li>
+<li><code>sort_order</code>: The sort order for results: <code>'descending'</code> or <code>'ascending'</code>.</li>
+</ul>
+
+<p>To fetch arXiv records matching a <code><a href="#Search">Search</a></code>, use <code>search.get()</code> or <code>(Client).get(search)</code> to get a generator yielding <code><a href="#Result">Result</a></code>s.</p>
+
+<h4 id="example-fetching-results">Example: fetching results</h4>
+
+<p>Print the titles fo the 10 most recent articles related to the keyword "quantum:"</p>
+
+<div class="codehilite"><pre><span></span><code><span class="kn">import</span> <span class="nn">arxiv</span>
+
+<span class="n">search</span> <span class="o">=</span> <span class="n">arxiv</span><span class="o">.</span><span class="n">Search</span><span class="p">(</span>
+  <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;quantum&quot;</span><span class="p">,</span>
+  <span class="n">max_results</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+  <span class="n">sort_by</span> <span class="o">=</span> <span class="n">arxiv</span><span class="o">.</span><span class="n">SortCriterion</span><span class="o">.</span><span class="n">SubmittedDate</span>
+<span class="p">)</span>
+
+<span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">search</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Fetch and print the title of the paper with ID "1605.08386v1:"</p>
+
+<div class="codehilite"><pre><span></span><code><span class="kn">import</span> <span class="nn">arxiv</span>
+
+<span class="n">search</span> <span class="o">=</span> <span class="n">arxiv</span><span class="o">.</span><span class="n">Search</span><span class="p">(</span><span class="n">id_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1605.08386v1&quot;</span><span class="p">])</span>
+<span class="n">paper</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">search</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+</code></pre></div>
+
+<h3 id="result">Result</h3>
+
+<!-- TODO: improve this section. -->
+
+<p>The <code><a href="#Result">Result</a></code> objects yielded by <code>(Search).get()</code> include metadata about each paper and some helper functions for downloading their content.</p>
+
+<p>The meaning of the underlying raw data is documented in the <a href="https://arxiv.org/help/api/user-manual#_details_of_atom_results_returned">arXiv API User Manual: Details of Atom Results Returned</a>.</p>
+
+<ul>
+<li><code>result.entry_id</code>: A url <code>http://arxiv.org/abs/{id}</code>.</li>
+<li><code>result.updated</code>: When the result was last updated.</li>
+<li><code>result.published</code>: When the result was originally published.</li>
+<li><code>result.title</code>: The title of the result.</li>
+<li><code>result.authors</code>: The result's authors, as <code>arxiv.Author</code>s.</li>
+<li><code>result.summary</code>: The result abstract.</li>
+<li><code>result.comment</code>: The authors' comment if present.</li>
+<li><code>result.journal_ref</code>: A journal reference if present.</li>
+<li><code>result.doi</code>: A URL for the resolved DOI to an external resource if present.</li>
+<li><code>result.primary_category</code>: The result's primary arXiv category. See <a href="https://arxiv.org/category_taxonomy">arXiv: Category Taxonomy</a>.</li>
+<li><code>result.categories</code>: All of the result's categories. See <a href="https://arxiv.org/category_taxonomy">arXiv: Category Taxonomy</a>.</li>
+<li><code>result.links</code>: Up to three URLs associated with this result, as <code>arxiv.Link</code>s.</li>
+<li><code>result.pdf_url</code>: A URL for the result's PDF if present. Note: this URL also appears among <code>result.links</code>.</li>
+</ul>
+
+<p>They also expose helper methods for downloading papers: <code>(Result).download_pdf()</code> and <code>(Result).download_source()</code>.</p>
+
+<h4 id="example-downloading-papers">Example: downloading papers</h4>
+
+<p>To download a PDF of the paper with ID "1605.08386v1," run a <code><a href="#Search">Search</a></code> and then use <code>(Result).download_pdf()</code>:</p>
+
+<div class="codehilite"><pre><span></span><code><span class="kn">import</span> <span class="nn">arxiv</span>
+
+<span class="n">paper</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">arxiv</span><span class="o">.</span><span class="n">Search</span><span class="p">(</span><span class="n">id_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1605.08386v1&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+<span class="c1"># Download the PDF to the PWD with a default filename.</span>
+<span class="n">paper</span><span class="o">.</span><span class="n">download_pdf</span><span class="p">()</span>
+<span class="c1"># Download the PDF to the PWD with a custom filename.</span>
+<span class="n">paper</span><span class="o">.</span><span class="n">download_pdf</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;downloaded-paper.pdf&quot;</span><span class="p">)</span>
+<span class="c1"># Download the PDF to a specified directory with a custom filename.</span>
+<span class="n">paper</span><span class="o">.</span><span class="n">download_pdf</span><span class="p">(</span><span class="n">dirpath</span><span class="o">=</span><span class="s2">&quot;./mydir&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;downloaded-paper.pdf&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The same interface is available for downloading .tar.gz files of the paper source:</p>
+
+<div class="codehilite"><pre><span></span><code><span class="kn">import</span> <span class="nn">arxiv</span>
+
+<span class="n">paper</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">arxiv</span><span class="o">.</span><span class="n">Search</span><span class="p">(</span><span class="n">id_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1605.08386v1&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+<span class="c1"># Download the archive to the PWD with a default filename.</span>
+<span class="n">paper</span><span class="o">.</span><span class="n">download_source</span><span class="p">()</span>
+<span class="c1"># Download the archive to the PWD with a custom filename.</span>
+<span class="n">paper</span><span class="o">.</span><span class="n">download_source</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;downloaded-paper.tar.gz&quot;</span><span class="p">)</span>
+<span class="c1"># Download the archive to a specified directory with a custom filename.</span>
+<span class="n">paper</span><span class="o">.</span><span class="n">download_source</span><span class="p">(</span><span class="n">dirpath</span><span class="o">=</span><span class="s2">&quot;./mydir&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;downloaded-paper.tar.gz&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<h3 id="client">Client</h3>
+
+<p>A <code><a href="#Client">Client</a></code> specifies a strategy for fetching results from arXiv's API; it obscures pagination and retry logic.</p>
+
+<p>For most use cases the default client should suffice. You can construct it explicitly with <code>arxiv.Client()</code>, or use it via the <code>(Search).get()</code> method.</p>
+
+<div class="codehilite"><pre><span></span><code><span class="n">arxiv</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span>
+  <span class="n">page_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+  <span class="n">delay_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+  <span class="n">num_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<ul>
+<li><code>page_size</code>: the number of papers to fetch from arXiv per page of results. Smaller pages can be retrieved faster, but may require more round-trips. The API's limit is 2000 results.</li>
+<li><code>delay_seconds</code>: the number of seconds to wait between requests for pages. <a href="https://arxiv.org/help/api/tou">arXiv's Terms of Use</a> ask that you "make no more than one request every three seconds."</li>
+<li><code>num_retries</code>: The number of times the client will retry a request that fails, either with a non-200 HTTP status code or with an unexpected number of results given the search parameters.</li>
+</ul>
+
+<h4 id="example-fetching-results-with-a-custom-client">Example: fetching results with a custom client</h4>
+
+<p><code>(Search).get()</code> uses the default client settings. If you want to use a client you've defined instead of the defaults, use <code>(Client).get(...)</code>:</p>
+
+<div class="codehilite"><pre><span></span><code><span class="kn">import</span> <span class="nn">arxiv</span>
+
+<span class="n">big_slow_client</span> <span class="o">=</span> <span class="n">arxiv</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span>
+  <span class="n">page_size</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+  <span class="n">delay_seconds</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+  <span class="n">num_retries</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="p">)</span>
+
+<span class="c1"># Prints 1000 titles before needing to make another request.</span>
+<span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">big_slow_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">arxiv</span><span class="o">.</span><span class="n">Search</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="s2">&quot;quantum&quot;</span><span class="p">)):</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+</code></pre></div>
+
+<h4 id="example-logging">Example: logging</h4>
+
+<p>To inspect this package's network behavior and API logic, configure an <code>INFO</code>-level logger.</p>
+
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">logging</span><span class="o">,</span> <span class="nn">arxiv</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">paper</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">arxiv</span><span class="o">.</span><span class="n">Search</span><span class="p">(</span><span class="n">id_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1605.08386v1&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+<span class="go">INFO:<a href="">arxiv.arxiv</a>:Requesting 100 results at offset 0</span>
+<span class="go">INFO:<a href="">arxiv.arxiv</a>:Requesting page of results</span>
+<span class="go">INFO:<a href="">arxiv.arxiv</a>:Got first page; 1 of inf results available</span>
+</code></pre></div>
+</div>
+
                         <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
+            <div class="codehilite"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. include:: ../README.md</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">feedparser</span>
 <span class="kn">import</span> <span class="nn">re</span>
@@ -273,6 +482,7 @@ arxiv<wbr>.arxiv    </h1>
 <span class="k">class</span> <span class="nc">Result</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An entry in an arXiv query results feed.</span>
+
 <span class="sd">    See [the arXiv API User&#39;s Manual: Details of Atom Results</span>
 <span class="sd">    Returned](https://arxiv.org/help/api/user-manual#_details_of_atom_results_returned).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -332,8 +542,10 @@ arxiv<wbr>.arxiv    </h1>
         <span class="n">_raw</span><span class="p">:</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">FeedParserDict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Constructs an arXiv search result item. In most cases, prefer using</span>
-<span class="sd">        `_from_feed_entry` to parsing and constructing feed items yourself.</span>
+<span class="sd">        Constructs an arXiv search result item.</span>
+
+<span class="sd">        In most cases, prefer using `Result._from_feed_entry` to parsing and</span>
+<span class="sd">        constructing `Result`s yourself.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span> <span class="o">=</span> <span class="n">entry_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="n">updated</span>
@@ -404,9 +616,10 @@ arxiv<wbr>.arxiv    </h1>
 
     <span class="k">def</span> <span class="nf">get_short_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the short ID for this result. If the result URL is</span>
-<span class="sd">        `&quot;http://arxiv.org/abs/quant-ph/0201082v1&quot;`, `result.get_short_id()`</span>
-<span class="sd">        returns `&quot;0201082v1&quot;`.</span>
+<span class="sd">        Returns the short ID for this result.</span>
+
+<span class="sd">        If the result URL is `&quot;http://arxiv.org/abs/quant-ph/0201082v1&quot;`,</span>
+<span class="sd">        `result.get_short_id()` returns `&quot;0201082v1&quot;`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
@@ -421,8 +634,9 @@ arxiv<wbr>.arxiv    </h1>
 
     <span class="k">def</span> <span class="nf">download_pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dirpath</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;./&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Downloads the PDF for this result to the specified directory. The</span>
-<span class="sd">        filename is generated by calling `to_filename(self)`.</span>
+<span class="sd">        Downloads the PDF for this result to the specified directory.</span>
+
+<span class="sd">        The filename is generated by calling `to_filename(self)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span>
             <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_default_filename</span><span class="p">()</span>
@@ -433,7 +647,9 @@ arxiv<wbr>.arxiv    </h1>
     <span class="k">def</span> <span class="nf">download_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dirpath</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;./&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Downloads the source tarfile for this result to the specified</span>
-<span class="sd">        directory. The filename is generated by calling `to_filename(self)`.</span>
+<span class="sd">        directory.</span>
+
+<span class="sd">        The filename is generated by calling `to_filename(self)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span>
             <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_default_filename</span><span class="p">(</span><span class="s1">&#39;tar.gz&#39;</span><span class="p">)</span>
@@ -445,8 +661,10 @@ arxiv<wbr>.arxiv    </h1>
 
     <span class="k">def</span> <span class="nf">_get_pdf_url</span><span class="p">(</span><span class="n">links</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Finds the PDF link among a result&#39;s links and returns its URL. Called</span>
-<span class="sd">        once from Result constructors.</span>
+<span class="sd">        Finds the PDF link among a result&#39;s links and returns its URL.</span>
+
+<span class="sd">        Should only be called once for a given `Result`, in its constructor.</span>
+<span class="sd">        After construction, the URL should be available in `Result.pdf_url`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">pdf_urls</span> <span class="o">=</span> <span class="p">[</span><span class="n">link</span><span class="o">.</span><span class="n">href</span> <span class="k">for</span> <span class="n">link</span> <span class="ow">in</span> <span class="n">links</span> <span class="k">if</span> <span class="n">link</span><span class="o">.</span><span class="n">title</span> <span class="o">==</span> <span class="s1">&#39;pdf&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdf_urls</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -460,9 +678,10 @@ arxiv<wbr>.arxiv    </h1>
 
     <span class="k">def</span> <span class="nf">_to_datetime</span><span class="p">(</span><span class="n">ts</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">struct_time</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Converts a UTC time.struct_time into a time-zone-aware datetime. This</span>
-<span class="sd">        will be replaced with feedparser functionality when it becomes</span>
-<span class="sd">        available: https://github.com/kurtmckee/feedparser/issues/212</span>
+<span class="sd">        Converts a UTC time.struct_time into a time-zone-aware datetime.</span>
+
+<span class="sd">        This will be replaced with feedparser functionality [when it becomes</span>
+<span class="sd">        available](https://github.com/kurtmckee/feedparser/issues/212).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">timegm</span><span class="p">(</span><span class="n">ts</span><span class="p">),</span> <span class="n">tz</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
 
@@ -470,14 +689,28 @@ arxiv<wbr>.arxiv    </h1>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A light inner class for representing a result&#39;s authors.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="sd">&quot;&quot;&quot;The author&#39;s name.&quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Constructs an `Author` with the specified name.</span>
+
+<span class="sd">            In most cases, prefer using `Author._from_feed_author` to parsing</span>
+<span class="sd">            and constructing `Author`s yourself.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
 
         <span class="k">def</span> <span class="nf">_from_feed_author</span><span class="p">(</span>
             <span class="n">feed_author</span><span class="p">:</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">FeedParserDict</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Result.Author&#39;</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Constructs an `Author` with the name specified in an author object</span>
+<span class="sd">            from a feed entry.</span>
+
+<span class="sd">            See usage in `Result._from_feed_entry`.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
             <span class="k">return</span> <span class="n">Result</span><span class="o">.</span><span class="n">Author</span><span class="p">(</span><span class="n">feed_author</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -495,10 +728,15 @@ arxiv<wbr>.arxiv    </h1>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A light inner class for representing a result&#39;s links.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">href</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="sd">&quot;&quot;&quot;The link&#39;s `href` attribute.&quot;&quot;&quot;</span>
         <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="sd">&quot;&quot;&quot;The link&#39;s title.&quot;&quot;&quot;</span>
         <span class="n">rel</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="sd">&quot;&quot;&quot;The link&#39;s relationship to the `Result`.&quot;&quot;&quot;</span>
         <span class="n">content_type</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="sd">&quot;&quot;&quot;The link&#39;s HTTP content type.&quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -507,6 +745,12 @@ arxiv<wbr>.arxiv    </h1>
             <span class="n">rel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">content_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Constructs a `Link` with the specified link metadata.</span>
+
+<span class="sd">            In most cases, prefer using `Link._from_feed_link` to parsing and</span>
+<span class="sd">            constructing `Link`s yourself.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">href</span> <span class="o">=</span> <span class="n">href</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">title</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rel</span> <span class="o">=</span> <span class="n">rel</span>
@@ -515,6 +759,12 @@ arxiv<wbr>.arxiv    </h1>
         <span class="k">def</span> <span class="nf">_from_feed_link</span><span class="p">(</span>
             <span class="n">feed_link</span><span class="p">:</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">FeedParserDict</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Result.Link&#39;</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Constructs a `Link` with link metadata specified in a link object</span>
+<span class="sd">            from a feed entry.</span>
+
+<span class="sd">            See usage in `Result._from_feed_entry`.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
             <span class="k">return</span> <span class="n">Result</span><span class="o">.</span><span class="n">Link</span><span class="p">(</span>
                 <span class="n">href</span><span class="o">=</span><span class="n">feed_link</span><span class="o">.</span><span class="n">href</span><span class="p">,</span>
                 <span class="n">title</span><span class="o">=</span><span class="n">feed_link</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">),</span>
@@ -543,7 +793,9 @@ arxiv<wbr>.arxiv    </h1>
 <span class="k">class</span> <span class="nc">SortCriterion</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A SortCriterion identifies a property by which search results can be</span>
-<span class="sd">    sorted. See [the arXiv API User&#39;s Manual: sort order for return</span>
+<span class="sd">    sorted.</span>
+
+<span class="sd">    See [the arXiv API User&#39;s Manual: sort order for return</span>
 <span class="sd">    results](https://arxiv.org/help/api/user-manual#sort).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">Relevance</span> <span class="o">=</span> <span class="s2">&quot;relevance&quot;</span>
@@ -554,8 +806,10 @@ arxiv<wbr>.arxiv    </h1>
 <span class="k">class</span> <span class="nc">SortOrder</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A SortOrder indicates order in which search results are sorted according</span>
-<span class="sd">    to the specified arxiv.SortCriterion. See [the arXiv API User&#39;s Manual:</span>
-<span class="sd">    sort order for return results](https://arxiv.org/help/api/user-manual#sort).</span>
+<span class="sd">    to the specified arxiv.SortCriterion.</span>
+
+<span class="sd">    See [the arXiv API User&#39;s Manual: sort order for return</span>
+<span class="sd">    results](https://arxiv.org/help/api/user-manual#sort).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">Ascending</span> <span class="o">=</span> <span class="s2">&quot;ascending&quot;</span>
     <span class="n">Descending</span> <span class="o">=</span> <span class="s2">&quot;descending&quot;</span>
@@ -563,26 +817,33 @@ arxiv<wbr>.arxiv    </h1>
 
 <span class="k">class</span> <span class="nc">Search</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A specification for a search of arXiv&#39;s database. To run a search, use</span>
-<span class="sd">    `Search.run` to use a default client or `Client.run` with a specific</span>
-<span class="sd">    client.</span>
+<span class="sd">    A specification for a search of arXiv&#39;s database.</span>
+
+<span class="sd">    To run a search, use `Search.run` to use a default client or `Client.run`</span>
+<span class="sd">    with a specific client.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">query</span><span class="p">:</span> <span class="nb">str</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A string query. See [the arXiv API User&#39;s Manual: Details of Query</span>
+<span class="sd">    A query string.</span>
+
+<span class="sd">    See [the arXiv API User&#39;s Manual: Details of Query</span>
 <span class="sd">    Construction](https://arxiv.org/help/api/user-manual#query_details).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">id_list</span><span class="p">:</span> <span class="nb">list</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A list of arXiv article IDs to which to limit the search. See [the arXiv</span>
-<span class="sd">    API User&#39;s Manual](https://arxiv.org/help/api/user-manual#search_query_and_id_list)</span>
+<span class="sd">    A list of arXiv article IDs to which to limit the search.</span>
+
+<span class="sd">    See [the arXiv API User&#39;s</span>
+<span class="sd">    Manual](https://arxiv.org/help/api/user-manual#search_query_and_id_list)</span>
 <span class="sd">    for documentation of the interaction between `query` and `id_list`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">max_results</span><span class="p">:</span> <span class="nb">float</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The maximum number of results to be returned in an execution of this</span>
-<span class="sd">    search. To fetch every result available, set `max_results=float(&#39;inf&#39;)`.</span>
+<span class="sd">    search.</span>
+
+<span class="sd">    To fetch every result available, set `max_results=float(&#39;inf&#39;)`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">sort_by</span><span class="p">:</span> <span class="n">SortCriterion</span>
     <span class="sd">&quot;&quot;&quot;The sort criterion for results.&quot;&quot;&quot;</span>
@@ -598,7 +859,7 @@ arxiv<wbr>.arxiv    </h1>
         <span class="n">sort_order</span><span class="p">:</span> <span class="n">SortOrder</span> <span class="o">=</span> <span class="n">SortOrder</span><span class="o">.</span><span class="n">Descending</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Construct an arXiv API search.</span>
+<span class="sd">        Constructs an arXiv API search with the specified criteria.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="n">query</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id_list</span> <span class="o">=</span> <span class="n">id_list</span>
@@ -637,16 +898,18 @@ arxiv<wbr>.arxiv    </h1>
 
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Result</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Executes the specified search using a default arXiv API client. For</span>
-<span class="sd">        info on those defauts see `Client`; see also `(Client).get`.</span>
+<span class="sd">        Executes the specified search using a default arXiv API client.</span>
+
+<span class="sd">        For info on default behavior, see `Client.__init__` and `(Client).get`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Client</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">Client</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Specifies a strategy for fetching results from arXiv&#39;s API; it obscures</span>
-<span class="sd">    pagination and retry logic, and exposes `(Client).get`.</span>
+<span class="sd">    Specifies a strategy for fetching results from arXiv&#39;s API.</span>
+
+<span class="sd">    This class obscures pagination and retry logic, and exposes `Client.get`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">query_url_format</span> <span class="o">=</span> <span class="s1">&#39;http://export.arxiv.org/api/query?</span><span class="si">{}</span><span class="s1">&#39;</span>
@@ -666,7 +929,12 @@ arxiv<wbr>.arxiv    </h1>
         <span class="n">num_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Construct an arXiv API client.</span>
+<span class="sd">        Constructs an arXiv API client with the specified options.</span>
+
+<span class="sd">        Note: the default parameters should provide a robust request strategy</span>
+<span class="sd">        for most use cases. Extreme page sizes, delays, or retries risk</span>
+<span class="sd">        violating the arXiv [API Terms of Use](https://arxiv.org/help/api/tou),</span>
+<span class="sd">        brittle behavior, and inconsistent results.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">page_size</span> <span class="o">=</span> <span class="n">page_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">delay_seconds</span> <span class="o">=</span> <span class="n">delay_seconds</span>
@@ -687,13 +955,14 @@ arxiv<wbr>.arxiv    </h1>
 
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search</span><span class="p">:</span> <span class="n">Search</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Result</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Uses this client configuration to fetch one page of the search at a</span>
-<span class="sd">        time, yielding the search results one by one, until `max_results`</span>
-<span class="sd">        results have been yielded or there are no more search results.</span>
+<span class="sd">        Uses this client configuration to fetch one page of the search results</span>
+<span class="sd">        at a time, yielding the parsed `Result`s, until `max_results` results</span>
+<span class="sd">        have been yielded or there are no more search results.</span>
 
 <span class="sd">        If all tries fail, raises an `UnexpectedEmptyPageError` or `HTTPError`.</span>
 
-<span class="sd">        For more on using generators, see [Generators](https://wiki.python.org/moin/Generators).</span>
+<span class="sd">        For more on using generators, see</span>
+<span class="sd">        [Generators](https://wiki.python.org/moin/Generators).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="c1"># total_results may be reduced according to the feed&#39;s</span>
@@ -754,8 +1023,9 @@ arxiv<wbr>.arxiv    </h1>
         <span class="n">first_page</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">FeedParserDict</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Fetches the specified URL and parses it with feedparser. If a request</span>
-<span class="sd">        fails or is unexpectedly empty, `_parse_feed` retries the request up to</span>
+<span class="sd">        Fetches the specified URL and parses it with feedparser.</span>
+
+<span class="sd">        If a request fails or is unexpectedly empty, retries the request up to</span>
 <span class="sd">        `self.num_retries` times.</span>
 
 <span class="sd">        Enforces `self.delay_seconds`: if that number of seconds has not passed</span>
@@ -793,11 +1063,17 @@ arxiv<wbr>.arxiv    </h1>
 
 
 <span class="k">class</span> <span class="nc">ArxivError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This package&#39;s base Exception class.&quot;&quot;&quot;</span>
+
     <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
     <span class="sd">&quot;&quot;&quot;The feed URL that could not be fetched.&quot;&quot;&quot;</span>
     <span class="n">message</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="sd">&quot;&quot;&quot;Message explaining what went wrong.&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Message describing what caused this error.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs an `ArxivError` encountered while fetching the specified URL.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
         <span class="c1"># logger.info(self.message, extra=extra)</span>
@@ -810,12 +1086,21 @@ arxiv<wbr>.arxiv    </h1>
 <span class="k">class</span> <span class="nc">UnexpectedEmptyPageError</span><span class="p">(</span><span class="n">ArxivError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An error raised when a page of results that should be non-empty is empty.</span>
+
 <span class="sd">    This should never happen in theory, but happens sporadically due to</span>
 <span class="sd">    brittleness in the underlying arXiv API; usually resolved by retries.</span>
+
+<span class="sd">    See `Client.get` for usage.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span>
     <span class="sd">&quot;&quot;&quot;The request retry number which encountered this error, zero-indexed.&quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs an `UnexpectedEmptyPageError` encountered for the specified</span>
+<span class="sd">        API URL after `retry` tries.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">retry</span> <span class="o">=</span> <span class="n">retry</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s2">&quot;Page of results was unexpectedly empty&quot;</span><span class="p">)</span>
@@ -829,12 +1114,22 @@ arxiv<wbr>.arxiv    </h1>
 
 
 <span class="k">class</span> <span class="nc">HTTPError</span><span class="p">(</span><span class="n">ArxivError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A non-200 status encountered while fetching a page of results.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A non-200 status encountered while fetching a page of results.</span>
+
+<span class="sd">    See `Client.get` for usage.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span>
     <span class="sd">&quot;&quot;&quot;The request retry number which encountered this error, zero-indexed.&quot;&quot;&quot;</span>
     <span class="n">status</span><span class="p">:</span> <span class="nb">int</span>
     <span class="sd">&quot;&quot;&quot;The HTTP status reported by feedparser.&quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs an `HTTPError` for the specified status code, encountered for</span>
+<span class="sd">        the specified API URL after `retry` tries.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">retry</span> <span class="o">=</span> <span class="n">retry</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status</span>
@@ -874,6 +1169,7 @@ arxiv<wbr>.arxiv    </h1>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Result</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An entry in an arXiv query results feed.</span>
+
 <span class="sd">    See [the arXiv API User&#39;s Manual: Details of Atom Results</span>
 <span class="sd">    Returned](https://arxiv.org/help/api/user-manual#_details_of_atom_results_returned).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -933,8 +1229,10 @@ arxiv<wbr>.arxiv    </h1>
         <span class="n">_raw</span><span class="p">:</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">FeedParserDict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Constructs an arXiv search result item. In most cases, prefer using</span>
-<span class="sd">        `_from_feed_entry` to parsing and constructing feed items yourself.</span>
+<span class="sd">        Constructs an arXiv search result item.</span>
+
+<span class="sd">        In most cases, prefer using `Result._from_feed_entry` to parsing and</span>
+<span class="sd">        constructing `Result`s yourself.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span> <span class="o">=</span> <span class="n">entry_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="n">updated</span>
@@ -1005,9 +1303,10 @@ arxiv<wbr>.arxiv    </h1>
 
     <span class="k">def</span> <span class="nf">get_short_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the short ID for this result. If the result URL is</span>
-<span class="sd">        `&quot;http://arxiv.org/abs/quant-ph/0201082v1&quot;`, `result.get_short_id()`</span>
-<span class="sd">        returns `&quot;0201082v1&quot;`.</span>
+<span class="sd">        Returns the short ID for this result.</span>
+
+<span class="sd">        If the result URL is `&quot;http://arxiv.org/abs/quant-ph/0201082v1&quot;`,</span>
+<span class="sd">        `result.get_short_id()` returns `&quot;0201082v1&quot;`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
@@ -1022,8 +1321,9 @@ arxiv<wbr>.arxiv    </h1>
 
     <span class="k">def</span> <span class="nf">download_pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dirpath</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;./&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Downloads the PDF for this result to the specified directory. The</span>
-<span class="sd">        filename is generated by calling `to_filename(self)`.</span>
+<span class="sd">        Downloads the PDF for this result to the specified directory.</span>
+
+<span class="sd">        The filename is generated by calling `to_filename(self)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span>
             <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_default_filename</span><span class="p">()</span>
@@ -1034,7 +1334,9 @@ arxiv<wbr>.arxiv    </h1>
     <span class="k">def</span> <span class="nf">download_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dirpath</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;./&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Downloads the source tarfile for this result to the specified</span>
-<span class="sd">        directory. The filename is generated by calling `to_filename(self)`.</span>
+<span class="sd">        directory.</span>
+
+<span class="sd">        The filename is generated by calling `to_filename(self)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span>
             <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_default_filename</span><span class="p">(</span><span class="s1">&#39;tar.gz&#39;</span><span class="p">)</span>
@@ -1046,8 +1348,10 @@ arxiv<wbr>.arxiv    </h1>
 
     <span class="k">def</span> <span class="nf">_get_pdf_url</span><span class="p">(</span><span class="n">links</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Finds the PDF link among a result&#39;s links and returns its URL. Called</span>
-<span class="sd">        once from Result constructors.</span>
+<span class="sd">        Finds the PDF link among a result&#39;s links and returns its URL.</span>
+
+<span class="sd">        Should only be called once for a given `Result`, in its constructor.</span>
+<span class="sd">        After construction, the URL should be available in `Result.pdf_url`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">pdf_urls</span> <span class="o">=</span> <span class="p">[</span><span class="n">link</span><span class="o">.</span><span class="n">href</span> <span class="k">for</span> <span class="n">link</span> <span class="ow">in</span> <span class="n">links</span> <span class="k">if</span> <span class="n">link</span><span class="o">.</span><span class="n">title</span> <span class="o">==</span> <span class="s1">&#39;pdf&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdf_urls</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -1061,9 +1365,10 @@ arxiv<wbr>.arxiv    </h1>
 
     <span class="k">def</span> <span class="nf">_to_datetime</span><span class="p">(</span><span class="n">ts</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">struct_time</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Converts a UTC time.struct_time into a time-zone-aware datetime. This</span>
-<span class="sd">        will be replaced with feedparser functionality when it becomes</span>
-<span class="sd">        available: https://github.com/kurtmckee/feedparser/issues/212</span>
+<span class="sd">        Converts a UTC time.struct_time into a time-zone-aware datetime.</span>
+
+<span class="sd">        This will be replaced with feedparser functionality [when it becomes</span>
+<span class="sd">        available](https://github.com/kurtmckee/feedparser/issues/212).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">timegm</span><span class="p">(</span><span class="n">ts</span><span class="p">),</span> <span class="n">tz</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
 
@@ -1071,14 +1376,28 @@ arxiv<wbr>.arxiv    </h1>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A light inner class for representing a result&#39;s authors.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="sd">&quot;&quot;&quot;The author&#39;s name.&quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Constructs an `Author` with the specified name.</span>
+
+<span class="sd">            In most cases, prefer using `Author._from_feed_author` to parsing</span>
+<span class="sd">            and constructing `Author`s yourself.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
 
         <span class="k">def</span> <span class="nf">_from_feed_author</span><span class="p">(</span>
             <span class="n">feed_author</span><span class="p">:</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">FeedParserDict</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Result.Author&#39;</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Constructs an `Author` with the name specified in an author object</span>
+<span class="sd">            from a feed entry.</span>
+
+<span class="sd">            See usage in `Result._from_feed_entry`.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
             <span class="k">return</span> <span class="n">Result</span><span class="o">.</span><span class="n">Author</span><span class="p">(</span><span class="n">feed_author</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -1096,10 +1415,15 @@ arxiv<wbr>.arxiv    </h1>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A light inner class for representing a result&#39;s links.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">href</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="sd">&quot;&quot;&quot;The link&#39;s `href` attribute.&quot;&quot;&quot;</span>
         <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="sd">&quot;&quot;&quot;The link&#39;s title.&quot;&quot;&quot;</span>
         <span class="n">rel</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="sd">&quot;&quot;&quot;The link&#39;s relationship to the `Result`.&quot;&quot;&quot;</span>
         <span class="n">content_type</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="sd">&quot;&quot;&quot;The link&#39;s HTTP content type.&quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -1108,6 +1432,12 @@ arxiv<wbr>.arxiv    </h1>
             <span class="n">rel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">content_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Constructs a `Link` with the specified link metadata.</span>
+
+<span class="sd">            In most cases, prefer using `Link._from_feed_link` to parsing and</span>
+<span class="sd">            constructing `Link`s yourself.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">href</span> <span class="o">=</span> <span class="n">href</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">title</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rel</span> <span class="o">=</span> <span class="n">rel</span>
@@ -1116,6 +1446,12 @@ arxiv<wbr>.arxiv    </h1>
         <span class="k">def</span> <span class="nf">_from_feed_link</span><span class="p">(</span>
             <span class="n">feed_link</span><span class="p">:</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">FeedParserDict</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Result.Link&#39;</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Constructs a `Link` with link metadata specified in a link object</span>
+<span class="sd">            from a feed entry.</span>
+
+<span class="sd">            See usage in `Result._from_feed_entry`.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
             <span class="k">return</span> <span class="n">Result</span><span class="o">.</span><span class="n">Link</span><span class="p">(</span>
                 <span class="n">href</span><span class="o">=</span><span class="n">feed_link</span><span class="o">.</span><span class="n">href</span><span class="p">,</span>
                 <span class="n">title</span><span class="o">=</span><span class="n">feed_link</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">),</span>
@@ -1143,8 +1479,9 @@ arxiv<wbr>.arxiv    </h1>
 
         </details>
 
-            <div class="docstring"><p>An entry in an arXiv query results feed.
-See <a href="https://arxiv.org/help/api/user-manual#_details_of_atom_results_returned">the arXiv API User's Manual: Details of Atom Results
+            <div class="docstring"><p>An entry in an arXiv query results feed.</p>
+
+<p>See <a href="https://arxiv.org/help/api/user-manual#_details_of_atom_results_returned">the arXiv API User's Manual: Details of Atom Results
 Returned</a>.</p>
 </div>
 
@@ -1189,8 +1526,10 @@ Returned</a>.</p>
         <span class="n">_raw</span><span class="p">:</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">FeedParserDict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Constructs an arXiv search result item. In most cases, prefer using</span>
-<span class="sd">        `_from_feed_entry` to parsing and constructing feed items yourself.</span>
+<span class="sd">        Constructs an arXiv search result item.</span>
+
+<span class="sd">        In most cases, prefer using `Result._from_feed_entry` to parsing and</span>
+<span class="sd">        constructing `Result`s yourself.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span> <span class="o">=</span> <span class="n">entry_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="n">updated</span>
@@ -1212,8 +1551,10 @@ Returned</a>.</p>
 
         </details>
 
-            <div class="docstring"><p>Constructs an arXiv search result item. In most cases, prefer using
-<code>_from_feed_entry</code> to parsing and constructing feed items yourself.</p>
+            <div class="docstring"><p>Constructs an arXiv search result item.</p>
+
+<p>In most cases, prefer using <code>Result._from_feed_entry</code> to parsing and
+constructing <code><a href="#Result">Result</a></code>s yourself.</p>
 </div>
 
 
@@ -1375,18 +1716,20 @@ Taxonomy</a>.</p>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_short_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the short ID for this result. If the result URL is</span>
-<span class="sd">        `&quot;http://arxiv.org/abs/quant-ph/0201082v1&quot;`, `result.get_short_id()`</span>
-<span class="sd">        returns `&quot;0201082v1&quot;`.</span>
+<span class="sd">        Returns the short ID for this result.</span>
+
+<span class="sd">        If the result URL is `&quot;http://arxiv.org/abs/quant-ph/0201082v1&quot;`,</span>
+<span class="sd">        `result.get_short_id()` returns `&quot;0201082v1&quot;`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Returns the short ID for this result. If the result URL is
-<code>"http://arxiv.org/abs/quant-ph/0201082v1"</code>, <code>result.get_short_id()</code>
-returns <code>"0201082v1"</code>.</p>
+            <div class="docstring"><p>Returns the short ID for this result.</p>
+
+<p>If the result URL is <code>"http://arxiv.org/abs/quant-ph/0201082v1"</code>,
+<code>result.get_short_id()</code> returns <code>"0201082v1"</code>.</p>
 </div>
 
 
@@ -1403,8 +1746,9 @@ returns <code>"0201082v1"</code>.</p>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">download_pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dirpath</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;./&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Downloads the PDF for this result to the specified directory. The</span>
-<span class="sd">        filename is generated by calling `to_filename(self)`.</span>
+<span class="sd">        Downloads the PDF for this result to the specified directory.</span>
+
+<span class="sd">        The filename is generated by calling `to_filename(self)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span>
             <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_default_filename</span><span class="p">()</span>
@@ -1415,8 +1759,9 @@ returns <code>"0201082v1"</code>.</p>
 
         </details>
 
-            <div class="docstring"><p>Downloads the PDF for this result to the specified directory. The
-filename is generated by calling <code>to_filename(self)</code>.</p>
+            <div class="docstring"><p>Downloads the PDF for this result to the specified directory.</p>
+
+<p>The filename is generated by calling <code>to_filename(self)</code>.</p>
 </div>
 
 
@@ -1434,7 +1779,9 @@ filename is generated by calling <code>to_filename(self)</code>.</p>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">download_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dirpath</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;./&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Downloads the source tarfile for this result to the specified</span>
-<span class="sd">        directory. The filename is generated by calling `to_filename(self)`.</span>
+<span class="sd">        directory.</span>
+
+<span class="sd">        The filename is generated by calling `to_filename(self)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span>
             <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_default_filename</span><span class="p">(</span><span class="s1">&#39;tar.gz&#39;</span><span class="p">)</span>
@@ -1448,7 +1795,9 @@ filename is generated by calling <code>to_filename(self)</code>.</p>
         </details>
 
             <div class="docstring"><p>Downloads the source tarfile for this result to the specified
-directory. The filename is generated by calling <code>to_filename(self)</code>.</p>
+directory.</p>
+
+<p>The filename is generated by calling <code>to_filename(self)</code>.</p>
 </div>
 
 
@@ -1469,14 +1818,28 @@ directory. The filename is generated by calling <code>to_filename(self)</code>.<
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A light inner class for representing a result&#39;s authors.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="sd">&quot;&quot;&quot;The author&#39;s name.&quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Constructs an `Author` with the specified name.</span>
+
+<span class="sd">            In most cases, prefer using `Author._from_feed_author` to parsing</span>
+<span class="sd">            and constructing `Author`s yourself.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
 
         <span class="k">def</span> <span class="nf">_from_feed_author</span><span class="p">(</span>
             <span class="n">feed_author</span><span class="p">:</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">FeedParserDict</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Result.Author&#39;</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Constructs an `Author` with the name specified in an author object</span>
+<span class="sd">            from a feed entry.</span>
+
+<span class="sd">            See usage in `Result._from_feed_entry`.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
             <span class="k">return</span> <span class="n">Result</span><span class="o">.</span><span class="n">Author</span><span class="p">(</span><span class="n">feed_author</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -1507,12 +1870,23 @@ directory. The filename is generated by calling <code>to_filename(self)</code>.<
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Constructs an `Author` with the specified name.</span>
+
+<span class="sd">            In most cases, prefer using `Author._from_feed_author` to parsing</span>
+<span class="sd">            and constructing `Author`s yourself.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Constructs an <code><a href="#Result.Author">Author</a></code> with the specified name.</p>
+
+<p>In most cases, prefer using <code>Author._from_feed_author</code> to parsing
+and constructing <code><a href="#Result.Author">Author</a></code>s yourself.</p>
+</div>
+
 
                             </div>
                             <div id="Result.Author.name" class="classattr">
@@ -1521,7 +1895,9 @@ directory. The filename is generated by calling <code>to_filename(self)</code>.<
         <span class="name">name</span><span class="annotation">: str</span>
     </div>
 
-    
+            <div class="docstring"><p>The author's name.</p>
+</div>
+
 
                             </div>
                 </section>
@@ -1540,10 +1916,15 @@ directory. The filename is generated by calling <code>to_filename(self)</code>.<
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A light inner class for representing a result&#39;s links.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">href</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="sd">&quot;&quot;&quot;The link&#39;s `href` attribute.&quot;&quot;&quot;</span>
         <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="sd">&quot;&quot;&quot;The link&#39;s title.&quot;&quot;&quot;</span>
         <span class="n">rel</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="sd">&quot;&quot;&quot;The link&#39;s relationship to the `Result`.&quot;&quot;&quot;</span>
         <span class="n">content_type</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="sd">&quot;&quot;&quot;The link&#39;s HTTP content type.&quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -1552,6 +1933,12 @@ directory. The filename is generated by calling <code>to_filename(self)</code>.<
             <span class="n">rel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">content_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Constructs a `Link` with the specified link metadata.</span>
+
+<span class="sd">            In most cases, prefer using `Link._from_feed_link` to parsing and</span>
+<span class="sd">            constructing `Link`s yourself.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">href</span> <span class="o">=</span> <span class="n">href</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">title</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rel</span> <span class="o">=</span> <span class="n">rel</span>
@@ -1560,6 +1947,12 @@ directory. The filename is generated by calling <code>to_filename(self)</code>.<
         <span class="k">def</span> <span class="nf">_from_feed_link</span><span class="p">(</span>
             <span class="n">feed_link</span><span class="p">:</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">FeedParserDict</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Result.Link&#39;</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Constructs a `Link` with link metadata specified in a link object</span>
+<span class="sd">            from a feed entry.</span>
+
+<span class="sd">            See usage in `Result._from_feed_entry`.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
             <span class="k">return</span> <span class="n">Result</span><span class="o">.</span><span class="n">Link</span><span class="p">(</span>
                 <span class="n">href</span><span class="o">=</span><span class="n">feed_link</span><span class="o">.</span><span class="n">href</span><span class="p">,</span>
                 <span class="n">title</span><span class="o">=</span><span class="n">feed_link</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">),</span>
@@ -1612,6 +2005,12 @@ directory. The filename is generated by calling <code>to_filename(self)</code>.<
             <span class="n">rel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">content_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Constructs a `Link` with the specified link metadata.</span>
+
+<span class="sd">            In most cases, prefer using `Link._from_feed_link` to parsing and</span>
+<span class="sd">            constructing `Link`s yourself.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">href</span> <span class="o">=</span> <span class="n">href</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">title</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rel</span> <span class="o">=</span> <span class="n">rel</span>
@@ -1620,7 +2019,12 @@ directory. The filename is generated by calling <code>to_filename(self)</code>.<
 
         </details>
 
-    
+            <div class="docstring"><p>Constructs a <code><a href="#Result.Link">Link</a></code> with the specified link metadata.</p>
+
+<p>In most cases, prefer using <code>Link._from_feed_link</code> to parsing and
+constructing <code><a href="#Result.Link">Link</a></code>s yourself.</p>
+</div>
+
 
                             </div>
                             <div id="Result.Link.href" class="classattr">
@@ -1629,7 +2033,9 @@ directory. The filename is generated by calling <code>to_filename(self)</code>.<
         <span class="name">href</span><span class="annotation">: str</span>
     </div>
 
-    
+            <div class="docstring"><p>The link's <code><a href="#Result.Link.href">href</a></code> attribute.</p>
+</div>
+
 
                             </div>
                             <div id="Result.Link.title" class="classattr">
@@ -1638,7 +2044,9 @@ directory. The filename is generated by calling <code>to_filename(self)</code>.<
         <span class="name">title</span><span class="annotation">: str</span>
     </div>
 
-    
+            <div class="docstring"><p>The link's title.</p>
+</div>
+
 
                             </div>
                             <div id="Result.Link.rel" class="classattr">
@@ -1647,7 +2055,9 @@ directory. The filename is generated by calling <code>to_filename(self)</code>.<
         <span class="name">rel</span><span class="annotation">: str</span>
     </div>
 
-    
+            <div class="docstring"><p>The link's relationship to the <code><a href="#Result">Result</a></code>.</p>
+</div>
+
 
                             </div>
                             <div id="Result.Link.content_type" class="classattr">
@@ -1656,7 +2066,9 @@ directory. The filename is generated by calling <code>to_filename(self)</code>.<
         <span class="name">content_type</span><span class="annotation">: str</span>
     </div>
 
-    
+            <div class="docstring"><p>The link's HTTP content type.</p>
+</div>
+
 
                             </div>
                 </section>
@@ -1674,7 +2086,9 @@ directory. The filename is generated by calling <code>to_filename(self)</code>.<
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">SortCriterion</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A SortCriterion identifies a property by which search results can be</span>
-<span class="sd">    sorted. See [the arXiv API User&#39;s Manual: sort order for return</span>
+<span class="sd">    sorted.</span>
+
+<span class="sd">    See [the arXiv API User&#39;s Manual: sort order for return</span>
 <span class="sd">    results](https://arxiv.org/help/api/user-manual#sort).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">Relevance</span> <span class="o">=</span> <span class="s2">&quot;relevance&quot;</span>
@@ -1685,7 +2099,9 @@ directory. The filename is generated by calling <code>to_filename(self)</code>.<
         </details>
 
             <div class="docstring"><p>A SortCriterion identifies a property by which search results can be
-sorted. See <a href="https://arxiv.org/help/api/user-manual#sort">the arXiv API User's Manual: sort order for return
+sorted.</p>
+
+<p>See <a href="https://arxiv.org/help/api/user-manual#sort">the arXiv API User's Manual: sort order for return
 results</a>.</p>
 </div>
 
@@ -1742,8 +2158,10 @@ results</a>.</p>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">SortOrder</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A SortOrder indicates order in which search results are sorted according</span>
-<span class="sd">    to the specified arxiv.SortCriterion. See [the arXiv API User&#39;s Manual:</span>
-<span class="sd">    sort order for return results](https://arxiv.org/help/api/user-manual#sort).</span>
+<span class="sd">    to the specified arxiv.SortCriterion.</span>
+
+<span class="sd">    See [the arXiv API User&#39;s Manual: sort order for return</span>
+<span class="sd">    results](https://arxiv.org/help/api/user-manual#sort).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">Ascending</span> <span class="o">=</span> <span class="s2">&quot;ascending&quot;</span>
     <span class="n">Descending</span> <span class="o">=</span> <span class="s2">&quot;descending&quot;</span>
@@ -1752,8 +2170,10 @@ results</a>.</p>
         </details>
 
             <div class="docstring"><p>A SortOrder indicates order in which search results are sorted according
-to the specified arxiv.SortCriterion. See <a href="https://arxiv.org/help/api/user-manual#sort">the arXiv API User's Manual:
-sort order for return results</a>.</p>
+to the specified arxiv.SortCriterion.</p>
+
+<p>See <a href="https://arxiv.org/help/api/user-manual#sort">the arXiv API User's Manual: sort order for return
+results</a>.</p>
 </div>
 
 
@@ -1799,26 +2219,33 @@ sort order for return results</a>.</p>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Search</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A specification for a search of arXiv&#39;s database. To run a search, use</span>
-<span class="sd">    `Search.run` to use a default client or `Client.run` with a specific</span>
-<span class="sd">    client.</span>
+<span class="sd">    A specification for a search of arXiv&#39;s database.</span>
+
+<span class="sd">    To run a search, use `Search.run` to use a default client or `Client.run`</span>
+<span class="sd">    with a specific client.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">query</span><span class="p">:</span> <span class="nb">str</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A string query. See [the arXiv API User&#39;s Manual: Details of Query</span>
+<span class="sd">    A query string.</span>
+
+<span class="sd">    See [the arXiv API User&#39;s Manual: Details of Query</span>
 <span class="sd">    Construction](https://arxiv.org/help/api/user-manual#query_details).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">id_list</span><span class="p">:</span> <span class="nb">list</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A list of arXiv article IDs to which to limit the search. See [the arXiv</span>
-<span class="sd">    API User&#39;s Manual](https://arxiv.org/help/api/user-manual#search_query_and_id_list)</span>
+<span class="sd">    A list of arXiv article IDs to which to limit the search.</span>
+
+<span class="sd">    See [the arXiv API User&#39;s</span>
+<span class="sd">    Manual](https://arxiv.org/help/api/user-manual#search_query_and_id_list)</span>
 <span class="sd">    for documentation of the interaction between `query` and `id_list`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">max_results</span><span class="p">:</span> <span class="nb">float</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The maximum number of results to be returned in an execution of this</span>
-<span class="sd">    search. To fetch every result available, set `max_results=float(&#39;inf&#39;)`.</span>
+<span class="sd">    search.</span>
+
+<span class="sd">    To fetch every result available, set `max_results=float(&#39;inf&#39;)`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">sort_by</span><span class="p">:</span> <span class="n">SortCriterion</span>
     <span class="sd">&quot;&quot;&quot;The sort criterion for results.&quot;&quot;&quot;</span>
@@ -1834,7 +2261,7 @@ sort order for return results</a>.</p>
         <span class="n">sort_order</span><span class="p">:</span> <span class="n">SortOrder</span> <span class="o">=</span> <span class="n">SortOrder</span><span class="o">.</span><span class="n">Descending</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Construct an arXiv API search.</span>
+<span class="sd">        Constructs an arXiv API search with the specified criteria.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="n">query</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id_list</span> <span class="o">=</span> <span class="n">id_list</span>
@@ -1873,17 +2300,19 @@ sort order for return results</a>.</p>
 
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Result</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Executes the specified search using a default arXiv API client. For</span>
-<span class="sd">        info on those defauts see `Client`; see also `(Client).get`.</span>
+<span class="sd">        Executes the specified search using a default arXiv API client.</span>
+
+<span class="sd">        For info on default behavior, see `Client.__init__` and `(Client).get`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Client</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>A specification for a search of arXiv's database. To run a search, use
-<code>Search.run</code> to use a default client or <code>Client.run</code> with a specific
-client.</p>
+            <div class="docstring"><p>A specification for a search of arXiv's database.</p>
+
+<p>To run a search, use <code>Search.run</code> to use a default client or <code>Client.run</code>
+with a specific client.</p>
 </div>
 
 
@@ -1911,7 +2340,7 @@ client.</p>
         <span class="n">sort_order</span><span class="p">:</span> <span class="n">SortOrder</span> <span class="o">=</span> <span class="n">SortOrder</span><span class="o">.</span><span class="n">Descending</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Construct an arXiv API search.</span>
+<span class="sd">        Constructs an arXiv API search with the specified criteria.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="n">query</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id_list</span> <span class="o">=</span> <span class="n">id_list</span>
@@ -1922,7 +2351,7 @@ client.</p>
 
         </details>
 
-            <div class="docstring"><p>Construct an arXiv API search.</p>
+            <div class="docstring"><p>Constructs an arXiv API search with the specified criteria.</p>
 </div>
 
 
@@ -1933,7 +2362,9 @@ client.</p>
         <span class="name">query</span><span class="annotation">: str</span>
     </div>
 
-            <div class="docstring"><p>A string query. See <a href="https://arxiv.org/help/api/user-manual#query_details">the arXiv API User's Manual: Details of Query
+            <div class="docstring"><p>A query string.</p>
+
+<p>See <a href="https://arxiv.org/help/api/user-manual#query_details">the arXiv API User's Manual: Details of Query
 Construction</a>.</p>
 </div>
 
@@ -1945,8 +2376,10 @@ Construction</a>.</p>
         <span class="name">id_list</span><span class="annotation">: list</span>
     </div>
 
-            <div class="docstring"><p>A list of arXiv article IDs to which to limit the search. See <a href="https://arxiv.org/help/api/user-manual#search_query_and_id_list">the arXiv
-API User's Manual</a>
+            <div class="docstring"><p>A list of arXiv article IDs to which to limit the search.</p>
+
+<p>See <a href="https://arxiv.org/help/api/user-manual#search_query_and_id_list">the arXiv API User's
+Manual</a>
 for documentation of the interaction between <code><a href="#Search.query">query</a></code> and <code><a href="#Search.id_list">id_list</a></code>.</p>
 </div>
 
@@ -1959,7 +2392,9 @@ for documentation of the interaction between <code><a href="#Search.query">query
     </div>
 
             <div class="docstring"><p>The maximum number of results to be returned in an execution of this
-search. To fetch every result available, set <code>max_results=float('inf')</code>.</p>
+search.</p>
+
+<p>To fetch every result available, set <code>max_results=float('inf')</code>.</p>
 </div>
 
 
@@ -1998,16 +2433,18 @@ search. To fetch every result available, set <code>max_results=float('inf')</cod
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Result</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Executes the specified search using a default arXiv API client. For</span>
-<span class="sd">        info on those defauts see `Client`; see also `(Client).get`.</span>
+<span class="sd">        Executes the specified search using a default arXiv API client.</span>
+
+<span class="sd">        For info on default behavior, see `Client.__init__` and `(Client).get`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Client</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Executes the specified search using a default arXiv API client. For
-info on those defauts see <code><a href="#Client">Client</a></code>; see also <code>(Client).get</code>.</p>
+            <div class="docstring"><p>Executes the specified search using a default arXiv API client.</p>
+
+<p>For info on default behavior, see <code><a href="#Client.__init__">Client.__init__</a></code> and <code>(Client).get</code>.</p>
 </div>
 
 
@@ -2026,8 +2463,9 @@ info on those defauts see <code><a href="#Client">Client</a></code>; see also <c
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Client</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Specifies a strategy for fetching results from arXiv&#39;s API; it obscures</span>
-<span class="sd">    pagination and retry logic, and exposes `(Client).get`.</span>
+<span class="sd">    Specifies a strategy for fetching results from arXiv&#39;s API.</span>
+
+<span class="sd">    This class obscures pagination and retry logic, and exposes `Client.get`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">query_url_format</span> <span class="o">=</span> <span class="s1">&#39;http://export.arxiv.org/api/query?</span><span class="si">{}</span><span class="s1">&#39;</span>
@@ -2047,7 +2485,12 @@ info on those defauts see <code><a href="#Client">Client</a></code>; see also <c
         <span class="n">num_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Construct an arXiv API client.</span>
+<span class="sd">        Constructs an arXiv API client with the specified options.</span>
+
+<span class="sd">        Note: the default parameters should provide a robust request strategy</span>
+<span class="sd">        for most use cases. Extreme page sizes, delays, or retries risk</span>
+<span class="sd">        violating the arXiv [API Terms of Use](https://arxiv.org/help/api/tou),</span>
+<span class="sd">        brittle behavior, and inconsistent results.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">page_size</span> <span class="o">=</span> <span class="n">page_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">delay_seconds</span> <span class="o">=</span> <span class="n">delay_seconds</span>
@@ -2068,13 +2511,14 @@ info on those defauts see <code><a href="#Client">Client</a></code>; see also <c
 
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search</span><span class="p">:</span> <span class="n">Search</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Result</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Uses this client configuration to fetch one page of the search at a</span>
-<span class="sd">        time, yielding the search results one by one, until `max_results`</span>
-<span class="sd">        results have been yielded or there are no more search results.</span>
+<span class="sd">        Uses this client configuration to fetch one page of the search results</span>
+<span class="sd">        at a time, yielding the parsed `Result`s, until `max_results` results</span>
+<span class="sd">        have been yielded or there are no more search results.</span>
 
 <span class="sd">        If all tries fail, raises an `UnexpectedEmptyPageError` or `HTTPError`.</span>
 
-<span class="sd">        For more on using generators, see [Generators](https://wiki.python.org/moin/Generators).</span>
+<span class="sd">        For more on using generators, see</span>
+<span class="sd">        [Generators](https://wiki.python.org/moin/Generators).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="c1"># total_results may be reduced according to the feed&#39;s</span>
@@ -2135,8 +2579,9 @@ info on those defauts see <code><a href="#Client">Client</a></code>; see also <c
         <span class="n">first_page</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">FeedParserDict</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Fetches the specified URL and parses it with feedparser. If a request</span>
-<span class="sd">        fails or is unexpectedly empty, `_parse_feed` retries the request up to</span>
+<span class="sd">        Fetches the specified URL and parses it with feedparser.</span>
+
+<span class="sd">        If a request fails or is unexpectedly empty, retries the request up to</span>
 <span class="sd">        `self.num_retries` times.</span>
 
 <span class="sd">        Enforces `self.delay_seconds`: if that number of seconds has not passed</span>
@@ -2175,8 +2620,9 @@ info on those defauts see <code><a href="#Client">Client</a></code>; see also <c
 
         </details>
 
-            <div class="docstring"><p>Specifies a strategy for fetching results from arXiv's API; it obscures
-pagination and retry logic, and exposes <code>(Client).get</code>.</p>
+            <div class="docstring"><p>Specifies a strategy for fetching results from arXiv's API.</p>
+
+<p>This class obscures pagination and retry logic, and exposes <code><a href="#Client.get">Client.get</a></code>.</p>
 </div>
 
 
@@ -2196,7 +2642,12 @@ pagination and retry logic, and exposes <code>(Client).get</code>.</p>
         <span class="n">num_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Construct an arXiv API client.</span>
+<span class="sd">        Constructs an arXiv API client with the specified options.</span>
+
+<span class="sd">        Note: the default parameters should provide a robust request strategy</span>
+<span class="sd">        for most use cases. Extreme page sizes, delays, or retries risk</span>
+<span class="sd">        violating the arXiv [API Terms of Use](https://arxiv.org/help/api/tou),</span>
+<span class="sd">        brittle behavior, and inconsistent results.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">page_size</span> <span class="o">=</span> <span class="n">page_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">delay_seconds</span> <span class="o">=</span> <span class="n">delay_seconds</span>
@@ -2206,7 +2657,12 @@ pagination and retry logic, and exposes <code>(Client).get</code>.</p>
 
         </details>
 
-            <div class="docstring"><p>Construct an arXiv API client.</p>
+            <div class="docstring"><p>Constructs an arXiv API client with the specified options.</p>
+
+<p>Note: the default parameters should provide a robust request strategy
+for most use cases. Extreme page sizes, delays, or retries risk
+violating the arXiv <a href="https://arxiv.org/help/api/tou">API Terms of Use</a>,
+brittle behavior, and inconsistent results.</p>
 </div>
 
 
@@ -2270,13 +2726,14 @@ pagination and retry logic, and exposes <code>(Client).get</code>.</p>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search</span><span class="p">:</span> <span class="n">Search</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Result</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Uses this client configuration to fetch one page of the search at a</span>
-<span class="sd">        time, yielding the search results one by one, until `max_results`</span>
-<span class="sd">        results have been yielded or there are no more search results.</span>
+<span class="sd">        Uses this client configuration to fetch one page of the search results</span>
+<span class="sd">        at a time, yielding the parsed `Result`s, until `max_results` results</span>
+<span class="sd">        have been yielded or there are no more search results.</span>
 
 <span class="sd">        If all tries fail, raises an `UnexpectedEmptyPageError` or `HTTPError`.</span>
 
-<span class="sd">        For more on using generators, see [Generators](https://wiki.python.org/moin/Generators).</span>
+<span class="sd">        For more on using generators, see</span>
+<span class="sd">        [Generators](https://wiki.python.org/moin/Generators).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="c1"># total_results may be reduced according to the feed&#39;s</span>
@@ -2319,13 +2776,14 @@ pagination and retry logic, and exposes <code>(Client).get</code>.</p>
 
         </details>
 
-            <div class="docstring"><p>Uses this client configuration to fetch one page of the search at a
-time, yielding the search results one by one, until <code>max_results</code>
-results have been yielded or there are no more search results.</p>
+            <div class="docstring"><p>Uses this client configuration to fetch one page of the search results
+at a time, yielding the parsed <code><a href="#Result">Result</a></code>s, until <code>max_results</code> results
+have been yielded or there are no more search results.</p>
 
 <p>If all tries fail, raises an <code><a href="#UnexpectedEmptyPageError">UnexpectedEmptyPageError</a></code> or <code><a href="#HTTPError">HTTPError</a></code>.</p>
 
-<p>For more on using generators, see <a href="https://wiki.python.org/moin/Generators">Generators</a>.</p>
+<p>For more on using generators, see
+<a href="https://wiki.python.org/moin/Generators">Generators</a>.</p>
 </div>
 
 
@@ -2343,11 +2801,17 @@ results have been yielded or there are no more search results.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">ArxivError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This package&#39;s base Exception class.&quot;&quot;&quot;</span>
+
     <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
     <span class="sd">&quot;&quot;&quot;The feed URL that could not be fetched.&quot;&quot;&quot;</span>
     <span class="n">message</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="sd">&quot;&quot;&quot;Message explaining what went wrong.&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Message describing what caused this error.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs an `ArxivError` encountered while fetching the specified URL.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
         <span class="c1"># logger.info(self.message, extra=extra)</span>
@@ -2359,7 +2823,7 @@ results have been yielded or there are no more search results.</p>
 
         </details>
 
-            <div class="docstring"><p>Common base class for all non-exit exceptions.</p>
+            <div class="docstring"><p>This package's base Exception class.</p>
 </div>
 
 
@@ -2367,12 +2831,15 @@ results have been yielded or there are no more search results.</p>
                                         <div class="attr function"><a class="headerlink" href="#ArxivError.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">ArxivError</span><span class="signature">(url, message)</span>
+            <span class="name">ArxivError</span><span class="signature">(url: str, message: str)</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs an `ArxivError` encountered while fetching the specified URL.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
         <span class="c1"># logger.info(self.message, extra=extra)</span>
@@ -2381,7 +2848,9 @@ results have been yielded or there are no more search results.</p>
 
         </details>
 
-    
+            <div class="docstring"><p>Constructs an <code><a href="#ArxivError">ArxivError</a></code> encountered while fetching the specified URL.</p>
+</div>
+
 
                             </div>
                             <div id="ArxivError.url" class="classattr">
@@ -2401,7 +2870,7 @@ results have been yielded or there are no more search results.</p>
         <span class="name">message</span><span class="annotation">: str</span>
     </div>
 
-            <div class="docstring"><p>Message explaining what went wrong.</p>
+            <div class="docstring"><p>Message describing what caused this error.</p>
 </div>
 
 
@@ -2431,12 +2900,21 @@ results have been yielded or there are no more search results.</p>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">UnexpectedEmptyPageError</span><span class="p">(</span><span class="n">ArxivError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An error raised when a page of results that should be non-empty is empty.</span>
+
 <span class="sd">    This should never happen in theory, but happens sporadically due to</span>
 <span class="sd">    brittleness in the underlying arXiv API; usually resolved by retries.</span>
+
+<span class="sd">    See `Client.get` for usage.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span>
     <span class="sd">&quot;&quot;&quot;The request retry number which encountered this error, zero-indexed.&quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs an `UnexpectedEmptyPageError` encountered for the specified</span>
+<span class="sd">        API URL after `retry` tries.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">retry</span> <span class="o">=</span> <span class="n">retry</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s2">&quot;Page of results was unexpectedly empty&quot;</span><span class="p">)</span>
@@ -2451,9 +2929,12 @@ results have been yielded or there are no more search results.</p>
 
         </details>
 
-            <div class="docstring"><p>An error raised when a page of results that should be non-empty is empty.
-This should never happen in theory, but happens sporadically due to
+            <div class="docstring"><p>An error raised when a page of results that should be non-empty is empty.</p>
+
+<p>This should never happen in theory, but happens sporadically due to
 brittleness in the underlying arXiv API; usually resolved by retries.</p>
+
+<p>See <code><a href="#Client.get">Client.get</a></code> for usage.</p>
 </div>
 
 
@@ -2467,6 +2948,10 @@ brittleness in the underlying arXiv API; usually resolved by retries.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs an `UnexpectedEmptyPageError` encountered for the specified</span>
+<span class="sd">        API URL after `retry` tries.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">retry</span> <span class="o">=</span> <span class="n">retry</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s2">&quot;Page of results was unexpectedly empty&quot;</span><span class="p">)</span>
@@ -2474,7 +2959,10 @@ brittleness in the underlying arXiv API; usually resolved by retries.</p>
 
         </details>
 
-    
+            <div class="docstring"><p>Constructs an <code><a href="#UnexpectedEmptyPageError">UnexpectedEmptyPageError</a></code> encountered for the specified
+API URL after <code><a href="#UnexpectedEmptyPageError.retry">retry</a></code> tries.</p>
+</div>
+
 
                             </div>
                             <div id="UnexpectedEmptyPageError.retry" class="classattr">
@@ -2516,12 +3004,22 @@ brittleness in the underlying arXiv API; usually resolved by retries.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">HTTPError</span><span class="p">(</span><span class="n">ArxivError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A non-200 status encountered while fetching a page of results.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A non-200 status encountered while fetching a page of results.</span>
+
+<span class="sd">    See `Client.get` for usage.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span>
     <span class="sd">&quot;&quot;&quot;The request retry number which encountered this error, zero-indexed.&quot;&quot;&quot;</span>
     <span class="n">status</span><span class="p">:</span> <span class="nb">int</span>
     <span class="sd">&quot;&quot;&quot;The HTTP status reported by feedparser.&quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs an `HTTPError` for the specified status code, encountered for</span>
+<span class="sd">        the specified API URL after `retry` tries.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">retry</span> <span class="o">=</span> <span class="n">retry</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status</span>
@@ -2542,6 +3040,8 @@ brittleness in the underlying arXiv API; usually resolved by retries.</p>
         </details>
 
             <div class="docstring"><p>A non-200 status encountered while fetching a page of results.</p>
+
+<p>See <code><a href="#Client.get">Client.get</a></code> for usage.</p>
 </div>
 
 
@@ -2555,6 +3055,10 @@ brittleness in the underlying arXiv API; usually resolved by retries.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs an `HTTPError` for the specified status code, encountered for</span>
+<span class="sd">        the specified API URL after `retry` tries.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">retry</span> <span class="o">=</span> <span class="n">retry</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status</span>
@@ -2566,7 +3070,10 @@ brittleness in the underlying arXiv API; usually resolved by retries.</p>
 
         </details>
 
-    
+            <div class="docstring"><p>Constructs an <code><a href="#HTTPError">HTTPError</a></code> for the specified status code, encountered for
+the specified API URL after <code><a href="#HTTPError.retry">retry</a></code> tries.</p>
+</div>
+
 
                             </div>
                             <div id="HTTPError.retry" class="classattr">

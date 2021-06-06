@@ -12,8 +12,8 @@ test: $(source) $(tests)
 	pytest
 
 docs: docs/index.html
-docs/index.html: $(source)
-	pdoc ./arxiv/arxiv.py -o docs
+docs/index.html: $(source) README.md
+	pdoc --docformat "restructuredtext" ./arxiv/arxiv.py -o docs
 	mv docs/arxiv/arxiv.html docs/index.html
 	rmdir docs/arxiv
 	rm docs/search.json
