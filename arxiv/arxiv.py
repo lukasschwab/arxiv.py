@@ -384,10 +384,16 @@ class Search(object):
 
     def get(self) -> Generator[Result, None, None]:
         """
-        Executes the specified search using a default arXiv API client. For
-        info on those defauts see `Client`; see also `(Client).get`.
+        Deprecated; use `(Search).results`.
         """
-        return Client().get(self)
+        return self.results()
+
+    def results(self) -> Generator[Result, None, None]:
+        """
+        Executes the specified search using a default arXiv API client. For
+        info on those defauts see `Client`; see also `(Client).results`.
+        """
+        return Client().results(self)
 
 
 class Client(object):
@@ -433,6 +439,12 @@ class Client(object):
         )
 
     def get(self, search: Search) -> Generator[Result, None, None]:
+        """
+        Deprecated; use `(Client).results`.
+        """
+        return self.results(search)
+
+    def results(self, search: Search) -> Generator[Result, None, None]:
         """
         Uses this client configuration to fetch one page of the search at a
         time, yielding the search results one by one, until `max_results`
