@@ -108,11 +108,23 @@ class Result(object):
         Converts a feedparser entry for an arXiv search result feed into a
         Result object.
         """
+        # Title attribute may be absent for certain titles. Defaulting to "0" as
+        # it's the only title observed to cause this bug.
+        # https://github.com/lukasschwab/arxiv.py/issues/71
+        # title = entry.title if hasattr(entry, "title") else "0"
+        title = "0"
+        if hasattr(entry, "title"):
+            title = entry.title
+        else:
+            logger.warn(
+                "Result %s is missing title attribute; defaulting to '0'",
+                entry.id
+            )
         return Result(
             entry_id=entry.id,
             updated=Result._to_datetime(entry.updated_parsed),
             published=Result._to_datetime(entry.published_parsed),
-            title=re.sub(r'\s+', ' ', entry.title),
+            title=re.sub(r'\s+', ' ', title),
             authors=[Result.Author._from_feed_author(a) for a in entry.authors],
             summary=entry.summary,
             comment=entry.get('comment'),
