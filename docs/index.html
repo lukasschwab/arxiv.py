@@ -566,11 +566,23 @@ arxiv<wbr>.arxiv    </h1>
 <span class="sd">        Converts a feedparser entry for an arXiv search result feed into a</span>
 <span class="sd">        Result object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Title attribute may be absent for certain titles. Defaulting to &quot;0&quot; as</span>
+        <span class="c1"># it&#39;s the only title observed to cause this bug.</span>
+        <span class="c1"># https://github.com/lukasschwab/arxiv.py/issues/71</span>
+        <span class="c1"># title = entry.title if hasattr(entry, &quot;title&quot;) else &quot;0&quot;</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">):</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">title</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Result </span><span class="si">%s</span><span class="s2"> is missing title attribute; defaulting to &#39;0&#39;&quot;</span><span class="p">,</span>
+                <span class="n">entry</span><span class="o">.</span><span class="n">id</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="n">Result</span><span class="p">(</span>
             <span class="n">entry_id</span><span class="o">=</span><span class="n">entry</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
             <span class="n">updated</span><span class="o">=</span><span class="n">Result</span><span class="o">.</span><span class="n">_to_datetime</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">updated_parsed</span><span class="p">),</span>
             <span class="n">published</span><span class="o">=</span><span class="n">Result</span><span class="o">.</span><span class="n">_to_datetime</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">published_parsed</span><span class="p">),</span>
-            <span class="n">title</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\s+&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">entry</span><span class="o">.</span><span class="n">title</span><span class="p">),</span>
+            <span class="n">title</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\s+&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">title</span><span class="p">),</span>
             <span class="n">authors</span><span class="o">=</span><span class="p">[</span><span class="n">Result</span><span class="o">.</span><span class="n">Author</span><span class="o">.</span><span class="n">_from_feed_author</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">entry</span><span class="o">.</span><span class="n">authors</span><span class="p">],</span>
             <span class="n">summary</span><span class="o">=</span><span class="n">entry</span><span class="o">.</span><span class="n">summary</span><span class="p">,</span>
             <span class="n">comment</span><span class="o">=</span><span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;comment&#39;</span><span class="p">),</span>
@@ -667,7 +679,7 @@ arxiv<wbr>.arxiv    </h1>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdf_urls</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdf_urls</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                 <span class="s2">&quot;Result has multiple PDF links; using </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
                 <span class="n">pdf_urls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="p">)</span>
@@ -1253,11 +1265,23 @@ arxiv<wbr>.arxiv    </h1>
 <span class="sd">        Converts a feedparser entry for an arXiv search result feed into a</span>
 <span class="sd">        Result object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Title attribute may be absent for certain titles. Defaulting to &quot;0&quot; as</span>
+        <span class="c1"># it&#39;s the only title observed to cause this bug.</span>
+        <span class="c1"># https://github.com/lukasschwab/arxiv.py/issues/71</span>
+        <span class="c1"># title = entry.title if hasattr(entry, &quot;title&quot;) else &quot;0&quot;</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">):</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">title</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Result </span><span class="si">%s</span><span class="s2"> is missing title attribute; defaulting to &#39;0&#39;&quot;</span><span class="p">,</span>
+                <span class="n">entry</span><span class="o">.</span><span class="n">id</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="n">Result</span><span class="p">(</span>
             <span class="n">entry_id</span><span class="o">=</span><span class="n">entry</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
             <span class="n">updated</span><span class="o">=</span><span class="n">Result</span><span class="o">.</span><span class="n">_to_datetime</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">updated_parsed</span><span class="p">),</span>
             <span class="n">published</span><span class="o">=</span><span class="n">Result</span><span class="o">.</span><span class="n">_to_datetime</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">published_parsed</span><span class="p">),</span>
-            <span class="n">title</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\s+&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">entry</span><span class="o">.</span><span class="n">title</span><span class="p">),</span>
+            <span class="n">title</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\s+&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">title</span><span class="p">),</span>
             <span class="n">authors</span><span class="o">=</span><span class="p">[</span><span class="n">Result</span><span class="o">.</span><span class="n">Author</span><span class="o">.</span><span class="n">_from_feed_author</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">entry</span><span class="o">.</span><span class="n">authors</span><span class="p">],</span>
             <span class="n">summary</span><span class="o">=</span><span class="n">entry</span><span class="o">.</span><span class="n">summary</span><span class="p">,</span>
             <span class="n">comment</span><span class="o">=</span><span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;comment&#39;</span><span class="p">),</span>
@@ -1354,7 +1378,7 @@ arxiv<wbr>.arxiv    </h1>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdf_urls</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdf_urls</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                 <span class="s2">&quot;Result has multiple PDF links; using </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
                 <span class="n">pdf_urls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="p">)</span>
@@ -1492,14 +1516,14 @@ Returned</a>.</p>
     updated: datetime.datetime = datetime.datetime(1, 1, 1, 0, 0),
     published: datetime.datetime = datetime.datetime(1, 1, 1, 0, 0),
     title: str = &#39;&#39;,
-    authors: list[<a href="#Result.Author">arxiv.arxiv.Result.Author</a>] = [],
+    authors: List[<a href="#Result.Author">arxiv.arxiv.Result.Author</a>] = [],
     summary: str = &#39;&#39;,
     comment: str = &#39;&#39;,
     journal_ref: str = &#39;&#39;,
     doi: str = &#39;&#39;,
     primary_category: str = &#39;&#39;,
     categories: List[str] = [],
-    links: list[<a href="#Result.Link">arxiv.arxiv.Result.Link</a>] = [],
+    links: List[<a href="#Result.Link">arxiv.arxiv.Result.Link</a>] = [],
     _raw: feedparser.util.FeedParserDict = None
 )</span>
     </div>

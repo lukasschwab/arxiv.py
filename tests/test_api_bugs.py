@@ -4,6 +4,7 @@ Tests for work-arounds to known arXiv API bugs.
 import arxiv
 import unittest
 
+
 class TestClient(unittest.TestCase):
     def test_missing_title(self):
         """
