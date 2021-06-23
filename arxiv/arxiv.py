@@ -4,6 +4,7 @@ import time
 import feedparser
 import re
 import os
+import warnings
 
 from urllib.parse import urlencode
 from urllib.request import urlretrieve
@@ -451,6 +452,11 @@ class Search(object):
         """
         **Deprecated** after 1.2.0; use `Search.results`.
         """
+        warnings.warn(
+            "The 'get' method is deprecated, use 'results' instead",
+            DeprecationWarning,
+            stacklevel=2
+        )
         return self.results()
 
     def results(self) -> Generator[Result, None, None]:
@@ -515,6 +521,11 @@ class Client(object):
         """
         **Deprecated** after 1.2.0; use `Client.results`.
         """
+        warnings.warn(
+            "The 'get' method is deprecated, use 'results' instead",
+            DeprecationWarning,
+            stacklevel=2
+        )
         return self.results(search)
 
     def results(self, search: Search) -> Generator[Result, None, None]:
