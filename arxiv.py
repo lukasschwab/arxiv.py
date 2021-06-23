@@ -1,4 +1,4 @@
-""".. include:: ../README.md"""
+""".. include:: ./README.md"""
 import logging
 import time
 import feedparser

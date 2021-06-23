@@ -8,7 +8,7 @@ with open('README.md', 'r') as fh:
 setup(
     name='arxiv',
     version=version,
-    packages=['arxiv'],
+    py_modules=['arxiv'],
     # dependencies
     install_requires=['feedparser'],
     tests_require=[

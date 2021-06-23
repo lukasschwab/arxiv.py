@@ -1,4 +1,4 @@
-from arxiv import arxiv
+import arxiv
 import os
 import shutil
 import tempfile
