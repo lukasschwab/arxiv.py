@@ -15,7 +15,6 @@ docs: docs/index.html
 docs/index.html: $(source) README.md
 	pdoc --docformat "restructuredtext" arxiv.py -o docs
 	mv docs/arxiv.html docs/index.html
-	rmdir docs/arxiv
 	rm docs/search.json
 
 clean:
