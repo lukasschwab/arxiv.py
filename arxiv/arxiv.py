@@ -116,7 +116,7 @@ class Result(object):
         if hasattr(entry, "title"):
             title = entry.title
         else:
-            logger.warn(
+            logger.warning(
                 "Result %s is missing title attribute; defaulting to '0'",
                 entry.id
             )
@@ -221,7 +221,7 @@ class Result(object):
         if len(pdf_urls) == 0:
             return None
         elif len(pdf_urls) > 1:
-            logger.warn(
+            logger.warning(
                 "Result has multiple PDF links; using %s",
                 pdf_urls[0]
             )
