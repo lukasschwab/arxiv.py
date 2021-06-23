@@ -3,4 +3,4 @@ feedparser>=6.0.2
 # Development dependencies
 pytest>=6.2.2
 flake8>=3.9.0
-pdoc==7.0.3
+pdoc==7.1.1
