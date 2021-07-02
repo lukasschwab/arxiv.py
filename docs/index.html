@@ -190,6 +190,9 @@
                         <li>
                                 <a class="function" href="#Search.get">get</a>
                         </li>
+                        <li>
+                                <a class="function" href="#Search.results">results</a>
+                        </li>
                 </ul>
 
             </li>
@@ -213,6 +216,9 @@
                         </li>
                         <li>
                                 <a class="function" href="#Client.get">get</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Client.results">results</a>
                         </li>
                 </ul>
 
@@ -324,7 +330,7 @@ arxiv<wbr>.arxiv    </h1>
 <li><code>sort_order</code>: The sort order for results: <code>'descending'</code> or <code>'ascending'</code>.</li>
 </ul>
 
-<p>To fetch arXiv records matching a <code><a href="#Search">Search</a></code>, use <code>search.get()</code> or <code>(Client).get(search)</code> to get a generator yielding <code><a href="#Result">Result</a></code>s.</p>
+<p>To fetch arXiv records matching a <code><a href="#Search">Search</a></code>, use <code>search.results()</code> or <code>(Client).results(search)</code> to get a generator yielding <code><a href="#Result">Result</a></code>s.</p>
 
 <h4 id="example-fetching-results">Example: fetching results</h4>
 
@@ -338,7 +344,7 @@ arxiv<wbr>.arxiv    </h1>
   <span class="n">sort_by</span> <span class="o">=</span> <span class="n">arxiv</span><span class="o">.</span><span class="n">SortCriterion</span><span class="o">.</span><span class="n">SubmittedDate</span>
 <span class="p">)</span>
 
-<span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">search</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+<span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">search</span><span class="o">.</span><span class="n">results</span><span class="p">():</span>
   <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
 </code></pre></div>
 
@@ -347,7 +353,7 @@ arxiv<wbr>.arxiv    </h1>
 <div class="codehilite"><pre><span></span><code><span class="kn">import</span> <span class="nn">arxiv</span>
 
 <span class="n">search</span> <span class="o">=</span> <span class="n">arxiv</span><span class="o">.</span><span class="n">Search</span><span class="p">(</span><span class="n">id_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1605.08386v1&quot;</span><span class="p">])</span>
-<span class="n">paper</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">search</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+<span class="n">paper</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">search</span><span class="o">.</span><span class="n">results</span><span class="p">())</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
 </code></pre></div>
 
@@ -355,7 +361,7 @@ arxiv<wbr>.arxiv    </h1>
 
 <!-- TODO: improve this section. -->
 
-<p>The <code><a href="#Result">Result</a></code> objects yielded by <code>(Search).get()</code> include metadata about each paper and some helper functions for downloading their content.</p>
+<p>The <code><a href="#Result">Result</a></code> objects yielded by <code>(Search).results()</code> include metadata about each paper and some helper functions for downloading their content.</p>
 
 <p>The meaning of the underlying raw data is documented in the <a href="https://arxiv.org/help/api/user-manual#_details_of_atom_results_returned">arXiv API User Manual: Details of Atom Results Returned</a>.</p>
 
@@ -383,7 +389,7 @@ arxiv<wbr>.arxiv    </h1>
 
 <div class="codehilite"><pre><span></span><code><span class="kn">import</span> <span class="nn">arxiv</span>
 
-<span class="n">paper</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">arxiv</span><span class="o">.</span><span class="n">Search</span><span class="p">(</span><span class="n">id_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1605.08386v1&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+<span class="n">paper</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">arxiv</span><span class="o">.</span><span class="n">Search</span><span class="p">(</span><span class="n">id_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1605.08386v1&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">results</span><span class="p">())</span>
 <span class="c1"># Download the PDF to the PWD with a default filename.</span>
 <span class="n">paper</span><span class="o">.</span><span class="n">download_pdf</span><span class="p">()</span>
 <span class="c1"># Download the PDF to the PWD with a custom filename.</span>
@@ -396,7 +402,7 @@ arxiv<wbr>.arxiv    </h1>
 
 <div class="codehilite"><pre><span></span><code><span class="kn">import</span> <span class="nn">arxiv</span>
 
-<span class="n">paper</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">arxiv</span><span class="o">.</span><span class="n">Search</span><span class="p">(</span><span class="n">id_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1605.08386v1&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+<span class="n">paper</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">arxiv</span><span class="o">.</span><span class="n">Search</span><span class="p">(</span><span class="n">id_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1605.08386v1&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">results</span><span class="p">())</span>
 <span class="c1"># Download the archive to the PWD with a default filename.</span>
 <span class="n">paper</span><span class="o">.</span><span class="n">download_source</span><span class="p">()</span>
 <span class="c1"># Download the archive to the PWD with a custom filename.</span>
@@ -409,7 +415,7 @@ arxiv<wbr>.arxiv    </h1>
 
 <p>A <code><a href="#Client">Client</a></code> specifies a strategy for fetching results from arXiv's API; it obscures pagination and retry logic.</p>
 
-<p>For most use cases the default client should suffice. You can construct it explicitly with <code>arxiv.Client()</code>, or use it via the <code>(Search).get()</code> method.</p>
+<p>For most use cases the default client should suffice. You can construct it explicitly with <code>arxiv.Client()</code>, or use it via the <code>(Search).results()</code> method.</p>
 
 <div class="codehilite"><pre><span></span><code><span class="n">arxiv</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span>
   <span class="n">page_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
@@ -426,7 +432,7 @@ arxiv<wbr>.arxiv    </h1>
 
 <h4 id="example-fetching-results-with-a-custom-client">Example: fetching results with a custom client</h4>
 
-<p><code>(Search).get()</code> uses the default client settings. If you want to use a client you've defined instead of the defaults, use <code>(Client).get(...)</code>:</p>
+<p><code>(Search).results()</code> uses the default client settings. If you want to use a client you've defined instead of the defaults, use <code>(Client).results(...)</code>:</p>
 
 <div class="codehilite"><pre><span></span><code><span class="kn">import</span> <span class="nn">arxiv</span>
 
@@ -437,7 +443,7 @@ arxiv<wbr>.arxiv    </h1>
 <span class="p">)</span>
 
 <span class="c1"># Prints 1000 titles before needing to make another request.</span>
-<span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">big_slow_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">arxiv</span><span class="o">.</span><span class="n">Search</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="s2">&quot;quantum&quot;</span><span class="p">)):</span>
+<span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">big_slow_client</span><span class="o">.</span><span class="n">results</span><span class="p">(</span><span class="n">arxiv</span><span class="o">.</span><span class="n">Search</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="s2">&quot;quantum&quot;</span><span class="p">)):</span>
   <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
 </code></pre></div>
 
@@ -447,7 +453,7 @@ arxiv<wbr>.arxiv    </h1>
 
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">logging</span><span class="o">,</span> <span class="nn">arxiv</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">paper</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">arxiv</span><span class="o">.</span><span class="n">Search</span><span class="p">(</span><span class="n">id_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1605.08386v1&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">paper</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">arxiv</span><span class="o">.</span><span class="n">Search</span><span class="p">(</span><span class="n">id_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1605.08386v1&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">results</span><span class="p">())</span>
 <span class="go">INFO:<a href="">arxiv.arxiv</a>:Requesting 100 results at offset 0</span>
 <span class="go">INFO:<a href="">arxiv.arxiv</a>:Requesting page of results</span>
 <span class="go">INFO:<a href="">arxiv.arxiv</a>:Got first page; 1 of inf results available</span>
@@ -462,6 +468,7 @@ arxiv<wbr>.arxiv    </h1>
 <span class="kn">import</span> <span class="nn">feedparser</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlencode</span>
 <span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">urlretrieve</span>
@@ -907,18 +914,30 @@ arxiv<wbr>.arxiv    </h1>
 
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Result</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **Deprecated** after 1.2.0; use `Search.results`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;The &#39;get&#39; method is deprecated, use &#39;results&#39; instead&quot;</span><span class="p">,</span>
+            <span class="ne">DeprecationWarning</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">results</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Result</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the specified search using a default arXiv API client.</span>
 
-<span class="sd">        For info on default behavior, see `Client.__init__` and `(Client).get`.</span>
+<span class="sd">        For info on default behavior, see `Client.__init__` and `Client.results`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">Client</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Client</span><span class="p">()</span><span class="o">.</span><span class="n">results</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">Client</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Specifies a strategy for fetching results from arXiv&#39;s API.</span>
 
-<span class="sd">    This class obscures pagination and retry logic, and exposes `Client.get`.</span>
+<span class="sd">    This class obscures pagination and retry logic, and exposes</span>
+<span class="sd">    `Client.results`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">query_url_format</span> <span class="o">=</span> <span class="s1">&#39;http://export.arxiv.org/api/query?</span><span class="si">{}</span><span class="s1">&#39;</span>
@@ -963,6 +982,17 @@ arxiv<wbr>.arxiv    </h1>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search</span><span class="p">:</span> <span class="n">Search</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Result</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **Deprecated** after 1.2.0; use `Client.results`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;The &#39;get&#39; method is deprecated, use &#39;results&#39; instead&quot;</span><span class="p">,</span>
+            <span class="ne">DeprecationWarning</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">(</span><span class="n">search</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search</span><span class="p">:</span> <span class="n">Search</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Result</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Uses this client configuration to fetch one page of the search results</span>
 <span class="sd">        at a time, yielding the parsed `Result`s, until `max_results` results</span>
@@ -1099,7 +1129,7 @@ arxiv<wbr>.arxiv    </h1>
 <span class="sd">    This should never happen in theory, but happens sporadically due to</span>
 <span class="sd">    brittleness in the underlying arXiv API; usually resolved by retries.</span>
 
-<span class="sd">    See `Client.get` for usage.</span>
+<span class="sd">    See `Client.results` for usage.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span>
@@ -1126,7 +1156,7 @@ arxiv<wbr>.arxiv    </h1>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A non-200 status encountered while fetching a page of results.</span>
 
-<span class="sd">    See `Client.get` for usage.</span>
+<span class="sd">    See `Client.results` for usage.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span>
@@ -2321,11 +2351,22 @@ results</a>.</p>
 
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Result</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **Deprecated** after 1.2.0; use `Search.results`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;The &#39;get&#39; method is deprecated, use &#39;results&#39; instead&quot;</span><span class="p">,</span>
+            <span class="ne">DeprecationWarning</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">results</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Result</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the specified search using a default arXiv API client.</span>
 
-<span class="sd">        For info on default behavior, see `Client.__init__` and `(Client).get`.</span>
+<span class="sd">        For info on default behavior, see `Client.__init__` and `Client.results`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">Client</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Client</span><span class="p">()</span><span class="o">.</span><span class="n">results</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -2454,18 +2495,47 @@ search.</p>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Result</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **Deprecated** after 1.2.0; use `Search.results`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;The &#39;get&#39; method is deprecated, use &#39;results&#39; instead&quot;</span><span class="p">,</span>
+            <span class="ne">DeprecationWarning</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">()</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p><strong>Deprecated</strong> after 1.2.0; use <code><a href="#Search.results">Search.results</a></code>.</p>
+</div>
+
+
+                            </div>
+                            <div id="Search.results" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Search.results">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">results</span><span class="signature">(self) -&gt; Generator[<a href="#Result">arxiv.arxiv.Result</a>, NoneType, NoneType]</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">results</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Result</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the specified search using a default arXiv API client.</span>
 
-<span class="sd">        For info on default behavior, see `Client.__init__` and `(Client).get`.</span>
+<span class="sd">        For info on default behavior, see `Client.__init__` and `Client.results`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">Client</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Client</span><span class="p">()</span><span class="o">.</span><span class="n">results</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
             <div class="docstring"><p>Executes the specified search using a default arXiv API client.</p>
 
-<p>For info on default behavior, see <code><a href="#Client.__init__">Client.__init__</a></code> and <code>(Client).get</code>.</p>
+<p>For info on default behavior, see <code><a href="#Client.__init__">Client.__init__</a></code> and <code><a href="#Client.results">Client.results</a></code>.</p>
 </div>
 
 
@@ -2486,7 +2556,8 @@ search.</p>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Specifies a strategy for fetching results from arXiv&#39;s API.</span>
 
-<span class="sd">    This class obscures pagination and retry logic, and exposes `Client.get`.</span>
+<span class="sd">    This class obscures pagination and retry logic, and exposes</span>
+<span class="sd">    `Client.results`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">query_url_format</span> <span class="o">=</span> <span class="s1">&#39;http://export.arxiv.org/api/query?</span><span class="si">{}</span><span class="s1">&#39;</span>
@@ -2531,6 +2602,17 @@ search.</p>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search</span><span class="p">:</span> <span class="n">Search</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Result</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **Deprecated** after 1.2.0; use `Client.results`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;The &#39;get&#39; method is deprecated, use &#39;results&#39; instead&quot;</span><span class="p">,</span>
+            <span class="ne">DeprecationWarning</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">(</span><span class="n">search</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search</span><span class="p">:</span> <span class="n">Search</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Result</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Uses this client configuration to fetch one page of the search results</span>
 <span class="sd">        at a time, yielding the parsed `Result`s, until `max_results` results</span>
@@ -2643,7 +2725,8 @@ search.</p>
 
             <div class="docstring"><p>Specifies a strategy for fetching results from arXiv's API.</p>
 
-<p>This class obscures pagination and retry logic, and exposes <code><a href="#Client.get">Client.get</a></code>.</p>
+<p>This class obscures pagination and retry logic, and exposes
+<code><a href="#Client.results">Client.results</a></code>.</p>
 </div>
 
 
@@ -2746,6 +2829,38 @@ brittle behavior, and inconsistent results.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search</span><span class="p">:</span> <span class="n">Search</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Result</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **Deprecated** after 1.2.0; use `Client.results`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;The &#39;get&#39; method is deprecated, use &#39;results&#39; instead&quot;</span><span class="p">,</span>
+            <span class="ne">DeprecationWarning</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">(</span><span class="n">search</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p><strong>Deprecated</strong> after 1.2.0; use <code><a href="#Client.results">Client.results</a></code>.</p>
+</div>
+
+
+                            </div>
+                            <div id="Client.results" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Client.results">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">results</span><span class="signature">(
+    self,
+    search: <a href="#Search">arxiv.arxiv.Search</a>
+) -&gt; Generator[<a href="#Result">arxiv.arxiv.Result</a>, NoneType, NoneType]</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search</span><span class="p">:</span> <span class="n">Search</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Result</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Uses this client configuration to fetch one page of the search results</span>
 <span class="sd">        at a time, yielding the parsed `Result`s, until `max_results` results</span>
@@ -2925,7 +3040,7 @@ have been yielded or there are no more search results.</p>
 <span class="sd">    This should never happen in theory, but happens sporadically due to</span>
 <span class="sd">    brittleness in the underlying arXiv API; usually resolved by retries.</span>
 
-<span class="sd">    See `Client.get` for usage.</span>
+<span class="sd">    See `Client.results` for usage.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span>
@@ -2955,7 +3070,7 @@ have been yielded or there are no more search results.</p>
 <p>This should never happen in theory, but happens sporadically due to
 brittleness in the underlying arXiv API; usually resolved by retries.</p>
 
-<p>See <code><a href="#Client.get">Client.get</a></code> for usage.</p>
+<p>See <code><a href="#Client.results">Client.results</a></code> for usage.</p>
 </div>
 
 
@@ -3028,7 +3143,7 @@ API URL after <code><a href="#UnexpectedEmptyPageError.retry">retry</a></code> t
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A non-200 status encountered while fetching a page of results.</span>
 
-<span class="sd">    See `Client.get` for usage.</span>
+<span class="sd">    See `Client.results` for usage.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">retry</span><span class="p">:</span> <span class="nb">int</span>
@@ -3062,7 +3177,7 @@ API URL after <code><a href="#UnexpectedEmptyPageError.retry">retry</a></code> t
 
             <div class="docstring"><p>A non-200 status encountered while fetching a page of results.</p>
 
-<p>See <code><a href="#Client.get">Client.get</a></code> for usage.</p>
+<p>See <code><a href="#Client.results">Client.results</a></code> for usage.</p>
 </div>
 
 

@@ -4,6 +4,7 @@ import time
 import feedparser
 import re
 import os
+import warnings
 
 from urllib.parse import urlencode
 from urllib.request import urlretrieve
@@ -449,18 +450,30 @@ class Search(object):
 
     def get(self) -> Generator[Result, None, None]:
         """
+        **Deprecated** after 1.2.0; use `Search.results`.
+        """
+        warnings.warn(
+            "The 'get' method is deprecated, use 'results' instead",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        return self.results()
+
+    def results(self) -> Generator[Result, None, None]:
+        """
         Executes the specified search using a default arXiv API client.
 
-        For info on default behavior, see `Client.__init__` and `(Client).get`.
+        For info on default behavior, see `Client.__init__` and `Client.results`.
         """
-        return Client().get(self)
+        return Client().results(self)
 
 
 class Client(object):
     """
     Specifies a strategy for fetching results from arXiv's API.
 
-    This class obscures pagination and retry logic, and exposes `Client.get`.
+    This class obscures pagination and retry logic, and exposes
+    `Client.results`.
     """
 
     query_url_format = 'http://export.arxiv.org/api/query?{}'
@@ -505,6 +518,17 @@ class Client(object):
         )
 
     def get(self, search: Search) -> Generator[Result, None, None]:
+        """
+        **Deprecated** after 1.2.0; use `Client.results`.
+        """
+        warnings.warn(
+            "The 'get' method is deprecated, use 'results' instead",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        return self.results(search)
+
+    def results(self, search: Search) -> Generator[Result, None, None]:
         """
         Uses this client configuration to fetch one page of the search results
         at a time, yielding the parsed `Result`s, until `max_results` results
@@ -641,7 +665,7 @@ class UnexpectedEmptyPageError(ArxivError):
     This should never happen in theory, but happens sporadically due to
     brittleness in the underlying arXiv API; usually resolved by retries.
 
-    See `Client.get` for usage.
+    See `Client.results` for usage.
     """
 
     retry: int
@@ -668,7 +692,7 @@ class HTTPError(ArxivError):
     """
     A non-200 status encountered while fetching a page of results.
 
-    See `Client.get` for usage.
+    See `Client.results` for usage.
     """
 
     retry: int
