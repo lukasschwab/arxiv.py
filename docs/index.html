@@ -637,10 +637,18 @@ arxiv<wbr>.arxiv    </h1>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the short ID for this result.</span>
 
-<span class="sd">        If the result URL is `&quot;http://arxiv.org/abs/quant-ph/0201082v1&quot;`,</span>
-<span class="sd">        `result.get_short_id()` returns `&quot;0201082v1&quot;`.</span>
+<span class="sd">        + If the result URL is `&quot;http://arxiv.org/abs/2107.05580v1&quot;`,</span>
+<span class="sd">        `result.get_short_id()` returns `2107.05580v1`.</span>
+
+<span class="sd">        + If the result URL is `&quot;http://arxiv.org/abs/quant-ph/0201082v1&quot;`,</span>
+<span class="sd">        `result.get_short_id()` returns `&quot;quant-ph/0201082v1&quot;` (the pre-March</span>
+<span class="sd">        2007 arXiv identifier format).</span>
+
+<span class="sd">        For an explanation of the difference between arXiv&#39;s legacy and current</span>
+<span class="sd">        identifiers, see [Understanding the arXiv</span>
+<span class="sd">        identifier](https://arxiv.org/help/arxiv_identifier).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;arxiv.org/abs/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_get_default_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extension</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;pdf&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1370,10 +1378,18 @@ arxiv<wbr>.arxiv    </h1>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the short ID for this result.</span>
 
-<span class="sd">        If the result URL is `&quot;http://arxiv.org/abs/quant-ph/0201082v1&quot;`,</span>
-<span class="sd">        `result.get_short_id()` returns `&quot;0201082v1&quot;`.</span>
+<span class="sd">        + If the result URL is `&quot;http://arxiv.org/abs/2107.05580v1&quot;`,</span>
+<span class="sd">        `result.get_short_id()` returns `2107.05580v1`.</span>
+
+<span class="sd">        + If the result URL is `&quot;http://arxiv.org/abs/quant-ph/0201082v1&quot;`,</span>
+<span class="sd">        `result.get_short_id()` returns `&quot;quant-ph/0201082v1&quot;` (the pre-March</span>
+<span class="sd">        2007 arXiv identifier format).</span>
+
+<span class="sd">        For an explanation of the difference between arXiv&#39;s legacy and current</span>
+<span class="sd">        identifiers, see [Understanding the arXiv</span>
+<span class="sd">        identifier](https://arxiv.org/help/arxiv_identifier).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;arxiv.org/abs/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_get_default_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extension</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;pdf&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1783,18 +1799,35 @@ Taxonomy</a>.</p>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the short ID for this result.</span>
 
-<span class="sd">        If the result URL is `&quot;http://arxiv.org/abs/quant-ph/0201082v1&quot;`,</span>
-<span class="sd">        `result.get_short_id()` returns `&quot;0201082v1&quot;`.</span>
+<span class="sd">        + If the result URL is `&quot;http://arxiv.org/abs/2107.05580v1&quot;`,</span>
+<span class="sd">        `result.get_short_id()` returns `2107.05580v1`.</span>
+
+<span class="sd">        + If the result URL is `&quot;http://arxiv.org/abs/quant-ph/0201082v1&quot;`,</span>
+<span class="sd">        `result.get_short_id()` returns `&quot;quant-ph/0201082v1&quot;` (the pre-March</span>
+<span class="sd">        2007 arXiv identifier format).</span>
+
+<span class="sd">        For an explanation of the difference between arXiv&#39;s legacy and current</span>
+<span class="sd">        identifiers, see [Understanding the arXiv</span>
+<span class="sd">        identifier](https://arxiv.org/help/arxiv_identifier).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;arxiv.org/abs/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 </pre></div>
 
         </details>
 
             <div class="docstring"><p>Returns the short ID for this result.</p>
 
-<p>If the result URL is <code>"http://arxiv.org/abs/quant-ph/0201082v1"</code>,
-<code>result.get_short_id()</code> returns <code>"0201082v1"</code>.</p>
+<ul>
+<li><p>If the result URL is <code>"http://arxiv.org/abs/2107.05580v1"</code>,
+<code>result.get_short_id()</code> returns <code>2107.05580v1</code>.</p></li>
+<li><p>If the result URL is <code>"http://arxiv.org/abs/quant-ph/0201082v1"</code>,
+<code>result.get_short_id()</code> returns <code>"quant-ph/0201082v1"</code> (the pre-March
+2007 arXiv identifier format).</p></li>
+</ul>
+
+<p>For an explanation of the difference between arXiv's legacy and current
+identifiers, see <a href="https://arxiv.org/help/arxiv_identifier">Understanding the arXiv
+identifier</a>.</p>
 </div>
 
 

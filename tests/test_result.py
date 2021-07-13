@@ -5,7 +5,7 @@ import time
 from datetime import datetime, timezone
 
 
-class TestAPI(unittest.TestCase):
+class TestResult(unittest.TestCase):
 
     def assert_nonempty(self, s):
         self.assertIsNotNone(s)
@@ -95,3 +95,8 @@ class TestAPI(unittest.TestCase):
         self.assertTrue(arxiv.Result.Link(href) == link)
         self.assertFalse(link == arxiv.Result.Link("other"))
         self.assertFalse(link == id)
+
+    def test_legacy_ids(self):
+        full_legacy_id = "quant-ph/0201082v1"
+        result = next(arxiv.Search(id_list=[full_legacy_id]).results())
+        self.assertEqual(result.get_short_id(), full_legacy_id)

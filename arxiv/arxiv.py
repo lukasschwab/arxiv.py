@@ -170,10 +170,18 @@ class Result(object):
         """
         Returns the short ID for this result.
 
-        If the result URL is `"http://arxiv.org/abs/quant-ph/0201082v1"`,
-        `result.get_short_id()` returns `"0201082v1"`.
+        + If the result URL is `"http://arxiv.org/abs/2107.05580v1"`,
+        `result.get_short_id()` returns `2107.05580v1`.
+
+        + If the result URL is `"http://arxiv.org/abs/quant-ph/0201082v1"`,
+        `result.get_short_id()` returns `"quant-ph/0201082v1"` (the pre-March
+        2007 arXiv identifier format).
+
+        For an explanation of the difference between arXiv's legacy and current
+        identifiers, see [Understanding the arXiv
+        identifier](https://arxiv.org/help/arxiv_identifier).
         """
-        return self.entry_id.split('/')[-1]
+        return self.entry_id.split('arxiv.org/abs/')[-1]
 
     def _get_default_filename(self, extension: str = "pdf") -> str:
         """
