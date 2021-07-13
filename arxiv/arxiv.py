@@ -710,13 +710,17 @@ class HTTPError(ArxivError):
         self.retry = retry
         self.url = url
         self.status = feed.status
+        # If the feed is valid and includes a single entry, trust it's an
+        # explanation.
         if not feed.bozo and len(feed.entries) == 1:
             self.entry = feed.entries[0]
+        else:
+            self.entry = None
         super().__init__(
             url,
             "Page request resulted in HTTP {}: {}".format(
                 self.status,
-                self.entry.summary,
+                self.entry.summary if self.entry else None,
             ),
         )
 
