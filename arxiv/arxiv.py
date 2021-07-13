@@ -627,7 +627,7 @@ class Client(object):
             feed = feedparser.parse(url)
             self._last_request_dt = datetime.now()
             if feed.status != 200:
-                err = HTTPError(url, retry, feed.status)
+                err = HTTPError(url, retry, feed)
             elif len(feed.entries) == 0 and not first_page:
                 err = UnexpectedEmptyPageError(url, retry)
             else:
@@ -655,7 +655,7 @@ class ArxivError(Exception):
         super().__init__(self.message)
 
     def __str__(self) -> str:
-        return '{}({})'.format(_classname(self), self.message)
+        return '{} ({})'.format(self.message, self.url)
 
 
 class UnexpectedEmptyPageError(ArxivError):
@@ -699,18 +699,29 @@ class HTTPError(ArxivError):
     """The request retry number which encountered this error, zero-indexed."""
     status: int
     """The HTTP status reported by feedparser."""
+    entry: feedparser.FeedParserDict
+    """The feed entry describing the error, if present."""
 
-    def __init__(self, url: str, retry: int, status: int):
+    def __init__(self, url: str, retry: int, feed: feedparser.FeedParserDict):
         """
         Constructs an `HTTPError` for the specified status code, encountered for
         the specified API URL after `retry` tries.
         """
         self.retry = retry
         self.url = url
-        self.status = status
+        self.status = feed.status
+        # If the feed is valid and includes a single entry, trust it's an
+        # explanation.
+        if not feed.bozo and len(feed.entries) == 1:
+            self.entry = feed.entries[0]
+        else:
+            self.entry = None
         super().__init__(
             url,
-            "Page request resulted in HTTP {}".format(self.status),
+            "Page request resulted in HTTP {}: {}".format(
+                self.status,
+                self.entry.summary if self.entry else None,
+            ),
         )
 
     def __repr__(self) -> str:
