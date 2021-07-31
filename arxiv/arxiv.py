@@ -128,7 +128,7 @@ class Result(object):
             title=re.sub(r'\s+', ' ', title),
             authors=[Result.Author._from_feed_author(a) for a in entry.authors],
             summary=entry.summary,
-            comment=entry.get('comment'),
+            comment=entry.get('arxiv_comment'),
             journal_ref=entry.get('arxiv_journal_ref'),
             doi=entry.get('arxiv_doi'),
             primary_category=entry.arxiv_primary_category.get('term'),
