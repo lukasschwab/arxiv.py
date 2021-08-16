@@ -1662,7 +1662,7 @@ Returned</a>.</p>
     primary_category: str = &#39;&#39;,
     categories: List[str] = [],
     links: list[<a href="#Result.Link">arxiv.arxiv.Result.Link</a>] = [],
-    _raw: feedparser.FeedParserDict = None
+    _raw: feedparser.util.FeedParserDict = None
 )</span>
     </div>
 
@@ -3438,7 +3438,7 @@ API URL after <code><a href="#UnexpectedEmptyPageError.retry">retry</a></code> t
                                         <div class="attr function"><a class="headerlink" href="#HTTPError.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">HTTPError</span><span class="signature">(url: str, retry: int, feed: feedparser.FeedParserDict)</span>
+            <span class="name">HTTPError</span><span class="signature">(url: str, retry: int, feed: feedparser.util.FeedParserDict)</span>
     </div>
 
                 <details>
@@ -3488,7 +3488,7 @@ the specified API URL after <code><a href="#HTTPError.retry">retry</a></code> tr
                             <div id="HTTPError.entry" class="classattr">
                                             <div class="attr variable"><a class="headerlink" href="#HTTPError.entry">#&nbsp;&nbsp</a>
 
-        <span class="name">entry</span><span class="annotation">: feedparser.FeedParserDict</span>
+        <span class="name">entry</span><span class="annotation">: feedparser.util.FeedParserDict</span>
     </div>
 
             <div class="docstring"><p>The feed entry describing the error, if present.</p>
