@@ -109,6 +109,8 @@ class Result(object):
         Converts a feedparser entry for an arXiv search result feed into a
         Result object.
         """
+        if not hasattr(entry, "id"):
+            raise Result.PartialEntryError("id")
         # Title attribute may be absent for certain titles. Defaulting to "0" as
         # it's the only title observed to cause this bug.
         # https://github.com/lukasschwab/arxiv.py/issues/71
@@ -349,6 +351,27 @@ class Result(object):
                 return self.href == other.href
             return False
 
+    class PartialEntryError(Exception):
+        """
+        An error indicating an entry is unparseable because it lacks required
+        fields.
+        """
+
+        missing_field: str
+        """The required field missing from the would-be entry."""
+        message: str
+        """Message describing what caused this error."""
+
+        def __init__(self, missing_field):
+            self.missing_field = missing_field
+            self.message = "Entry from arXiv missing required info"
+
+        def __repr__(self) -> str:
+            return '{}({})'.format(
+                _classname(self),
+                repr(self.missing_field)
+            )
+
 
 class SortCriterion(Enum):
     """
@@ -583,7 +606,11 @@ class Client(object):
             offset += len(feed.entries)
             # Yield query results until page is exhausted.
             for entry in feed.entries:
-                yield Result._from_feed_entry(entry)
+                try:
+                    yield Result._from_feed_entry(entry)
+                except Result.PartialEntryError:
+                    logger.warning("Skipping partial result")
+                    continue
 
     def _format_url(self, search: Search, start: int, page_size: int) -> str:
         """
@@ -683,7 +710,6 @@ class ArxivError(Exception):
         self.url = url
         self.retry = retry
         self.message = message
-        # logger.info(self.message, extra=extra)
         super().__init__(self.message)
 
     def __str__(self) -> str:

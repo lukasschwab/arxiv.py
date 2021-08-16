@@ -136,6 +136,21 @@
                             </ul>
 
                         </li>
+                        <li>
+                                <a class="class" href="#Result.PartialEntryError">Result.PartialEntryError</a>
+                                        <ul class="memberlist">
+                                    <li>
+                                            <a class="function" href="#Result.PartialEntryError.__init__">PartialEntryError</a>
+                                    </li>
+                                    <li>
+                                            <a class="variable" href="#Result.PartialEntryError.missing_field">missing_field</a>
+                                    </li>
+                                    <li>
+                                            <a class="variable" href="#Result.PartialEntryError.message">message</a>
+                                    </li>
+                            </ul>
+
+                        </li>
                 </ul>
 
             </li>
@@ -573,6 +588,8 @@ arxiv<wbr>.arxiv    </h1>
 <span class="sd">        Converts a feedparser entry for an arXiv search result feed into a</span>
 <span class="sd">        Result object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">Result</span><span class="o">.</span><span class="n">PartialEntryError</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
         <span class="c1"># Title attribute may be absent for certain titles. Defaulting to &quot;0&quot; as</span>
         <span class="c1"># it&#39;s the only title observed to cause this bug.</span>
         <span class="c1"># https://github.com/lukasschwab/arxiv.py/issues/71</span>
@@ -812,6 +829,27 @@ arxiv<wbr>.arxiv    </h1>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Result</span><span class="o">.</span><span class="n">Link</span><span class="p">):</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">href</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">href</span>
             <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">class</span> <span class="nc">PartialEntryError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        An error indicating an entry is unparseable because it lacks required</span>
+<span class="sd">        fields.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">missing_field</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="sd">&quot;&quot;&quot;The required field missing from the would-be entry.&quot;&quot;&quot;</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="sd">&quot;&quot;&quot;Message describing what caused this error.&quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">missing_field</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">missing_field</span> <span class="o">=</span> <span class="n">missing_field</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Entry from arXiv missing required info&quot;</span>
+
+        <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
+                <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">missing_field</span><span class="p">)</span>
+            <span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">SortCriterion</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
@@ -1047,7 +1085,11 @@ arxiv<wbr>.arxiv    </h1>
             <span class="n">offset</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">feed</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span>
             <span class="c1"># Yield query results until page is exhausted.</span>
             <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">feed</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
-                <span class="k">yield</span> <span class="n">Result</span><span class="o">.</span><span class="n">_from_feed_entry</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">Result</span><span class="o">.</span><span class="n">_from_feed_entry</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">Result</span><span class="o">.</span><span class="n">PartialEntryError</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Skipping partial result&quot;</span><span class="p">)</span>
+                    <span class="k">continue</span>
 
     <span class="k">def</span> <span class="nf">_format_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search</span><span class="p">:</span> <span class="n">Search</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">page_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1147,7 +1189,6 @@ arxiv<wbr>.arxiv    </h1>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">retry</span> <span class="o">=</span> <span class="n">retry</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="c1"># logger.info(self.message, extra=extra)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -1331,6 +1372,8 @@ arxiv<wbr>.arxiv    </h1>
 <span class="sd">        Converts a feedparser entry for an arXiv search result feed into a</span>
 <span class="sd">        Result object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">Result</span><span class="o">.</span><span class="n">PartialEntryError</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
         <span class="c1"># Title attribute may be absent for certain titles. Defaulting to &quot;0&quot; as</span>
         <span class="c1"># it&#39;s the only title observed to cause this bug.</span>
         <span class="c1"># https://github.com/lukasschwab/arxiv.py/issues/71</span>
@@ -1570,6 +1613,27 @@ arxiv<wbr>.arxiv    </h1>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Result</span><span class="o">.</span><span class="n">Link</span><span class="p">):</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">href</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">href</span>
             <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">class</span> <span class="nc">PartialEntryError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        An error indicating an entry is unparseable because it lacks required</span>
+<span class="sd">        fields.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">missing_field</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="sd">&quot;&quot;&quot;The required field missing from the would-be entry.&quot;&quot;&quot;</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="sd">&quot;&quot;&quot;Message describing what caused this error.&quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">missing_field</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">missing_field</span> <span class="o">=</span> <span class="n">missing_field</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Entry from arXiv missing required info&quot;</span>
+
+        <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
+                <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">missing_field</span><span class="p">)</span>
+            <span class="p">)</span>
 </pre></div>
 
         </details>
@@ -1598,7 +1662,7 @@ Returned</a>.</p>
     primary_category: str = &#39;&#39;,
     categories: List[str] = [],
     links: list[<a href="#Result.Link">arxiv.arxiv.Result.Link</a>] = [],
-    _raw: feedparser.util.FeedParserDict = None
+    _raw: feedparser.FeedParserDict = None
 )</span>
     </div>
 
@@ -2184,6 +2248,98 @@ constructing <code><a href="#Result.Link">Link</a></code>s yourself.</p>
 
                             </div>
                 </section>
+                <section id="Result.PartialEntryError">
+                                <div class="attr class">
+        <a class="headerlink" href="#Result.PartialEntryError">#&nbsp;&nbsp</a>
+
+        
+        <span class="def">class</span>
+        <span class="name">Result.PartialEntryError</span><wbr>(<span class="base">builtins.Exception</span>):
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">class</span> <span class="nc">PartialEntryError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        An error indicating an entry is unparseable because it lacks required</span>
+<span class="sd">        fields.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">missing_field</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="sd">&quot;&quot;&quot;The required field missing from the would-be entry.&quot;&quot;&quot;</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="sd">&quot;&quot;&quot;Message describing what caused this error.&quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">missing_field</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">missing_field</span> <span class="o">=</span> <span class="n">missing_field</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Entry from arXiv missing required info&quot;</span>
+
+        <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">_classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
+                <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">missing_field</span><span class="p">)</span>
+            <span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>An error indicating an entry is unparseable because it lacks required
+fields.</p>
+</div>
+
+
+                            <div id="Result.PartialEntryError.__init__" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Result.PartialEntryError.__init__">#&nbsp;&nbsp</a>
+
+        
+            <span class="name">Result.PartialEntryError</span><span class="signature">(missing_field)</span>
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">missing_field</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">missing_field</span> <span class="o">=</span> <span class="n">missing_field</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Entry from arXiv missing required info&quot;</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="Result.PartialEntryError.missing_field" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#Result.PartialEntryError.missing_field">#&nbsp;&nbsp</a>
+
+        <span class="name">missing_field</span><span class="annotation">: str</span>
+    </div>
+
+            <div class="docstring"><p>The required field missing from the would-be entry.</p>
+</div>
+
+
+                            </div>
+                            <div id="Result.PartialEntryError.message" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#Result.PartialEntryError.message">#&nbsp;&nbsp</a>
+
+        <span class="name">message</span><span class="annotation">: str</span>
+    </div>
+
+            <div class="docstring"><p>Message describing what caused this error.</p>
+</div>
+
+
+                            </div>
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt>builtins.BaseException</dt>
+                                <dd id="Result.PartialEntryError.with_traceback" class="function">with_traceback</dd>
+                <dd id="Result.PartialEntryError.args" class="variable">args</dd>
+
+            </div>
+                                </dl>
+                            </div>
+                </section>
                 <section id="SortCriterion">
                                 <div class="attr class">
         <a class="headerlink" href="#SortCriterion">#&nbsp;&nbsp</a>
@@ -2720,7 +2876,11 @@ search.</p>
             <span class="n">offset</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">feed</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span>
             <span class="c1"># Yield query results until page is exhausted.</span>
             <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">feed</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
-                <span class="k">yield</span> <span class="n">Result</span><span class="o">.</span><span class="n">_from_feed_entry</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">Result</span><span class="o">.</span><span class="n">_from_feed_entry</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">Result</span><span class="o">.</span><span class="n">PartialEntryError</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Skipping partial result&quot;</span><span class="p">)</span>
+                    <span class="k">continue</span>
 
     <span class="k">def</span> <span class="nf">_format_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search</span><span class="p">:</span> <span class="n">Search</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">page_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -2986,7 +3146,11 @@ brittle behavior, and inconsistent results.</p>
             <span class="n">offset</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">feed</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span>
             <span class="c1"># Yield query results until page is exhausted.</span>
             <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">feed</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
-                <span class="k">yield</span> <span class="n">Result</span><span class="o">.</span><span class="n">_from_feed_entry</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">Result</span><span class="o">.</span><span class="n">_from_feed_entry</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">Result</span><span class="o">.</span><span class="n">PartialEntryError</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Skipping partial result&quot;</span><span class="p">)</span>
+                    <span class="k">continue</span>
 </pre></div>
 
         </details>
@@ -3035,7 +3199,6 @@ have been yielded or there are no more search results.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">retry</span> <span class="o">=</span> <span class="n">retry</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="c1"># logger.info(self.message, extra=extra)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -3064,7 +3227,6 @@ have been yielded or there are no more search results.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">retry</span> <span class="o">=</span> <span class="n">retry</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="c1"># logger.info(self.message, extra=extra)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
 </pre></div>
 
@@ -3276,7 +3438,7 @@ API URL after <code><a href="#UnexpectedEmptyPageError.retry">retry</a></code> t
                                         <div class="attr function"><a class="headerlink" href="#HTTPError.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">HTTPError</span><span class="signature">(url: str, retry: int, feed: feedparser.util.FeedParserDict)</span>
+            <span class="name">HTTPError</span><span class="signature">(url: str, retry: int, feed: feedparser.FeedParserDict)</span>
     </div>
 
                 <details>
@@ -3326,7 +3488,7 @@ the specified API URL after <code><a href="#HTTPError.retry">retry</a></code> tr
                             <div id="HTTPError.entry" class="classattr">
                                             <div class="attr variable"><a class="headerlink" href="#HTTPError.entry">#&nbsp;&nbsp</a>
 
-        <span class="name">entry</span><span class="annotation">: feedparser.util.FeedParserDict</span>
+        <span class="name">entry</span><span class="annotation">: feedparser.FeedParserDict</span>
     </div>
 
             <div class="docstring"><p>The feed entry describing the error, if present.</p>
