@@ -12,9 +12,9 @@ class TestClient(unittest.TestCase):
         self.assertEqual(len(results), 0)
 
     def test_nonexistent_id_in_list(self):
-        # Assert _from_feed_entry throws PartialEntryError.
+        # Assert _from_feed_entry throws MissingFieldError.
         feed = feedparser.parse("http://export.arxiv.org/api/query?id_list=0808.05394")
-        with self.assertRaises(arxiv.Result.PartialEntryError):
+        with self.assertRaises(arxiv.Result.MissingFieldError):
             arxiv.Result._from_feed_entry(feed.entries[0])
         # Assert thrown error is handled and hidden by generator.
         results = list(arxiv.Search(id_list=["0808.05394"]).results())

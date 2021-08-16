@@ -137,16 +137,16 @@
 
                         </li>
                         <li>
-                                <a class="class" href="#Result.PartialEntryError">Result.PartialEntryError</a>
+                                <a class="class" href="#Result.MissingFieldError">Result.MissingFieldError</a>
                                         <ul class="memberlist">
                                     <li>
-                                            <a class="function" href="#Result.PartialEntryError.__init__">PartialEntryError</a>
+                                            <a class="function" href="#Result.MissingFieldError.__init__">MissingFieldError</a>
                                     </li>
                                     <li>
-                                            <a class="variable" href="#Result.PartialEntryError.missing_field">missing_field</a>
+                                            <a class="variable" href="#Result.MissingFieldError.missing_field">missing_field</a>
                                     </li>
                                     <li>
-                                            <a class="variable" href="#Result.PartialEntryError.message">message</a>
+                                            <a class="variable" href="#Result.MissingFieldError.message">message</a>
                                     </li>
                             </ul>
 
@@ -589,7 +589,7 @@ arxiv<wbr>.arxiv    </h1>
 <span class="sd">        Result object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">Result</span><span class="o">.</span><span class="n">PartialEntryError</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">Result</span><span class="o">.</span><span class="n">MissingFieldError</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
         <span class="c1"># Title attribute may be absent for certain titles. Defaulting to &quot;0&quot; as</span>
         <span class="c1"># it&#39;s the only title observed to cause this bug.</span>
         <span class="c1"># https://github.com/lukasschwab/arxiv.py/issues/71</span>
@@ -830,7 +830,7 @@ arxiv<wbr>.arxiv    </h1>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">href</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">href</span>
             <span class="k">return</span> <span class="kc">False</span>
 
-    <span class="k">class</span> <span class="nc">PartialEntryError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">MissingFieldError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        An error indicating an entry is unparseable because it lacks required</span>
 <span class="sd">        fields.</span>
@@ -1087,7 +1087,7 @@ arxiv<wbr>.arxiv    </h1>
             <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">feed</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="k">yield</span> <span class="n">Result</span><span class="o">.</span><span class="n">_from_feed_entry</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
-                <span class="k">except</span> <span class="n">Result</span><span class="o">.</span><span class="n">PartialEntryError</span><span class="p">:</span>
+                <span class="k">except</span> <span class="n">Result</span><span class="o">.</span><span class="n">MissingFieldError</span><span class="p">:</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Skipping partial result&quot;</span><span class="p">)</span>
                     <span class="k">continue</span>
 
@@ -1373,7 +1373,7 @@ arxiv<wbr>.arxiv    </h1>
 <span class="sd">        Result object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">Result</span><span class="o">.</span><span class="n">PartialEntryError</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">Result</span><span class="o">.</span><span class="n">MissingFieldError</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
         <span class="c1"># Title attribute may be absent for certain titles. Defaulting to &quot;0&quot; as</span>
         <span class="c1"># it&#39;s the only title observed to cause this bug.</span>
         <span class="c1"># https://github.com/lukasschwab/arxiv.py/issues/71</span>
@@ -1614,7 +1614,7 @@ arxiv<wbr>.arxiv    </h1>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">href</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">href</span>
             <span class="k">return</span> <span class="kc">False</span>
 
-    <span class="k">class</span> <span class="nc">PartialEntryError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">MissingFieldError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        An error indicating an entry is unparseable because it lacks required</span>
 <span class="sd">        fields.</span>
@@ -2248,18 +2248,18 @@ constructing <code><a href="#Result.Link">Link</a></code>s yourself.</p>
 
                             </div>
                 </section>
-                <section id="Result.PartialEntryError">
+                <section id="Result.MissingFieldError">
                                 <div class="attr class">
-        <a class="headerlink" href="#Result.PartialEntryError">#&nbsp;&nbsp</a>
+        <a class="headerlink" href="#Result.MissingFieldError">#&nbsp;&nbsp</a>
 
         
         <span class="def">class</span>
-        <span class="name">Result.PartialEntryError</span><wbr>(<span class="base">builtins.Exception</span>):
+        <span class="name">Result.MissingFieldError</span><wbr>(<span class="base">builtins.Exception</span>):
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">class</span> <span class="nc">PartialEntryError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">class</span> <span class="nc">MissingFieldError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        An error indicating an entry is unparseable because it lacks required</span>
 <span class="sd">        fields.</span>
@@ -2288,11 +2288,11 @@ fields.</p>
 </div>
 
 
-                            <div id="Result.PartialEntryError.__init__" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#Result.PartialEntryError.__init__">#&nbsp;&nbsp</a>
+                            <div id="Result.MissingFieldError.__init__" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Result.MissingFieldError.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">Result.PartialEntryError</span><span class="signature">(missing_field)</span>
+            <span class="name">Result.MissingFieldError</span><span class="signature">(missing_field)</span>
     </div>
 
                 <details>
@@ -2307,8 +2307,8 @@ fields.</p>
     
 
                             </div>
-                            <div id="Result.PartialEntryError.missing_field" class="classattr">
-                                            <div class="attr variable"><a class="headerlink" href="#Result.PartialEntryError.missing_field">#&nbsp;&nbsp</a>
+                            <div id="Result.MissingFieldError.missing_field" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#Result.MissingFieldError.missing_field">#&nbsp;&nbsp</a>
 
         <span class="name">missing_field</span><span class="annotation">: str</span>
     </div>
@@ -2318,8 +2318,8 @@ fields.</p>
 
 
                             </div>
-                            <div id="Result.PartialEntryError.message" class="classattr">
-                                            <div class="attr variable"><a class="headerlink" href="#Result.PartialEntryError.message">#&nbsp;&nbsp</a>
+                            <div id="Result.MissingFieldError.message" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#Result.MissingFieldError.message">#&nbsp;&nbsp</a>
 
         <span class="name">message</span><span class="annotation">: str</span>
     </div>
@@ -2333,8 +2333,8 @@ fields.</p>
                                 <h5>Inherited Members</h5>
                                 <dl>
                                     <div><dt>builtins.BaseException</dt>
-                                <dd id="Result.PartialEntryError.with_traceback" class="function">with_traceback</dd>
-                <dd id="Result.PartialEntryError.args" class="variable">args</dd>
+                                <dd id="Result.MissingFieldError.with_traceback" class="function">with_traceback</dd>
+                <dd id="Result.MissingFieldError.args" class="variable">args</dd>
 
             </div>
                                 </dl>
@@ -2878,7 +2878,7 @@ search.</p>
             <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">feed</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="k">yield</span> <span class="n">Result</span><span class="o">.</span><span class="n">_from_feed_entry</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
-                <span class="k">except</span> <span class="n">Result</span><span class="o">.</span><span class="n">PartialEntryError</span><span class="p">:</span>
+                <span class="k">except</span> <span class="n">Result</span><span class="o">.</span><span class="n">MissingFieldError</span><span class="p">:</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Skipping partial result&quot;</span><span class="p">)</span>
                     <span class="k">continue</span>
 
@@ -3148,7 +3148,7 @@ brittle behavior, and inconsistent results.</p>
             <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">feed</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="k">yield</span> <span class="n">Result</span><span class="o">.</span><span class="n">_from_feed_entry</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
-                <span class="k">except</span> <span class="n">Result</span><span class="o">.</span><span class="n">PartialEntryError</span><span class="p">:</span>
+                <span class="k">except</span> <span class="n">Result</span><span class="o">.</span><span class="n">MissingFieldError</span><span class="p">:</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Skipping partial result&quot;</span><span class="p">)</span>
                     <span class="k">continue</span>
 </pre></div>

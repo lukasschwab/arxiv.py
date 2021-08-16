@@ -110,7 +110,7 @@ class Result(object):
         Result object.
         """
         if not hasattr(entry, "id"):
-            raise Result.PartialEntryError("id")
+            raise Result.MissingFieldError("id")
         # Title attribute may be absent for certain titles. Defaulting to "0" as
         # it's the only title observed to cause this bug.
         # https://github.com/lukasschwab/arxiv.py/issues/71
@@ -351,7 +351,7 @@ class Result(object):
                 return self.href == other.href
             return False
 
-    class PartialEntryError(Exception):
+    class MissingFieldError(Exception):
         """
         An error indicating an entry is unparseable because it lacks required
         fields.
@@ -608,7 +608,7 @@ class Client(object):
             for entry in feed.entries:
                 try:
                     yield Result._from_feed_entry(entry)
-                except Result.PartialEntryError:
+                except Result.MissingFieldError:
                     logger.warning("Skipping partial result")
                     continue
 
