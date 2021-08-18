@@ -3,12 +3,29 @@ from unittest.mock import MagicMock, call, patch
 import arxiv
 from datetime import datetime, timedelta
 from pytest import approx
+import feedparser
 
 
 class TestClient(unittest.TestCase):
+    def test_invalid_format_id(self):
+        with self.assertRaises(arxiv.HTTPError):
+            list(arxiv.Client(num_retries=0).results(arxiv.Search(id_list=["abc"])))
+
     def test_invalid_id(self):
         results = list(arxiv.Search(id_list=["0000.0000"]).results())
         self.assertEqual(len(results), 0)
+
+    def test_nonexistent_id_in_list(self):
+        # Assert _from_feed_entry throws MissingFieldError.
+        feed = feedparser.parse("http://export.arxiv.org/api/query?id_list=0808.05394")
+        with self.assertRaises(arxiv.Result.MissingFieldError):
+            arxiv.Result._from_feed_entry(feed.entries[0])
+        # Assert thrown error is handled and hidden by generator.
+        results = list(arxiv.Search(id_list=["0808.05394"]).results())
+        self.assertEqual(len(results), 0)
+        # Generator should still yield valid entries.
+        results = list(arxiv.Search(id_list=["0808.05394", "1707.08567"]).results())
+        self.assertEqual(len(results), 1)
 
     def test_max_results(self):
         client = arxiv.Client(page_size=10, delay_seconds=0)
@@ -33,7 +50,7 @@ class TestClient(unittest.TestCase):
 
     @patch('time.sleep', return_value=None)
     def test_retry(self, patched_time_sleep):
-        broken_client = get_broken_client()
+        broken_client = TestClient.get_broken_client()
 
         def broken_get():
             search = arxiv.Search(query="quantum")
@@ -107,7 +124,7 @@ class TestClient(unittest.TestCase):
 
     @patch('time.sleep', return_value=None)
     def test_sleep_between_errors(self, patched_time_sleep):
-        client = get_broken_client()
+        client = TestClient.get_broken_client()
         url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
         try:
             client._parse_feed(url)
@@ -120,9 +137,18 @@ class TestClient(unittest.TestCase):
             call(approx(client.delay_seconds, rel=1e-3)),
         ] * client.num_retries)
 
+    def get_broken_client():
+        """
+        get_broken_client returns an arxiv.Client that always encounters a 500
+        status.
+        """
+        # TODO: reimplement broken_client with a mock.
+        broken_client = arxiv.Client(page_size=1)
+        broken_client.query_url_format = "https://httpstat.us/500?{}"
+        return broken_client
 
-def get_broken_client():
-    # broken_client always encounters a 500 status.
-    broken_client = arxiv.Client(page_size=1)
-    broken_client.query_url_format = "https://httpstat.us/500?{}"
-    return broken_client
+    def get_once_client():
+        """
+        get_once_client returns an arxiv.Client that only tries once.
+        """
+        return arxiv.Client(num_retries=0)
