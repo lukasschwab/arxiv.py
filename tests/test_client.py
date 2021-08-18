@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 import arxiv
 from datetime import datetime, timedelta
 from pytest import approx
@@ -31,22 +31,23 @@ class TestClient(unittest.TestCase):
             self.assertFalse(r.entry_id in ids)
             ids.add(r.entry_id)
 
-    def test_retry(self):
-        # broken_client always encounters a 500 status.
-        broken_client = arxiv.Client(page_size=1, delay_seconds=0)
-        broken_client.query_url_format = "https://httpstat.us/500?{}"
+    @patch('time.sleep', return_value=None)
+    def test_retry(self, patched_time_sleep):
+        broken_client = get_broken_client()
 
         def broken_get():
             search = arxiv.Search(query="quantum")
             return next(broken_client.results(search))
-
         self.assertRaises(arxiv.HTTPError, broken_get)
+
         for num_retries in [2, 5]:
             broken_client.num_retries = num_retries
             try:
                 broken_get()
+                self.fail("broken_get didn't throw HTTPError")
             except arxiv.HTTPError as e:
-                self.assertEqual(e.retry, broken_client.num_retries - 1)
+                self.assertEqual(e.status, 500)
+                self.assertEqual(e.retry, broken_client.num_retries)
 
     @patch('time.sleep', return_value=None)
     def test_sleep_standard(self, patched_time_sleep):
@@ -103,3 +104,25 @@ class TestClient(unittest.TestCase):
         client._parse_feed(url)
         client._parse_feed(url)
         patched_time_sleep.assert_not_called()
+
+    @patch('time.sleep', return_value=None)
+    def test_sleep_between_errors(self, patched_time_sleep):
+        client = get_broken_client()
+        url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
+        try:
+            client._parse_feed(url)
+        except arxiv.HTTPError:
+            pass
+        # Should sleep between retries.
+        patched_time_sleep.assert_called()
+        self.assertEqual(patched_time_sleep.call_count, client.num_retries)
+        patched_time_sleep.assert_has_calls([
+            call(approx(client.delay_seconds, rel=1e-3)),
+        ] * client.num_retries)
+
+
+def get_broken_client():
+    # broken_client always encounters a 500 status.
+    broken_client = arxiv.Client(page_size=1)
+    broken_client.query_url_format = "https://httpstat.us/500?{}"
+    return broken_client
