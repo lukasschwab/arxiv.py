@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 import arxiv
 from datetime import datetime, timedelta
 from pytest import approx
@@ -31,21 +31,28 @@ class TestClient(unittest.TestCase):
             self.assertFalse(r.entry_id in ids)
             ids.add(r.entry_id)
 
-    def test_retry(self):
+    @patch('time.sleep', return_value=None)
+    def test_retry(self, patched_time_sleep):
         broken_client = get_broken_client()
-        broken_client.delay_seconds = 0  # For test speed.
 
         def broken_get():
             search = arxiv.Search(query="quantum")
             return next(broken_client.results(search))
-
         self.assertRaises(arxiv.HTTPError, broken_get)
+
         for num_retries in [2, 5]:
             broken_client.num_retries = num_retries
-            try:
-                broken_get()
-            except arxiv.HTTPError as e:
-                self.assertEqual(e.retry, broken_client.num_retries)
+            with patch('time.sleep', return_value=None) as patched_time_sleep:
+                try:
+                    broken_get()
+                    self.fail("broken_get didn't throw HTTPError")
+                except arxiv.HTTPError as e:
+                    self.assertEqual(e.status, 500)
+                    self.assertEqual(e.retry, broken_client.num_retries)
+                # Should have slept before each retry.
+                patched_time_sleep.assert_has_calls([
+                    call(approx(broken_client.delay_seconds, rel=1e-3)),
+                ] * num_retries)
 
     @patch('time.sleep', return_value=None)
     def test_sleep_standard(self, patched_time_sleep):

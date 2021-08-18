@@ -609,13 +609,13 @@ class Client(object):
         `self.num_retries` times.
         """
         # Invoke the recursive helper with initial available retries.
-        return self.__parse_feed_try(
+        return self.__try_parse_feed(
             url,
             first_page=first_page,
             retries_left=self.num_retries
         )
 
-    def __parse_feed_try(
+    def __try_parse_feed(
         self,
         url: str,
         first_page: bool,
@@ -651,7 +651,7 @@ class Client(object):
             err = UnexpectedEmptyPageError(url, retry)
         if err is not None:
             if retries_left > 0:
-                return self.__parse_feed_try(
+                return self.__try_parse_feed(
                     url,
                     first_page=first_page,
                     retries_left=retries_left-1,
@@ -670,8 +670,8 @@ class ArxivError(Exception):
     """The feed URL that could not be fetched."""
     retry: int
     """
-    The request try number which encountered this error; 1 for the initial try,
-    2 for the first retry, and so on.
+    The request try number which encountered this error; 0 for the initial try,
+    1 for the first retry, and so on.
     """
     message: str
     """Message describing what caused this error."""
