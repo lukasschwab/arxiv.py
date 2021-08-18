@@ -7,6 +7,10 @@ import feedparser
 
 
 class TestClient(unittest.TestCase):
+    def test_invalid_format_id(self):
+        with self.assertRaises(arxiv.HTTPError):
+            list(arxiv.Client(num_retries=0).results(arxiv.Search(id_list=["abc"])))
+
     def test_invalid_id(self):
         results = list(arxiv.Search(id_list=["0000.0000"]).results())
         self.assertEqual(len(results), 0)
@@ -19,6 +23,9 @@ class TestClient(unittest.TestCase):
         # Assert thrown error is handled and hidden by generator.
         results = list(arxiv.Search(id_list=["0808.05394"]).results())
         self.assertEqual(len(results), 0)
+        # Generator should still yield valid entries.
+        results = list(arxiv.Search(id_list=["0808.05394", "1707.08567"]).results())
+        self.assertEqual(len(results), 1)
 
     def test_max_results(self):
         client = arxiv.Client(page_size=10, delay_seconds=0)
@@ -139,3 +146,9 @@ class TestClient(unittest.TestCase):
         broken_client = arxiv.Client(page_size=1)
         broken_client.query_url_format = "https://httpstat.us/500?{}"
         return broken_client
+
+    def get_once_client():
+        """
+        get_once_client returns an arxiv.Client that only tries once.
+        """
+        return arxiv.Client(num_retries=0)
