@@ -42,17 +42,12 @@ class TestClient(unittest.TestCase):
 
         for num_retries in [2, 5]:
             broken_client.num_retries = num_retries
-            with patch('time.sleep', return_value=None) as patched_time_sleep:
-                try:
-                    broken_get()
-                    self.fail("broken_get didn't throw HTTPError")
-                except arxiv.HTTPError as e:
-                    self.assertEqual(e.status, 500)
-                    self.assertEqual(e.retry, broken_client.num_retries)
-                # Should have slept before each retry.
-                patched_time_sleep.assert_has_calls([
-                    call(approx(broken_client.delay_seconds, rel=1e-3)),
-                ] * num_retries)
+            try:
+                broken_get()
+                self.fail("broken_get didn't throw HTTPError")
+            except arxiv.HTTPError as e:
+                self.assertEqual(e.status, 500)
+                self.assertEqual(e.retry, broken_client.num_retries)
 
     @patch('time.sleep', return_value=None)
     def test_sleep_standard(self, patched_time_sleep):
@@ -121,6 +116,9 @@ class TestClient(unittest.TestCase):
         # Should sleep between retries.
         patched_time_sleep.assert_called()
         self.assertEqual(patched_time_sleep.call_count, client.num_retries)
+        patched_time_sleep.assert_has_calls([
+            call(approx(client.delay_seconds, rel=1e-3)),
+        ] * client.num_retries)
 
 
 def get_broken_client():
