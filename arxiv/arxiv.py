@@ -609,13 +609,13 @@ class Client(object):
         `self.num_retries` times.
         """
         # Invoke the recursive helper with initial available retries.
-        return self._parse_feed_r(
+        return self.__parse_feed_try(
             url,
             first_page=first_page,
             retries_left=self.num_retries
         )
 
-    def _parse_feed_r(
+    def __parse_feed_try(
         self,
         url: str,
         first_page: bool,
@@ -651,7 +651,7 @@ class Client(object):
             err = UnexpectedEmptyPageError(url, retry)
         if err is not None:
             if retries_left > 0:
-                return self._parse_feed_r(
+                return self.__parse_feed_try(
                     url,
                     first_page=first_page,
                     retries_left=retries_left-1,

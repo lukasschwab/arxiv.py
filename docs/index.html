@@ -1073,13 +1073,13 @@ arxiv<wbr>.arxiv    </h1>
 <span class="sd">        `self.num_retries` times.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Invoke the recursive helper with initial available retries.</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_feed_r</span><span class="p">(</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parse_feed_try</span><span class="p">(</span>
             <span class="n">url</span><span class="p">,</span>
             <span class="n">first_page</span><span class="o">=</span><span class="n">first_page</span><span class="p">,</span>
             <span class="n">retries_left</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_retries</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_parse_feed_r</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">__parse_feed_try</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">first_page</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -1115,7 +1115,7 @@ arxiv<wbr>.arxiv    </h1>
             <span class="n">err</span> <span class="o">=</span> <span class="n">UnexpectedEmptyPageError</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">retry</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">err</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">retries_left</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_feed_r</span><span class="p">(</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parse_feed_try</span><span class="p">(</span>
                     <span class="n">url</span><span class="p">,</span>
                     <span class="n">first_page</span><span class="o">=</span><span class="n">first_page</span><span class="p">,</span>
                     <span class="n">retries_left</span><span class="o">=</span><span class="n">retries_left</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span>
@@ -2746,13 +2746,13 @@ search.</p>
 <span class="sd">        `self.num_retries` times.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Invoke the recursive helper with initial available retries.</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_feed_r</span><span class="p">(</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parse_feed_try</span><span class="p">(</span>
             <span class="n">url</span><span class="p">,</span>
             <span class="n">first_page</span><span class="o">=</span><span class="n">first_page</span><span class="p">,</span>
             <span class="n">retries_left</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_retries</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_parse_feed_r</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">__parse_feed_try</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">first_page</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -2788,7 +2788,7 @@ search.</p>
             <span class="n">err</span> <span class="o">=</span> <span class="n">UnexpectedEmptyPageError</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">retry</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">err</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">retries_left</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_feed_r</span><span class="p">(</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parse_feed_try</span><span class="p">(</span>
                     <span class="n">url</span><span class="p">,</span>
                     <span class="n">first_page</span><span class="o">=</span><span class="n">first_page</span><span class="p">,</span>
                     <span class="n">retries_left</span><span class="o">=</span><span class="n">retries_left</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span>
