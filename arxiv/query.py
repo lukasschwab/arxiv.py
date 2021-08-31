@@ -9,7 +9,7 @@ class Query(object):
         self._query_string = query_string
 
     # FIXME: check if value is a Category?
-    def attribute(attribute: "Query.Attribute", value: str) -> "Query":
+    def attribute(attribute: "Attribute", value: str) -> "Query":
         return Query('{}:"{}"'.format(attribute.value, value))
 
     def __compose(self, other: "Query", operator: "Query.Operator"):
