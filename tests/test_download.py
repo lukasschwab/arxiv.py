@@ -1,4 +1,4 @@
-from arxiv import arxiv
+from arxiv import api
 import os
 import shutil
 import tempfile
@@ -9,7 +9,7 @@ class TestDownload(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        self.fetched_result = next(arxiv.Search(id_list=["1605.08386"]).results())
+        self.fetched_result = next(api.Search(id_list=["1605.08386"]).results())
 
     @classmethod
     def setUp(self):
