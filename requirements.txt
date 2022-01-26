@@ -4,3 +4,4 @@ feedparser>=6.0.2
 pytest>=6.2.2
 flake8>=3.9.0
 pdoc==7.1.1
+pip-audit>=1.1.2

@@ -1,7 +1,7 @@
 source := ${wildcard ./arxiv/*.py}
 tests := ${wildcard tests/*.py}
 
-.PHONY: all lint test docs clean
+.PHONY: all lint test audit docs clean
 
 all: lint test docs
 
@@ -10,6 +10,9 @@ lint: $(source) $(tests)
 
 test: $(source) $(tests)
 	pytest
+
+audit:
+	python -m pip_audit --strict --requirement requirements.txt
 
 docs: docs/index.html
 docs/index.html: $(source) README.md
