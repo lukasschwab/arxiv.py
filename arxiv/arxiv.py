@@ -410,6 +410,9 @@ class Search(object):
     """
     A query string.
 
+    This should be unencoded. Use `au:del_maestro AND ti:checkerboard`, not
+    `au:del_maestro+AND+ti:checkerboard`.
+
     See [the arXiv API User's Manual: Details of Query
     Construction](https://arxiv.org/help/api/user-manual#query_details).
     """
