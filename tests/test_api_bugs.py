@@ -10,7 +10,7 @@ class TestClient(unittest.TestCase):
         """
         Papers with the title "0" do not have a title element in the Atom feed.
 
-        It's unclear whether other false titles (e.g. "False", "null", or empty
+        It's unclear whether other falsey titles (e.g. "False", "null", or empty
         titles) are allowed by arXiv and are impacted by this bug. This may also
         surface for other expected fields (e.g. author names).
 
