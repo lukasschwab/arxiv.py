@@ -38,7 +38,7 @@ class Result(object):
     authors: list
     """The result's authors."""
     summary: str
-    """The result abstrace."""
+    """The result abstract."""
     comment: str
     """The authors' comment if present."""
     journal_ref: str
