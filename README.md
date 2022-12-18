@@ -25,6 +25,8 @@ In your Python script, include the line
 
 ```python
 import arxiv
+from arxiv import SortCriterion
+from arxiv import SortOrder
 ```
 
 ### Search
@@ -36,7 +38,7 @@ arxiv.Search(
   query: str = "",
   id_list: List[str] = [],
   max_results: float = float('inf'),
-  sort_by: SortCriterion = SortCriterion.Relevanvce,
+  sort_by: SortCriterion = SortCriterion.Relevance,
   sort_order: SortOrder = SortOrder.Descending
 )
 ```
