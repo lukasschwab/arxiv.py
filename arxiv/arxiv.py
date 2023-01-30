@@ -562,18 +562,20 @@ class Client(object):
         )
         return self.results(search)
 
-    def results(self, search: Search) -> Generator[Result, None, None]:
+    def results(self, search: Search, offset: int = 0) -> Generator[Result, None, None]:
         """
         Uses this client configuration to fetch one page of the search results
         at a time, yielding the parsed `Result`s, until `max_results` results
         have been yielded or there are no more search results.
 
         If all tries fail, raises an `UnexpectedEmptyPageError` or `HTTPError`.
+        In that case you can restart your query beginning with an offset. 
+        
 
         For more on using generators, see
         [Generators](https://wiki.python.org/moin/Generators).
         """
-        offset = 0
+        
         # total_results may be reduced according to the feed's
         # opensearch:totalResults value.
         total_results = search.max_results
