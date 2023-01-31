@@ -569,13 +569,13 @@ class Client(object):
         have been yielded or there are no more search results.
 
         If all tries fail, raises an `UnexpectedEmptyPageError` or `HTTPError`.
-        In that case you can restart your query beginning with an offset. 
-        
+        In that case you can restart your query beginning with an offset.
+
 
         For more on using generators, see
         [Generators](https://wiki.python.org/moin/Generators).
         """
-        
+
         # total_results may be reduced according to the feed's
         # opensearch:totalResults value.
         total_results = search.max_results
