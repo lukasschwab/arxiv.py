@@ -41,6 +41,30 @@ class TestClient(unittest.TestCase):
         self.assertEqual(len(results), 55)
         self.assertEqual(client._parse_feed.call_count, 6)
 
+    def test_offset(self):
+        max_results = 10
+        search = arxiv.Search(query="testing", max_results=max_results)
+        client = arxiv.Client(page_size=10, delay_seconds=0)
+
+        default = list(client.results(search))
+        no_offset = list(client.results(search))
+        self.assertListEqual(default, no_offset)
+
+        offset = max_results // 2
+        half_offset = list(client.results(search, offset=offset))
+        self.assertListEqual(default[offset:], half_offset)
+
+        offset_above_max_results = list(client.results(search, offset=max_results))
+        self.assertListEqual(offset_above_max_results, [])
+
+    def test_search_results_offset(self):
+        search = arxiv.Search(query="testing", max_results=10)
+        client = arxiv.Client(page_size=3, delay_seconds=0)
+        for offset in [0, 5, 9, 10, 11]:
+            client_results = list(client.results(search, offset=offset))
+            search_results = list(search.results(offset=offset))
+            self.assertListEqual(client_results, search_results)
+
     def test_no_duplicates(self):
         search = arxiv.Search("testing", max_results=100)
         ids = set()
