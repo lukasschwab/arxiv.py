@@ -493,13 +493,13 @@ class Search(object):
         )
         return self.results()
 
-    def results(self) -> Generator[Result, None, None]:
+    def results(self, offset: int = 0) -> Generator[Result, None, None]:
         """
         Executes the specified search using a default arXiv API client.
 
         For info on default behavior, see `Client.__init__` and `Client.results`.
         """
-        return Client().results(self)
+        return Client().results(self, offset=offset)
 
 
 class Client(object):
@@ -569,8 +569,10 @@ class Client(object):
         have been yielded or there are no more search results.
 
         If all tries fail, raises an `UnexpectedEmptyPageError` or `HTTPError`.
-        In that case you can restart your query beginning with an offset.
 
+        Setting a nonzero `offset` discards leading records in the result set.
+        When `offset` is greater than or equal to `search.max_results`, the full
+        result set is discarded.
 
         For more on using generators, see
         [Generators](https://wiki.python.org/moin/Generators).
