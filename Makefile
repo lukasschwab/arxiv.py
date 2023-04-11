@@ -16,6 +16,7 @@ audit:
 
 docs: docs/index.html
 docs/index.html: $(source) README.md
+	pdoc --version
 	pdoc --docformat "restructuredtext" ./arxiv/arxiv.py -o docs
 	mv docs/arxiv/arxiv.html docs/index.html
 	rmdir docs/arxiv
