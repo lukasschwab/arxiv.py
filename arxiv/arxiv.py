@@ -29,9 +29,9 @@ class Result(object):
 
     entry_id: str
     """A url of the form `http://arxiv.org/abs/{id}`."""
-    updated: time.struct_time
+    updated: datetime
     """When the result was last updated."""
-    published: time.struct_time
+    published: datetime
     """When the result was originally published."""
     title: str
     """The title of the result."""
