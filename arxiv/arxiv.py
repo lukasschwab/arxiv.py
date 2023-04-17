@@ -1,4 +1,6 @@
 """.. include:: ../README.md"""
+from __future__ import annotations
+
 import logging
 import time
 import feedparser
@@ -35,7 +37,7 @@ class Result(object):
     """When the result was originally published."""
     title: str
     """The title of the result."""
-    authors: list
+    authors: List[Author]
     """The result's authors."""
     summary: str
     """The result abstract."""
@@ -55,7 +57,7 @@ class Result(object):
     All of the result's categories. See [arXiv: Category
     Taxonomy](https://arxiv.org/category_taxonomy).
     """
-    links: list
+    links: List[Link]
     """Up to three URLs associated with this result."""
     pdf_url: str
     """The URL of a PDF version of this result if present among links."""
@@ -71,14 +73,14 @@ class Result(object):
         updated: datetime = _DEFAULT_TIME,
         published: datetime = _DEFAULT_TIME,
         title: str = "",
-        authors: List['Result.Author'] = [],
+        authors: List[Author] = [],
         summary: str = "",
         comment: str = "",
         journal_ref: str = "",
         doi: str = "",
         primary_category: str = "",
         categories: List[str] = [],
-        links: List['Result.Link'] = [],
+        links: List[Link] = [],
         _raw: feedparser.FeedParserDict = None,
     ):
         """
@@ -104,7 +106,7 @@ class Result(object):
         # Debugging
         self._raw = _raw
 
-    def _from_feed_entry(entry: feedparser.FeedParserDict) -> 'Result':
+    def _from_feed_entry(entry: feedparser.FeedParserDict) -> Result:
         """
         Converts a feedparser entry for an arXiv search result feed into a
         Result object.
@@ -221,7 +223,7 @@ class Result(object):
         written_path, _ = urlretrieve(source_url, path)
         return written_path
 
-    def _get_pdf_url(links: list) -> str:
+    def _get_pdf_url(links: List[Link]) -> str:
         """
         Finds the PDF link among a result's links and returns its URL.
 
@@ -266,7 +268,7 @@ class Result(object):
 
         def _from_feed_author(
             feed_author: feedparser.FeedParserDict
-        ) -> 'Result.Author':
+        ) -> Result.Author:
             """
             Constructs an `Author` with the name specified in an author object
             from a feed entry.
@@ -320,7 +322,7 @@ class Result(object):
 
         def _from_feed_link(
             feed_link: feedparser.FeedParserDict
-        ) -> 'Result.Link':
+        ) -> Result.Link:
             """
             Constructs a `Link` with link metadata specified in a link object
             from a feed entry.
@@ -416,7 +418,7 @@ class Search(object):
     See [the arXiv API User's Manual: Details of Query
     Construction](https://arxiv.org/help/api/user-manual#query_details).
     """
-    id_list: list
+    id_list: List[str]
     """
     A list of arXiv article IDs to which to limit the search.
 
