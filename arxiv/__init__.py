@@ -1,2 +1,1 @@
-# flake8: noqa
-from .arxiv import *
+from .arxiv import *  # noqa: F403
