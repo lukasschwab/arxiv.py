@@ -178,3 +178,7 @@ INFO:arxiv.arxiv:Requesting 100 results at offset 0
 INFO:arxiv.arxiv:Requesting page of results
 INFO:arxiv.arxiv:Got first page; 1 of inf results available
 ```
+
+# Canary
+
+This is a canary section for testing https://github.com/lukasschwab/arxiv.py/pull/113; you can disregard it, it will soon be reverted.
