@@ -6,7 +6,7 @@ tests := ${wildcard tests/*.py}
 all: lint test docs
 
 lint: $(source) $(tests)
-	flake8 . --count --max-complexity=10 --statistics
+	ruff check .
 
 test: $(source) $(tests)
 	pytest
