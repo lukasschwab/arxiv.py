@@ -1,6 +1,6 @@
 from setuptools import setup
 
-version = '1.4.5'
+version = '1.4.6'
 
 with open('README.md', 'r') as fh:
     long_description = fh.read()
@@ -10,6 +10,7 @@ setup(
     version=version,
     packages=['arxiv'],
     # dependencies
+    python_requires='>=3.7',
     install_requires=['feedparser'],
     tests_require=[
         'pytest',
