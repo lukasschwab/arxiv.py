@@ -17,10 +17,9 @@ audit:
 docs: docs/index.html
 docs/index.html: $(source) README.md
 	pdoc --version
-	pdoc --docformat "restructuredtext" ./arxiv/arxiv.py -o docs
+	pdoc --docformat "restructuredtext" ./arxiv/arxiv.py -o docs --no-search
 	mv docs/arxiv/arxiv.html docs/index.html
 	rmdir docs/arxiv
-	rm docs/search.js
 
 clean:
 	rm -rf build dist
