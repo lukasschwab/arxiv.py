@@ -10,7 +10,7 @@ class TestDownload(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.fetched_result = next(arxiv.Search(id_list=["1605.08386"]).results())
-        self.fetched_result_with_id_slash = next(arxiv.Search(id_list=['hep-ex/0406020v1']).results())
+        self.fetched_result_with_slash = next(arxiv.Search(id_list=['hep-ex/0406020v1']).results())
 
     @classmethod
     def setUp(self):
@@ -27,7 +27,7 @@ class TestDownload(unittest.TestCase):
             '1605.08386v1.Heat_bath_random_walks_with_Markov_bases.pdf')
         ))
         # Regression-tests https://github.com/lukasschwab/arxiv.py/issues/117.
-        self.fetched_result_with_id_slash.download_pdf(dirpath=self.temp_dir)
+        self.fetched_result_with_slash.download_pdf(dirpath=self.temp_dir)
         self.assertTrue(os.path.exists(os.path.join(
             self.temp_dir,
             'hep-ex_0406020v1.Sparticle_Reconstruction_at_LHC.pdf')
