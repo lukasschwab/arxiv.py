@@ -26,7 +26,12 @@ class TestDownload(unittest.TestCase):
             self.temp_dir,
             '1605.08386v1.Heat_bath_random_walks_with_Markov_bases.pdf')
         ))
+        # Regression-tests https://github.com/lukasschwab/arxiv.py/issues/117.
         self.fetched_result_with_id_slash.download_pdf(dirpath=self.temp_dir)
+        self.assertTrue(os.path.exists(os.path.join(
+            self.temp_dir,
+            'hep-ex_0406020v1.Sparticle_Reconstruction_at_LHC.pdf')
+        ))
 
     def test_download_tarfile_from_query(self):
         self.fetched_result.download_source(dirpath=self.temp_dir)
