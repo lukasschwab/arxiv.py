@@ -10,6 +10,7 @@ class TestDownload(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.fetched_result = next(arxiv.Search(id_list=["1605.08386"]).results())
+        self.fetched_result_with_id_slash = next(arxiv.Search(id_list=['hep-ex/0406020v1']).results())
 
     @classmethod
     def setUp(self):
@@ -25,6 +26,7 @@ class TestDownload(unittest.TestCase):
             self.temp_dir,
             '1605.08386v1.Heat_bath_random_walks_with_Markov_bases.pdf')
         ))
+        self.fetched_result_with_id_slash.download_pdf(dirpath=self.temp_dir)
 
     def test_download_tarfile_from_query(self):
         self.fetched_result.download_source(dirpath=self.temp_dir)
