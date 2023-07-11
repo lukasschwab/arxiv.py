@@ -192,9 +192,11 @@ class Result(object):
         A default `to_filename` function for the extension given.
         """
         nonempty_title = self.title if self.title else "UNTITLED"
-        # Remove disallowed characters.
-        clean_title = '_'.join(re.findall(r'\w+', nonempty_title))
-        return "{}.{}.{}".format(self.get_short_id(), clean_title, extension)
+        return '.'.join([
+            self.get_short_id().replace("/", "_"),
+            re.sub(r"[^\w]", "_", nonempty_title),
+            extension
+        ])
 
     def download_pdf(self, dirpath: str = './', filename: str = '') -> str:
         """
