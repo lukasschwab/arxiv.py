@@ -28,15 +28,6 @@ jobs:
     - name: Audit dependencies
       run: |
         make -B audit
-    - name: Set up flake8 annotations
-      uses: rbialon/flake8-annotations@v1
-    - name: Lint with ruff
-      uses: chartboost/ruff-action@v1
     - name: Test with pytest
       run: |
         make -B test
-    - name: Check format with black
-      uses: psf/black@stable
-      with:
-        options: "--check --verbose"
-        src: "."

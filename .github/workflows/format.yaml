@@ -1,0 +1,25 @@
+name: format
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v2
+    - name: Check format with black
+      uses: psf/black@stable
+      with:
+        options: "--check --verbose"
+        src: "."
+    - name: Set up flake8 annotations
+      uses: rbialon/flake8-annotations@v1
+    - name: Lint with ruff
+      uses: chartboost/ruff-action@v1
+    
