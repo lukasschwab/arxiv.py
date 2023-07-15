@@ -1,7 +1,7 @@
 feedparser>=6.0.2
 
 # Development dependencies
-pytest >= 6.2.2
-ruff >= 0.0.261
-pdoc == 13.1.0
-pip-audit >= 1.1.2
+pytest>=6.2.2
+ruff>=0.0.261
+pdoc==13.1.0
+pip-audit>=1.1.2
