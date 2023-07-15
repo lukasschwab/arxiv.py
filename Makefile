@@ -5,6 +5,9 @@ tests := ${wildcard tests/*.py}
 
 all: lint test docs
 
+format: $(source) $(tests)
+	black .
+
 lint: $(source) $(tests)
 	ruff check .
 
