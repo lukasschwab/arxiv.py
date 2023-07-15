@@ -35,3 +35,8 @@ jobs:
     - name: Test with pytest
       run: |
         make -B test
+    - name: Check format with black
+      uses: psf/black@stable
+      with:
+        options: "--check --verbose"
+        src: "."
