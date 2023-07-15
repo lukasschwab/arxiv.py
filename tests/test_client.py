@@ -72,13 +72,14 @@ class TestClient(unittest.TestCase):
             self.assertFalse(r.entry_id in ids)
             ids.add(r.entry_id)
 
-    @patch('time.sleep', return_value=None)
+    @patch("time.sleep", return_value=None)
     def test_retry(self, patched_time_sleep):
         broken_client = TestClient.get_broken_client()
 
         def broken_get():
             search = arxiv.Search(query="quantum")
             return next(broken_client.results(search))
+
         self.assertRaises(arxiv.HTTPError, broken_get)
 
         for num_retries in [2, 5]:
@@ -90,7 +91,7 @@ class TestClient(unittest.TestCase):
                 self.assertEqual(e.status, 500)
                 self.assertEqual(e.retry, broken_client.num_retries)
 
-    @patch('time.sleep', return_value=None)
+    @patch("time.sleep", return_value=None)
     def test_sleep_standard(self, patched_time_sleep):
         client = arxiv.Client(page_size=1)
         url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
@@ -105,7 +106,7 @@ class TestClient(unittest.TestCase):
             approx(client.delay_seconds, rel=1e-3)
         )
 
-    @patch('time.sleep', return_value=None)
+    @patch("time.sleep", return_value=None)
     def test_sleep_multiple_requests(self, patched_time_sleep):
         client = arxiv.Client(page_size=1)
         url1 = client._format_url(arxiv.Search(query="quantum"), 0, 1)
@@ -120,25 +121,25 @@ class TestClient(unittest.TestCase):
             approx(client.delay_seconds, rel=1e-3)
         )
 
-    @patch('time.sleep', return_value=None)
+    @patch("time.sleep", return_value=None)
     def test_sleep_elapsed(self, patched_time_sleep):
         client = arxiv.Client(page_size=1)
         url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
         # If _last_request_dt is less than delay_seconds ago, sleep.
-        client._last_request_dt = (
-            datetime.now() - timedelta(seconds=client.delay_seconds-1)
+        client._last_request_dt = datetime.now() - timedelta(
+            seconds=client.delay_seconds - 1
         )
         client._parse_feed(url)
         patched_time_sleep.assert_called_once()
         patched_time_sleep.reset_mock()
         # If _last_request_dt is at least delay_seconds ago, don't sleep.
-        client._last_request_dt = (
-            datetime.now() - timedelta(seconds=client.delay_seconds)
+        client._last_request_dt = datetime.now() - timedelta(
+            seconds=client.delay_seconds
         )
         client._parse_feed(url)
         patched_time_sleep.assert_not_called()
 
-    @patch('time.sleep', return_value=None)
+    @patch("time.sleep", return_value=None)
     def test_sleep_zero_delay(self, patched_time_sleep):
         client = arxiv.Client(page_size=1, delay_seconds=0)
         url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
@@ -146,7 +147,7 @@ class TestClient(unittest.TestCase):
         client._parse_feed(url)
         patched_time_sleep.assert_not_called()
 
-    @patch('time.sleep', return_value=None)
+    @patch("time.sleep", return_value=None)
     def test_sleep_between_errors(self, patched_time_sleep):
         client = TestClient.get_broken_client()
         url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
@@ -157,9 +158,12 @@ class TestClient(unittest.TestCase):
         # Should sleep between retries.
         patched_time_sleep.assert_called()
         self.assertEqual(patched_time_sleep.call_count, client.num_retries)
-        patched_time_sleep.assert_has_calls([
-            call(approx(client.delay_seconds, rel=1e-3)),
-        ] * client.num_retries)
+        patched_time_sleep.assert_has_calls(
+            [
+                call(approx(client.delay_seconds, rel=1e-3)),
+            ]
+            * client.num_retries
+        )
 
     def get_broken_client():
         """
