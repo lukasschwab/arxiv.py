@@ -33,6 +33,12 @@ class TestClient(unittest.TestCase):
         results = [r for r in client.results(search)]
         self.assertEqual(len(results), 2)
 
+    def test_max_results_float(self):
+        client = arxiv.Client(page_size=10, delay_seconds=0)
+        with self.assertRaises(arxiv.HTTPError):
+            search = arxiv.Search(query="testing", max_results=2.0)
+            next(client.results(search))
+
     def test_query_page_count(self):
         client = arxiv.Client(page_size=10, delay_seconds=0)
         client._parse_feed = MagicMock(wraps=client._parse_feed)

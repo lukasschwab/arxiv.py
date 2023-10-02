@@ -421,7 +421,7 @@ class Search(object):
     Manual](https://arxiv.org/help/api/user-manual#search_query_and_id_list)
     for documentation of the interaction between `query` and `id_list`.
     """
-    max_results: float
+    max_results: int
     """
     The maximum number of results to be returned in an execution of this
     search.
@@ -437,7 +437,7 @@ class Search(object):
         self,
         query: str = "",
         id_list: List[str] = [],
-        max_results: float = float("inf"),
+        max_results: int = 300000,
         sort_by: SortCriterion = SortCriterion.Relevance,
         sort_order: SortOrder = SortOrder.Descending,
     ):
