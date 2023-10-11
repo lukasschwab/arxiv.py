@@ -1,4 +1,4 @@
-# Run `make lint test`: flake8 and pytest.
+# Run `make lint test`: mypy, ruff and pytest.
 name: python-test
 
 on:
