@@ -10,6 +10,7 @@ format: $(source) $(tests)
 
 lint: $(source) $(tests)
 	ruff check .
+	mypy
 
 test: $(source) $(tests)
 	pytest

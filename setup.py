@@ -15,7 +15,7 @@ setup(
     # dependencies
     python_requires=">=3.7",
     install_requires=["feedparser>=6.0.2"],
-    tests_require=["pytest", "pdoc", "ruff"],
+    tests_require=["mypy", "pytest", "pdoc", "ruff"],
     # metadata for upload to PyPI
     author="Lukas Schwab",
     author_email="lukas.schwab@gmail.com",
