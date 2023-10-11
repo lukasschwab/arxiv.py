@@ -9,6 +9,9 @@ setup(
     name="arxiv",
     version=version,
     packages=["arxiv"],
+    package_data={
+        "arxiv": ["py.typed"],
+    },
     # dependencies
     python_requires=">=3.7",
     install_requires=["feedparser>=6.0.2"],
