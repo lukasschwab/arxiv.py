@@ -3,7 +3,8 @@ from __future__ import annotations
 
 import logging
 import time
-import feedparser
+# FIXME: feedparser includes py.typed file after 7.x.
+import feedparser  # type: ignore[import-untyped]
 import re
 import os
 import warnings
@@ -14,7 +15,7 @@ from datetime import datetime, timedelta, timezone
 from calendar import timegm
 
 from enum import Enum
-from typing import Dict, Generator, List
+from typing import cast, Dict, Generator, List
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +60,7 @@ class Result(object):
     """
     links: List[Link]
     """Up to three URLs associated with this result."""
-    pdf_url: str
+    pdf_url: str | None
     """The URL of a PDF version of this result if present among links."""
     _raw: feedparser.FeedParserDict
     """
@@ -82,7 +83,7 @@ class Result(object):
         categories: List[str] = [],
         links: List[Link] = [],
         _raw: feedparser.FeedParserDict = None,
-    ):
+    ) -> None:
         """
         Constructs an arXiv search result item.
 
@@ -164,7 +165,7 @@ class Result(object):
             repr(self.links),
         )
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, Result):
             return self.entry_id == other.entry_id
         return False
@@ -208,7 +209,8 @@ class Result(object):
         if not filename:
             filename = self._get_default_filename()
         path = os.path.join(dirpath, filename)
-        written_path, _ = urlretrieve(self.pdf_url, path)
+        # FIXME: `self.pdf_url` is possibly `None` and following code raises `TypeError`.
+        written_path, _ = urlretrieve(self.pdf_url, path)  # type: ignore[arg-type]
         return written_path
 
     def download_source(self, dirpath: str = "./", filename: str = "") -> str:
@@ -222,11 +224,13 @@ class Result(object):
             filename = self._get_default_filename("tar.gz")
         path = os.path.join(dirpath, filename)
         # Bodge: construct the source URL from the PDF URL.
-        source_url = self.pdf_url.replace("/pdf/", "/src/")
+        # FIXME: `self.pdf_url` is possibly `None` and following code raises `AttributeError`.
+        source_url = self.pdf_url.replace("/pdf/", "/src/")  # type: ignore[union-attr]
         written_path, _ = urlretrieve(source_url, path)
         return written_path
 
-    def _get_pdf_url(links: List[Link]) -> str:
+    @staticmethod
+    def _get_pdf_url(links: List[Link]) -> str | None:
         """
         Finds the PDF link among a result's links and returns its URL.
 
@@ -240,6 +244,7 @@ class Result(object):
             logger.warning("Result has multiple PDF links; using %s", pdf_urls[0])
         return pdf_urls[0]
 
+    @staticmethod
     def _to_datetime(ts: time.struct_time) -> datetime:
         """
         Converts a UTC time.struct_time into a time-zone-aware datetime.
@@ -257,7 +262,7 @@ class Result(object):
         name: str
         """The author's name."""
 
-        def __init__(self, name: str):
+        def __init__(self, name: str) -> None:
             """
             Constructs an `Author` with the specified name.
 
@@ -281,7 +286,7 @@ class Result(object):
         def __repr__(self) -> str:
             return "{}({})".format(_classname(self), repr(self.name))
 
-        def __eq__(self, other) -> bool:
+        def __eq__(self, other: object) -> bool:
             if isinstance(other, Result.Author):
                 return self.name == other.name
             return False
@@ -293,20 +298,20 @@ class Result(object):
 
         href: str
         """The link's `href` attribute."""
-        title: str
+        title: str | None
         """The link's title."""
-        rel: str
+        rel: str | None
         """The link's relationship to the `Result`."""
-        content_type: str
+        content_type: str | None
         """The link's HTTP content type."""
 
         def __init__(
             self,
             href: str,
-            title: str = None,
-            rel: str = None,
-            content_type: str = None,
-        ):
+            title: str | None = None,
+            rel: str | None = None,
+            content_type: str | None = None,
+        ) -> None:
             """
             Constructs a `Link` with the specified link metadata.
 
@@ -344,7 +349,7 @@ class Result(object):
                 repr(self.content_type),
             )
 
-        def __eq__(self, other) -> bool:
+        def __eq__(self, other: object) -> bool:
             if isinstance(other, Result.Link):
                 return self.href == other.href
             return False
@@ -360,7 +365,7 @@ class Result(object):
         message: str
         """Message describing what caused this error."""
 
-        def __init__(self, missing_field):
+        def __init__(self, missing_field: str) -> None:
             self.missing_field = missing_field
             self.message = "Entry from arXiv missing required info"
 
@@ -421,7 +426,7 @@ class Search(object):
     Manual](https://arxiv.org/help/api/user-manual#search_query_and_id_list)
     for documentation of the interaction between `query` and `id_list`.
     """
-    max_results: float
+    max_results: int
     """
     The maximum number of results to be returned in an execution of this
     search.
@@ -437,10 +442,10 @@ class Search(object):
         self,
         query: str = "",
         id_list: List[str] = [],
-        max_results: float = float("inf"),
+        max_results: int = cast(int, float("inf")),
         sort_by: SortCriterion = SortCriterion.Relevance,
         sort_order: SortOrder = SortOrder.Descending,
-    ):
+    ) -> None:
         """
         Constructs an arXiv API search with the specified criteria.
         """
@@ -514,11 +519,11 @@ class Client(object):
     """Number of seconds to wait between API requests."""
     num_retries: int
     """Number of times to retry a failing API request."""
-    _last_request_dt: datetime
+    _last_request_dt: datetime | None
 
     def __init__(
         self, page_size: int = 100, delay_seconds: int = 3, num_retries: int = 3
-    ):
+    ) -> None:
         """
         Constructs an arXiv API client with the specified options.
 
@@ -622,8 +627,8 @@ class Client(object):
         url_args = search._url_args()
         url_args.update(
             {
-                "start": start,
-                "max_results": page_size,
+                "start": str(start),
+                "max_results": str(page_size),
             }
         )
         return self.query_url_format.format(urlencode(url_args))
@@ -647,7 +652,7 @@ class Client(object):
         url: str,
         first_page: bool,
         retries_left: int,
-        last_err: Exception = None,
+        last_err: Exception | None = None,
     ) -> feedparser.FeedParserDict:
         """
         Recursive helper for _parse_feed. Enforces `self.delay_seconds`: if that
@@ -669,12 +674,12 @@ class Client(object):
                 "url": url,
                 "first_page": first_page,
                 "retry": retry,
-                "last_err": last_err.message if last_err is not None else None,
+                "last_err": last_err.message if last_err and hasattr(last_err, "message") else None,
             },
         )
         feed = feedparser.parse(url)
         self._last_request_dt = datetime.now()
-        err = None
+        err: HTTPError | UnexpectedEmptyPageError | None = None
         if feed.status != 200:
             err = HTTPError(url, retry, feed)
         elif len(feed.entries) == 0 and not first_page:
@@ -706,7 +711,7 @@ class ArxivError(Exception):
     message: str
     """Message describing what caused this error."""
 
-    def __init__(self, url: str, retry: int, message: str):
+    def __init__(self, url: str, retry: int, message: str) -> None:
         """
         Constructs an `ArxivError` encountered while fetching the specified URL.
         """
@@ -729,7 +734,7 @@ class UnexpectedEmptyPageError(ArxivError):
     See `Client.results` for usage.
     """
 
-    def __init__(self, url: str, retry: int):
+    def __init__(self, url: str, retry: int) -> None:
         """
         Constructs an `UnexpectedEmptyPageError` encountered for the specified
         API URL after `retry` tries.
@@ -753,7 +758,7 @@ class HTTPError(ArxivError):
     entry: feedparser.FeedParserDict
     """The feed entry describing the error, if present."""
 
-    def __init__(self, url: str, retry: int, feed: feedparser.FeedParserDict):
+    def __init__(self, url: str, retry: int, feed: feedparser.FeedParserDict) -> None:
         """
         Constructs an `HTTPError` for the specified status code, encountered for
         the specified API URL after `retry` tries.
@@ -781,6 +786,6 @@ class HTTPError(ArxivError):
         )
 
 
-def _classname(o):
+def _classname(o: object) -> str:
     """A helper function for use in __repr__ methods: arxiv.Result.Link."""
     return "arxiv.{}".format(o.__class__.__qualname__)
