@@ -1,4 +1,4 @@
-feedparser>=6.0.2
+feedparser==6.0.2
 
 # Development dependencies
 pytest>=6.2.2
