@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 import time
+
 # FIXME: feedparser includes py.typed file after 7.x.
 import feedparser  # type: ignore[import-untyped]
 import re
@@ -674,7 +675,9 @@ class Client(object):
                 "url": url,
                 "first_page": first_page,
                 "retry": retry,
-                "last_err": last_err.message if last_err and hasattr(last_err, "message") else None,
+                "last_err": last_err.message
+                if last_err and hasattr(last_err, "message")
+                else None,
             },
         )
         feed = feedparser.parse(url)
