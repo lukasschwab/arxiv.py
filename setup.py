@@ -16,7 +16,7 @@ setup(
     # metadata for upload to PyPI
     author="Lukas Schwab",
     author_email="lukas.schwab@gmail.com",
-    description="Python wrapper for the arXiv API: http://arxiv.org/help/api/",
+    description="Python wrapper for the arXiv API: https://arxiv.org/help/api/",
     long_description=long_description,
     long_description_content_type="text/markdown",
     license="MIT",

@@ -30,7 +30,7 @@ class Result(object):
     """
 
     entry_id: str
-    """A url of the form `http://arxiv.org/abs/{id}`."""
+    """A url of the form `https://arxiv.org/abs/{id}`."""
     updated: datetime
     """When the result was last updated."""
     published: datetime
@@ -173,10 +173,10 @@ class Result(object):
         """
         Returns the short ID for this result.
 
-        + If the result URL is `"http://arxiv.org/abs/2107.05580v1"`,
+        + If the result URL is `"https://arxiv.org/abs/2107.05580v1"`,
         `result.get_short_id()` returns `2107.05580v1`.
 
-        + If the result URL is `"http://arxiv.org/abs/quant-ph/0201082v1"`,
+        + If the result URL is `"https://arxiv.org/abs/quant-ph/0201082v1"`,
         `result.get_short_id()` returns `"quant-ph/0201082v1"` (the pre-March
         2007 arXiv identifier format).
 
