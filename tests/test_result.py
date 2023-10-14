@@ -33,7 +33,6 @@ class TestResult(unittest.TestCase):
             self.assert_valid_link(link)
         self.assert_nonempty(result.pdf_url)
 
-    # FIXME: failed
     def test_result_shape(self):
         max_results = 100
         search = arxiv.Search("testing", max_results=max_results)
@@ -42,10 +41,9 @@ class TestResult(unittest.TestCase):
         for result in results:
             self.assert_valid_result(result)
 
-    # FIXME: failed
     def test_from_feed_entry(self):
         feed = arxiv.Client()._parse_feed(
-            "http://export.arxiv.org/api/query?search_query=testing"
+            "https://export.arxiv.org/api/query?search_query=testing"
         )
         feed_entry = feed.entries[0]
         result = arxiv.Result._from_feed_entry(feed_entry)
