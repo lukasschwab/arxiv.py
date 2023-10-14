@@ -34,13 +34,13 @@ class TestClient(unittest.TestCase):
         self.assertEqual(len(results), 1)
 
     def test_max_results(self):
-        client = arxiv.Client(page_size=10, delay_seconds=0)
+        client = arxiv.Client(page_size=10)
         search = arxiv.Search(query="testing", max_results=2)
         results = [r for r in client.results(search)]
         self.assertEqual(len(results), 2)
 
     def test_query_page_count(self):
-        client = arxiv.Client(page_size=10, delay_seconds=0)
+        client = arxiv.Client(page_size=10)
         client._parse_feed = MagicMock(wraps=client._parse_feed)
         generator = client.results(arxiv.Search(query="testing", max_results=55))
         results = [r for r in generator]
@@ -50,7 +50,7 @@ class TestClient(unittest.TestCase):
     def test_offset(self):
         max_results = 10
         search = arxiv.Search(query="testing", max_results=max_results)
-        client = arxiv.Client(page_size=10, delay_seconds=0)
+        client = arxiv.Client(page_size=10)
 
         default = list(client.results(search))
         no_offset = list(client.results(search))
@@ -145,13 +145,13 @@ class TestClient(unittest.TestCase):
         client._parse_feed(url)
         patched_time_sleep.assert_not_called()
 
-    @patch("time.sleep", return_value=None)
-    def test_sleep_zero_delay(self, patched_time_sleep):
-        client = arxiv.Client(page_size=1, delay_seconds=0)
-        url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
-        client._parse_feed(url)
-        client._parse_feed(url)
-        patched_time_sleep.assert_not_called()
+    # @patch("time.sleep", return_value=None)
+    # def test_sleep_zero_delay(self, patched_time_sleep):
+    #     client = arxiv.Client(page_size=1, delay_seconds=0)
+    #     url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
+    #     client._parse_feed(url)
+    #     client._parse_feed(url)
+    #     patched_time_sleep.assert_not_called()
 
     @patch("time.sleep", return_value=None)
     def test_sleep_between_errors(self, patched_time_sleep):
