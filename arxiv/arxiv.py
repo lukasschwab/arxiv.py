@@ -672,7 +672,7 @@ class Client(object):
                 "last_err": last_err.message if last_err is not None else None,
             },
         )
-        feed = feedparser.parse(url)
+        feed = feedparser.parse(url, agent="arXiv.py/1.4.8")
         self._last_request_dt = datetime.now()
         err = None
         if feed.status != 200:
