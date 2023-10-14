@@ -517,7 +517,10 @@ class Client(object):
     _last_request_dt: datetime
 
     def __init__(
-        self, page_size: int = 100, delay_seconds: int = 3, num_retries: int = 3
+        self,
+        page_size: int = 100,
+        delay_seconds: int = 3,
+        num_retries: int = 3,
     ):
         """
         Constructs an arXiv API client with the specified options.
@@ -669,14 +672,18 @@ class Client(object):
                 "url": url,
                 "first_page": first_page,
                 "retry": retry,
-                "last_err": last_err.message if last_err is not None else None,
+                "last_err": last_err.__str__() if last_err is not None else None,
             },
         )
         feed = feedparser.parse(url, agent="arXiv.py/1.4.8")
         self._last_request_dt = datetime.now()
         err = None
-        if feed.status != 200:
+
+        # Bodge: catchall for TCP errors.
+        if 'status' in feed and feed.status != 200:
             err = HTTPError(url, retry, feed)
+        elif "bozo_exception" in feed:
+            err = feed.bozo_exception
         elif len(feed.entries) == 0 and not first_page:
             err = UnexpectedEmptyPageError(url, retry)
         if err is not None:
