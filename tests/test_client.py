@@ -15,7 +15,7 @@ class TestClient(unittest.TestCase):
 
     def test_invalid_format_id(self):
         with self.assertRaises(arxiv.HTTPError):
-            list(arxiv.Client(num_retries=0).results(arxiv.Search(id_list=["abc"])))
+            list(TestClient.get_once_client().results(arxiv.Search(id_list=["abc"])))
 
     def test_invalid_id(self):
         results = list(arxiv.Search(id_list=["0000.0000"]).results())
