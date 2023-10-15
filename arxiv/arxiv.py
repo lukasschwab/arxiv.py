@@ -520,7 +520,7 @@ class Client(object):
         self,
         page_size: int = 100,
         delay_seconds: int = 3,
-        num_retries: int = 5,
+        num_retries: int = 10,
     ):
         """
         Constructs an arXiv API client with the specified options.
