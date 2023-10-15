@@ -680,7 +680,7 @@ class Client(object):
         err = None
 
         # Bodge: catchall for TCP errors.
-        if 'status' in feed and feed.status != 200:
+        if "status" in feed and feed.status != 200:
             err = HTTPError(url, retry, feed)
         elif "bozo_exception" in feed:
             err = feed.bozo_exception
