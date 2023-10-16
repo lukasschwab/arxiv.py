@@ -1,18 +1,18 @@
 # arxiv.py
 [![PyPI](https://img.shields.io/pypi/v/arxiv)](https://pypi.org/project/arxiv/) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/arxiv) [![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/lukasschwab/arxiv.py/python-package.yml?branch=master)](https://github.com/lukasschwab/arxiv.py/actions?query=branch%3Amaster)
 
-Python wrapper for [the arXiv API](http://arxiv.org/help/api/index).
+Python wrapper for [the arXiv API](https://arxiv.org/help/api/index).
 
 ## Quick links
 
-+ [Full package documentation](http://lukasschwab.me/arxiv.py/index.html)
++ [Full package documentation](https://lukasschwab.me/arxiv.py/index.html)
 + [Example: fetching results](#example-fetching-results): the most common usage.
 + [Example: downloading papers](#example-downloading-papers)
 + [Example: fetching results with a custom client](#example-fetching-results-with-a-custom-client)
 
 ## About arXiv
 
-[arXiv](http://arxiv.org/) is a project by the Cornell University Library that provides open access to 1,000,000+ articles in Physics, Mathematics, Computer Science, Quantitative Biology, Quantitative Finance, and Statistics.
+[arXiv](https://arxiv.org/) is a project by the Cornell University Library that provides open access to 1,000,000+ articles in Physics, Mathematics, Computer Science, Quantitative Biology, Quantitative Finance, and Statistics.
 
 ## Usage
 
@@ -85,7 +85,7 @@ The `Result` objects yielded by `(Search).results()` include metadata about each
 
 The meaning of the underlying raw data is documented in the [arXiv API User Manual: Details of Atom Results Returned](https://arxiv.org/help/api/user-manual#_details_of_atom_results_returned).
 
-+ `result.entry_id`: A url `http://arxiv.org/abs/{id}`.
++ `result.entry_id`: A url `https://arxiv.org/abs/{id}`.
 + `result.updated`: When the result was last updated.
 + `result.published`: When the result was originally published.
 + `result.title`: The title of the result.

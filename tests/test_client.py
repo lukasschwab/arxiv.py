@@ -17,7 +17,7 @@ class TestClient(unittest.TestCase):
 
     def test_nonexistent_id_in_list(self):
         # Assert _from_feed_entry throws MissingFieldError.
-        feed = feedparser.parse("http://export.arxiv.org/api/query?id_list=0808.05394")
+        feed = feedparser.parse("https://export.arxiv.org/api/query?id_list=0808.05394")
         with self.assertRaises(arxiv.Result.MissingFieldError):
             arxiv.Result._from_feed_entry(feed.entries[0])
         # Assert thrown error is handled and hidden by generator.
