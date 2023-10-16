@@ -43,7 +43,7 @@ class TestResult(unittest.TestCase):
 
     def test_from_feed_entry(self):
         feed = arxiv.Client()._parse_feed(
-            "https://export.arxiv.org/api/query?search_query=testing"
+            "http://export.arxiv.org/api/query?search_query=testing"
         )
         feed_entry = feed.entries[0]
         result = arxiv.Result._from_feed_entry(feed_entry)

@@ -506,7 +506,7 @@ class Client(object):
     `Client.results`.
     """
 
-    query_url_format = "https://export.arxiv.org/api/query?{}"
+    query_url_format = "http://export.arxiv.org/api/query?{}"
     """The arXiv query API endpoint format."""
     page_size: int
     """Maximum number of results fetched in a single API request."""
