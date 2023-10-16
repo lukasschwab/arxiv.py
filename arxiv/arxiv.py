@@ -520,7 +520,7 @@ class Client(object):
         self,
         page_size: int = 100,
         delay_seconds: int = 3,
-        num_retries: int = 10,
+        num_retries: int = 3,
     ):
         """
         Constructs an arXiv API client with the specified options.
@@ -683,23 +683,30 @@ class Client(object):
         if "status" in feed and feed.status != 200:
             err = HTTPError(url, retry, feed)
         elif "bozo_exception" in feed:
-            logger.warn("Caught bozo exception", feed)
+            logger.warning("Caught bozo exception: {}".format(feed))
             err = feed.bozo_exception
         elif len(feed.entries) == 0 and not first_page:
             err = UnexpectedEmptyPageError(url, retry)
-        elif first_page and feed.feed.opensearch_totalresults == 0:
+        elif first_page and int(feed.feed.opensearch_totalresults) == 0:
             # Crazy bodge, leveraging two bugs against each other. From above:
             # > The totalresults value is set to 1 for results with zero entries.
             # Therefore a first_page with 0 entries and 0 totalresults is *not*
             # an empty result set; it's unexpectedly empty, and deserves retry.
             err = UnexpectedEmptyPageError(url, retry)
-            logger.warn("Retrying first page request")
+            logger.warning("Retrying first page request")
 
-        if len(feed.entries) == 0:
-            logger.debug('{} and {}'.format(len(feed.entries), feed.feed))
+        logger.debug(
+            "First page: {}, Totalresults: {}".format(
+                first_page,
+                feed.feed.opensearch_totalresults
+                if "opensearch_totalresults" in feed.feed
+                else None,
+            )
+        )
 
         if err is not None:
             if retries_left > 0:
+                logger.info("Retrying")
                 return self.__try_parse_feed(
                     url,
                     first_page=first_page,
