@@ -683,9 +683,21 @@ class Client(object):
         if "status" in feed and feed.status != 200:
             err = HTTPError(url, retry, feed)
         elif "bozo_exception" in feed:
+            logger.warn("Caught bozo exception", feed)
             err = feed.bozo_exception
         elif len(feed.entries) == 0 and not first_page:
             err = UnexpectedEmptyPageError(url, retry)
+        elif first_page and feed.feed.opensearch_totalresults == 0:
+            # Crazy bodge, leveraging two bugs against each other. From above:
+            # > The totalresults value is set to 1 for results with zero entries.
+            # Therefore a first_page with 0 entries and 0 totalresults is *not*
+            # an empty result set; it's unexpectedly empty, and deserves retry.
+            err = UnexpectedEmptyPageError(url, retry)
+            logger.warn("Retrying first page request")
+
+        if len(feed.entries) == 0:
+            logger.debug('{} and {}'.format(len(feed.entries), feed.feed))
+
         if err is not None:
             if retries_left > 0:
                 return self.__try_parse_feed(
