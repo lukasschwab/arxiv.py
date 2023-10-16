@@ -577,12 +577,7 @@ class Client(object):
         first_page = True
         while offset < total_results:
             page_size = min(self.page_size, search.max_results - offset)
-            logger.info(
-                "Requesting {} results at offset {}".format(
-                    page_size,
-                    offset,
-                )
-            )
+            logger.info("Requesting %d results at offset %d", page_size, offset)
             page_url = self._format_url(search, offset, page_size)
             feed = self._parse_feed(page_url, first_page)
             if first_page:
@@ -591,16 +586,16 @@ class Client(object):
                 # bug is fixed, we can remove this conditional and always set
                 # `total_results = min(...)`.
                 if len(feed.entries) == 0:
-                    logger.info("Got empty results; stopping generation")
+                    logger.info("Got empty first page; stopping generation")
                     total_results = 0
                 else:
                     total_results = min(
                         total_results, int(feed.feed.opensearch_totalresults)
                     )
                     logger.info(
-                        "Got first page; {} of {} results available".format(
-                            total_results, search.max_results
-                        )
+                        "Got first page: %d of %d total results",
+                        total_results,
+                        search.max_results,
                     )
                 # Subsequent pages are not the first page.
                 first_page = False
@@ -610,8 +605,8 @@ class Client(object):
             for entry in feed.entries:
                 try:
                     yield Result._from_feed_entry(entry)
-                except Result.MissingFieldError:
-                    logger.warning("Skipping partial result")
+                except Result.MissingFieldError as e:
+                    logger.warning("Skipping partial result: %s", e)
                     continue
 
     def _format_url(self, search: Search, start: int, page_size: int) -> str:
@@ -661,14 +656,14 @@ class Client(object):
             since_last_request = datetime.now() - self._last_request_dt
             if since_last_request < required:
                 to_sleep = (required - since_last_request).total_seconds()
-                logger.info("Sleeping for %f seconds", to_sleep)
+                logger.info("Sleeping: %f seconds", to_sleep)
                 time.sleep(to_sleep)
         logger.info(
-            "Requesting page of results",
+            "Requesting page (try %d): %s",
+            retry,
+            url,
             extra={
-                "url": url,
                 "first_page": first_page,
-                "retry": retry,
                 "last_err": last_err.message if last_err is not None else None,
             },
         )
@@ -680,6 +675,7 @@ class Client(object):
         elif len(feed.entries) == 0 and not first_page:
             err = UnexpectedEmptyPageError(url, retry)
         if err is not None:
+            logger.debug("Got error (try %d): %s", retry, err)
             if retries_left > 0:
                 return self.__try_parse_feed(
                     url,
