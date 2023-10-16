@@ -595,7 +595,9 @@ class Client(object):
                     logger.info(
                         "Got first page: %d of %d total results",
                         total_results,
-                        search.max_results if search.max_results != float("inf") else -1,
+                        search.max_results
+                        if search.max_results != float("inf")
+                        else -1,
                     )
                 # Subsequent pages are not the first page.
                 first_page = False
