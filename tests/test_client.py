@@ -80,7 +80,7 @@ class TestClient(unittest.TestCase):
 
     @patch("time.sleep", return_value=None)
     def test_retry(self, patched_time_sleep):
-        broken_client = TestClient.get_broken_client()
+        broken_client = TestClient.get_code_client(500)
 
         def broken_get():
             search = arxiv.Search(query="quantum")
@@ -99,7 +99,7 @@ class TestClient(unittest.TestCase):
 
     @patch("time.sleep", return_value=None)
     def test_sleep_standard(self, patched_time_sleep):
-        client = arxiv.Client(page_size=1)
+        client = TestClient.get_code_client(200)
         url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
         # A client should sleep until delay_seconds have passed.
         client._parse_feed(url)
@@ -114,7 +114,7 @@ class TestClient(unittest.TestCase):
 
     @patch("time.sleep", return_value=None)
     def test_sleep_multiple_requests(self, patched_time_sleep):
-        client = arxiv.Client(page_size=1)
+        client = TestClient.get_code_client(200)
         url1 = client._format_url(arxiv.Search(query="quantum"), 0, 1)
         url2 = client._format_url(arxiv.Search(query="testing"), 0, 1)
         # Rate limiting is URL-independent; expect same behavior as in
@@ -129,7 +129,7 @@ class TestClient(unittest.TestCase):
 
     @patch("time.sleep", return_value=None)
     def test_sleep_elapsed(self, patched_time_sleep):
-        client = arxiv.Client(page_size=1)
+        client = TestClient.get_code_client(200)
         url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
         # If _last_request_dt is less than delay_seconds ago, sleep.
         client._last_request_dt = datetime.now() - timedelta(
@@ -147,7 +147,8 @@ class TestClient(unittest.TestCase):
 
     @patch("time.sleep", return_value=None)
     def test_sleep_zero_delay(self, patched_time_sleep):
-        client = arxiv.Client(page_size=1, delay_seconds=0)
+        client = TestClient.get_code_client(200, delay_seconds=0)
+        client.query_url_format = "https://httpstat.us/200?{}"
         url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
         client._parse_feed(url)
         client._parse_feed(url)
@@ -155,7 +156,7 @@ class TestClient(unittest.TestCase):
 
     @patch("time.sleep", return_value=None)
     def test_sleep_between_errors(self, patched_time_sleep):
-        client = TestClient.get_broken_client()
+        client = TestClient.get_code_client(500)
         url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
         try:
             client._parse_feed(url)
@@ -171,18 +172,12 @@ class TestClient(unittest.TestCase):
             * client.num_retries
         )
 
-    def get_broken_client():
+    def get_code_client(code: int, delay_seconds=3, num_retries=3) -> arxiv.Client:
         """
-        get_broken_client returns an arxiv.Client that always encounters a 500
-        status.
+        get_code_client returns an arxiv.Cient with HTTP requests routed to
+        httpstat.us.
         """
-        # TODO: reimplement broken_client with a mock.
-        broken_client = arxiv.Client(page_size=1)
-        broken_client.query_url_format = "https://httpstat.us/500?{}"
-        return broken_client
-
-    def get_once_client():
-        """
-        get_once_client returns an arxiv.Client that only tries once.
-        """
-        return arxiv.Client(num_retries=0)
+        # TODO: reimplement with a mock.
+        client = arxiv.Client(delay_seconds=delay_seconds, num_retries=num_retries)
+        client.query_url_format = "https://httpstat.us/{}?".format(code) + "{}"
+        return client
