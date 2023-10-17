@@ -627,10 +627,7 @@ class Client(object):
         return self.query_url_format.format(urlencode(url_args))
 
     def _parse_feed(
-        self,
-        url: str,
-        retries_left: int = 0,
-        first_page: bool = True,
+        self, url: str, first_page: bool = True, retries_left: int | None = None
     ) -> feedparser.FeedParserDict:
         """
         Fetches the specified URL and parses it with feedparser.
@@ -638,6 +635,8 @@ class Client(object):
         If a request fails or is unexpectedly empty, retries the request up to
         `self.num_retries` times.
         """
+        retries_left = retries_left if retries_left is not None else self.num_retries
+        print(retries_left)
         try_index = self.num_retries - retries_left
         try:
             return self.__try_parse_feed(
@@ -645,11 +644,11 @@ class Client(object):
             )
         except (HTTPError, UnexpectedEmptyPageError) as err:
             if retries_left > 0:
-                try_index = self.num_retries - retries_left
                 logger.debug("Got error (try %d): %s", try_index, err)
                 return self._parse_feed(
-                    url, retries_left=retries_left - 1, first_page=first_page
+                    url, first_page=first_page, retries_left=retries_left - 1
                 )
+            logger.debug("Giving up (try %d): %s", try_index, err)
             raise err
 
     def __try_parse_feed(
@@ -672,9 +671,11 @@ class Client(object):
                 logger.info("Sleeping: %f seconds", to_sleep)
                 time.sleep(to_sleep)
 
-        logger.info("Requesting page (first? %r): %s", first_page, url)
-        self._last_request_dt = datetime.now()
+        logger.info(
+            "Requesting page (first: %r, try: %d): %s", first_page, try_index, url
+        )
         resp = requests.get(url, {"user-agent": "arxiv.py/1.4.8"})
+        self._last_request_dt = datetime.now()
         # TODO: consider loosening to 2XX.
         if resp.status_code != requests.codes.OK:
             raise HTTPError(url, try_index, resp.status_code)
