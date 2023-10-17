@@ -639,7 +639,11 @@ class Client(object):
             return self.__try_parse_feed(
                 url, first_page=first_page, try_index=_try_index
             )
-        except (HTTPError, UnexpectedEmptyPageError) as err:
+        except (
+            HTTPError,
+            UnexpectedEmptyPageError,
+            requests.exceptions.ConnectionError,
+        ) as err:
             if _try_index < self.num_retries:
                 logger.debug("Got error (try %d): %s", _try_index, err)
                 return self._parse_feed(
@@ -671,6 +675,7 @@ class Client(object):
         logger.info(
             "Requesting page (first: %r, try: %d): %s", first_page, try_index, url
         )
+
         resp = requests.get(url, {"user-agent": "arxiv.py/1.4.8"})
         self._last_request_dt = datetime.now()
         if resp.status_code != requests.codes.OK:
