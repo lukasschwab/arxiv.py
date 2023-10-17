@@ -22,25 +22,28 @@ class TestClient(unittest.TestCase):
         self.assertEqual(len(results), 0)
 
     def test_nonexistent_id_in_list(self):
+        client = arxiv.Client()
         # Assert _from_feed_entry throws MissingFieldError.
         feed = feedparser.parse("https://export.arxiv.org/api/query?id_list=0808.05394")
         with self.assertRaises(arxiv.Result.MissingFieldError):
             arxiv.Result._from_feed_entry(feed.entries[0])
         # Assert thrown error is handled and hidden by generator.
-        results = list(arxiv.Search(id_list=["0808.05394"]).results())
+        results = list(client.results(arxiv.Search(id_list=["0808.05394"])))
         self.assertEqual(len(results), 0)
         # Generator should still yield valid entries.
-        results = list(arxiv.Search(id_list=["0808.05394", "1707.08567"]).results())
+        results = list(
+            client.results(arxiv.Search(id_list=["0808.05394", "1707.08567"]))
+        )
         self.assertEqual(len(results), 1)
 
     def test_max_results(self):
-        client = arxiv.Client(page_size=10, delay_seconds=0)
+        client = arxiv.Client(page_size=10)
         search = arxiv.Search(query="testing", max_results=2)
         results = [r for r in client.results(search)]
         self.assertEqual(len(results), 2)
 
     def test_query_page_count(self):
-        client = arxiv.Client(page_size=10, delay_seconds=0)
+        client = arxiv.Client(page_size=10)
         client._parse_feed = MagicMock(wraps=client._parse_feed)
         generator = client.results(arxiv.Search(query="testing", max_results=55))
         results = [r for r in generator]
@@ -50,7 +53,7 @@ class TestClient(unittest.TestCase):
     def test_offset(self):
         max_results = 10
         search = arxiv.Search(query="testing", max_results=max_results)
-        client = arxiv.Client(page_size=10, delay_seconds=0)
+        client = arxiv.Client(page_size=10)
 
         default = list(client.results(search))
         no_offset = list(client.results(search))
