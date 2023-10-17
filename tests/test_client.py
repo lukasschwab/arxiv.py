@@ -3,15 +3,9 @@ from unittest.mock import MagicMock, call, patch
 import arxiv
 from datetime import datetime, timedelta
 from pytest import approx
-import time
 
 
 class TestClient(unittest.TestCase):
-    def tearDown(self) -> None:
-        # Bodge: sleep three seconds between tests to simulate a shared rate limit.
-        time.sleep(3)
-        return super().tearDown()
-
     def test_invalid_format_id(self):
         with self.assertRaises(arxiv.HTTPError):
             list(arxiv.Client(num_retries=0).results(arxiv.Search(id_list=["abc"])))
