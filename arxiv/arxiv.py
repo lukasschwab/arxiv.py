@@ -515,7 +515,9 @@ class Client(object):
     """Number of seconds to wait between API requests."""
     num_retries: int
     """Number of times to retry a failing API request."""
+
     _last_request_dt: datetime
+    _session: requests.Session
 
     def __init__(
         self, page_size: int = 100, delay_seconds: int = 3, num_retries: int = 3
@@ -532,6 +534,7 @@ class Client(object):
         self.delay_seconds = delay_seconds
         self.num_retries = num_retries
         self._last_request_dt = None
+        self._session = requests.Session()
 
     def __str__(self) -> str:
         # TODO: develop a more informative string representation.
@@ -601,7 +604,7 @@ class Client(object):
                         else -1,
                     )
                 # Subsequent pages are not the first page.
-                first_page = False
+                first_page = True
             # Update offset for next request: account for received results.
             offset += len(feed.entries)
             # Yield query results until page is exhausted.
@@ -676,7 +679,7 @@ class Client(object):
             "Requesting page (first: %r, try: %d): %s", first_page, try_index, url
         )
 
-        resp = requests.get(url, {"user-agent": "arxiv.py/1.4.8"})
+        resp = self._session.get(url, headers={"user-agent": "arxiv.py/1.4.8"})
         self._last_request_dt = datetime.now()
         if resp.status_code != requests.codes.OK:
             raise HTTPError(url, try_index, resp.status_code)

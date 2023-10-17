@@ -43,8 +43,11 @@ class TestClient(unittest.TestCase):
         generator = client.results(arxiv.Search(query="testing", max_results=55))
         results = [r for r in generator]
         self.assertEqual(len(results), 55)
+
         # NOTE: don't assert on call count; allow for retries.
-        unique_urls = {args.args[0] for args in client._parse_feed.call_args_list}
+        print("GOT ARGS", client._parse_feed.call_args_list)
+        unique_urls = {call.args[0] for call in client._parse_feed.call_args_list}
+        print("GOT UNIQUE URLS", unique_urls)
         self.assertSetEqual(
             unique_urls,
             {
