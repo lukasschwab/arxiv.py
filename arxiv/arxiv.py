@@ -684,7 +684,7 @@ class Client(object):
         # TODO: probably handle other errros with a feed present.
         # + Handle XML errors; usually these will result in an empty feed.
         if feed.bozo:
-            logger.warn(
+            logger.warning(
                 "Bozo feed; consider handling: %s",
                 feed.bozo_exception if "bozo_exception" in feed else None,
             )
