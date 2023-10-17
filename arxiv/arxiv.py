@@ -6,6 +6,7 @@ import time
 import itertools
 import feedparser
 import os
+import math
 import re
 import requests
 import warnings
@@ -448,7 +449,8 @@ class Search(object):
         """
         self.query = query
         self.id_list = id_list
-        self.max_results = max_results
+        # Handle deprecated v1 default behavior.
+        self.max_results = None if max_results == math.inf else max_results
         self.sort_by = sort_by
         self.sort_order = sort_order
 
