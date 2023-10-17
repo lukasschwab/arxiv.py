@@ -48,7 +48,7 @@ arxiv.Search(
 + `sort_by`: The sort criterion for results: `relevance`, `lastUpdatedDate`, or `submittedDate`.
 + `sort_order`: The sort order for results: `'descending'` or `'ascending'`.
 
-To fetch arXiv records matching a `Search`, use `search.results()` or `(Client).results(search)` to get a generator yielding `Result`s.
+To fetch arXiv records matching a `Search`, use `(Client).results(search)` to get a generator yielding `Result`s.
 
 #### Example: fetching results
 
@@ -63,7 +63,7 @@ search = arxiv.Search(
   sort_by = arxiv.SortCriterion.SubmittedDate
 )
 
-for result in search.results():
+for result in arxiv.Client().results(search):
   print(result.title)
 ```
 
@@ -72,8 +72,10 @@ Fetch and print the title of the paper with ID "1605.08386v1:"
 ```python
 import arxiv
 
+client = arxiv.Client()
 search = arxiv.Search(id_list=["1605.08386v1"])
-paper = next(search.results())
+
+paper = next(arxiv.Client().results(search))
 print(paper.title)
 ```
 
@@ -81,7 +83,7 @@ print(paper.title)
 
 <!-- TODO: improve this section. -->
 
-The `Result` objects yielded by `(Search).results()` include metadata about each paper and some helper functions for downloading their content.
+The `Result` objects yielded by `(Client).results()` include metadata about each paper and some helper functions for downloading their content.
 
 The meaning of the underlying raw data is documented in the [arXiv API User Manual: Details of Atom Results Returned](https://arxiv.org/help/api/user-manual#_details_of_atom_results_returned).
 
@@ -108,7 +110,7 @@ To download a PDF of the paper with ID "1605.08386v1," run a `Search` and then u
 ```python
 import arxiv
 
-paper = next(arxiv.Search(id_list=["1605.08386v1"]).results())
+paper = next(arxiv.Client().results(arxiv.Search(id_list=["1605.08386v1"])))
 # Download the PDF to the PWD with a default filename.
 paper.download_pdf()
 # Download the PDF to the PWD with a custom filename.
@@ -122,7 +124,7 @@ The same interface is available for downloading .tar.gz files of the paper sourc
 ```python
 import arxiv
 
-paper = next(arxiv.Search(id_list=["1605.08386v1"]).results())
+paper = next(arxiv.Client().results(arxiv.Search(id_list=["1605.08386v1"])))
 # Download the archive to the PWD with a default filename.
 paper.download_source()
 # Download the archive to the PWD with a custom filename.
@@ -133,11 +135,10 @@ paper.download_source(dirpath="./mydir", filename="downloaded-paper.tar.gz")
 
 ### Client
 
-A `Client` specifies a strategy for fetching results from arXiv's API; it obscures pagination and retry logic.
-
-For most use cases the default client should suffice. You can construct it explicitly with `arxiv.Client()`, or use it via the `(Search).results()` method.
+A `Client` specifies a strategy for fetching results from arXiv's API; it obscures pagination and retry logic. For most use cases the default client should suffice.
 
 ```python
+# Default client properties.
 arxiv.Client(
   page_size: int = 100,
   delay_seconds: int = 3,
@@ -150,8 +151,6 @@ arxiv.Client(
 + `num_retries`: The number of times the client will retry a request that fails, either with a non-200 HTTP status code or with an unexpected number of results given the search parameters.
 
 #### Example: fetching results with a custom client
-
-`(Search).results()` uses the default client settings. If you want to use a client you've defined instead of the defaults, use `(Client).results(...)`:
 
 ```python
 import arxiv
@@ -173,9 +172,11 @@ To inspect this package's network behavior and API logic, configure an `INFO`-le
 
 ```pycon
 >>> import logging, arxiv
->>> logging.basicConfig(level=logging.INFO)
->>> paper = next(arxiv.Search(id_list=["1605.08386v1"]).results())
+>>> logging.basicConfig(level=logging.DEBUG)
+>>> client = arxiv.Client()
+>>> paper = next(client.results(arxiv.Search(id_list=["1605.08386v1"])))
 INFO:arxiv.arxiv:Requesting 100 results at offset 0
-INFO:arxiv.arxiv:Requesting page of results
-INFO:arxiv.arxiv:Got first page; 1 of inf results available
+INFO:arxiv.arxiv:Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=&id_list=1605.08386v1&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): export.arxiv.org:443
+DEBUG:urllib3.connectionpool:https://export.arxiv.org:443 "GET /api/query?search_query=&id_list=1605.08386v1&sortBy=relevance&sortOrder=descending&start=0&max_results=100&user-agent=arxiv.py%2F1.4.8 HTTP/1.1" 200 979
 ```

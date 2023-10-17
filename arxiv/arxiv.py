@@ -488,7 +488,7 @@ class Search(object):
         **Deprecated** after 2.0.0; use `Client.results`.
         """
         warnings.warn(
-            "The 'Search.results' method is deprecated, use 'Client.results' instead",
+            "The '(Search).results' method is deprecated, use 'Client.results' instead",
             DeprecationWarning,
             stacklevel=2,
         )
