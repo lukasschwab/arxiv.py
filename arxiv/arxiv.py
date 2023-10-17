@@ -604,7 +604,7 @@ class Client(object):
                         else -1,
                     )
                 # Subsequent pages are not the first page.
-                first_page = True
+                first_page = False
             # Update offset for next request: account for received results.
             offset += len(feed.entries)
             # Yield query results until page is exhausted.
