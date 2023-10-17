@@ -6,6 +6,11 @@ from datetime import datetime, timezone
 
 
 class TestResult(unittest.TestCase):
+    def tearDown(self) -> None:
+        # Bodge: sleep three seconds between tests to simulate a shared rate limit.
+        time.sleep(3)
+        return super().tearDown()
+
     def assert_nonempty(self, s):
         self.assertIsNotNone(s)
         self.assertNotEqual(s, "")

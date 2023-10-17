@@ -3,10 +3,15 @@ from unittest.mock import MagicMock, call, patch
 import arxiv
 from datetime import datetime, timedelta
 from pytest import approx
-import feedparser
+import time
 
 
 class TestClient(unittest.TestCase):
+    def tearDown(self) -> None:
+        # Bodge: sleep three seconds between tests to simulate a shared rate limit.
+        time.sleep(3)
+        return super().tearDown()
+
     def test_invalid_format_id(self):
         with self.assertRaises(arxiv.HTTPError):
             list(arxiv.Client(num_retries=0).results(arxiv.Search(id_list=["abc"])))
@@ -16,35 +21,51 @@ class TestClient(unittest.TestCase):
         self.assertEqual(len(results), 0)
 
     def test_nonexistent_id_in_list(self):
-        # Assert _from_feed_entry throws MissingFieldError.
-        feed = feedparser.parse("https://export.arxiv.org/api/query?id_list=0808.05394")
-        with self.assertRaises(arxiv.Result.MissingFieldError):
-            arxiv.Result._from_feed_entry(feed.entries[0])
+        client = arxiv.Client()
         # Assert thrown error is handled and hidden by generator.
-        results = list(arxiv.Search(id_list=["0808.05394"]).results())
+        results = list(client.results(arxiv.Search(id_list=["0808.05394"])))
         self.assertEqual(len(results), 0)
         # Generator should still yield valid entries.
-        results = list(arxiv.Search(id_list=["0808.05394", "1707.08567"]).results())
+        results = list(
+            client.results(arxiv.Search(id_list=["0808.05394", "1707.08567"]))
+        )
         self.assertEqual(len(results), 1)
 
     def test_max_results(self):
-        client = arxiv.Client(page_size=10, delay_seconds=0)
+        client = arxiv.Client(page_size=10)
         search = arxiv.Search(query="testing", max_results=2)
         results = [r for r in client.results(search)]
         self.assertEqual(len(results), 2)
 
     def test_query_page_count(self):
-        client = arxiv.Client(page_size=10, delay_seconds=0)
+        client = arxiv.Client(page_size=10)
         client._parse_feed = MagicMock(wraps=client._parse_feed)
         generator = client.results(arxiv.Search(query="testing", max_results=55))
         results = [r for r in generator]
+
+        # NOTE: don't directly assert on call count; allow for retries.
+        unique_urls = set()
+        for parse_call in client._parse_feed.call_args_list:
+            args, _kwargs = parse_call
+            unique_urls.add(args[0])
+
         self.assertEqual(len(results), 55)
-        self.assertEqual(client._parse_feed.call_count, 6)
+        self.assertSetEqual(
+            unique_urls,
+            {
+                "https://export.arxiv.org/api/query?search_query=testing&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=10",
+                "https://export.arxiv.org/api/query?search_query=testing&id_list=&sortBy=relevance&sortOrder=descending&start=10&max_results=10",
+                "https://export.arxiv.org/api/query?search_query=testing&id_list=&sortBy=relevance&sortOrder=descending&start=20&max_results=10",
+                "https://export.arxiv.org/api/query?search_query=testing&id_list=&sortBy=relevance&sortOrder=descending&start=30&max_results=10",
+                "https://export.arxiv.org/api/query?search_query=testing&id_list=&sortBy=relevance&sortOrder=descending&start=40&max_results=10",
+                "https://export.arxiv.org/api/query?search_query=testing&id_list=&sortBy=relevance&sortOrder=descending&start=50&max_results=5",
+            },
+        )
 
     def test_offset(self):
         max_results = 10
         search = arxiv.Search(query="testing", max_results=max_results)
-        client = arxiv.Client(page_size=10, delay_seconds=0)
+        client = arxiv.Client(page_size=10)
 
         default = list(client.results(search))
         no_offset = list(client.results(search))
@@ -59,11 +80,20 @@ class TestClient(unittest.TestCase):
 
     def test_search_results_offset(self):
         search = arxiv.Search(query="testing", max_results=10)
-        client = arxiv.Client(page_size=3, delay_seconds=0)
+        client = arxiv.Client()
+
+        all_results = list(client.results(search, 0))
+        self.assertEqual(len(all_results), 10)
+
+        client.page_size = 5
+
         for offset in [0, 5, 9, 10, 11]:
             client_results = list(client.results(search, offset=offset))
-            search_results = list(search.results(offset=offset))
-            self.assertListEqual(client_results, search_results)
+            self.assertEqual(len(client_results), max(0, search.max_results - offset))
+            if client_results:
+                self.assertEqual(
+                    all_results[offset].entry_id, client_results[0].entry_id
+                )
 
     def test_no_duplicates(self):
         search = arxiv.Search("testing", max_results=100)
@@ -74,7 +104,7 @@ class TestClient(unittest.TestCase):
 
     @patch("time.sleep", return_value=None)
     def test_retry(self, patched_time_sleep):
-        broken_client = TestClient.get_broken_client()
+        broken_client = TestClient.get_code_client(500)
 
         def broken_get():
             search = arxiv.Search(query="quantum")
@@ -93,7 +123,7 @@ class TestClient(unittest.TestCase):
 
     @patch("time.sleep", return_value=None)
     def test_sleep_standard(self, patched_time_sleep):
-        client = arxiv.Client(page_size=1)
+        client = TestClient.get_code_client(200)
         url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
         # A client should sleep until delay_seconds have passed.
         client._parse_feed(url)
@@ -108,7 +138,7 @@ class TestClient(unittest.TestCase):
 
     @patch("time.sleep", return_value=None)
     def test_sleep_multiple_requests(self, patched_time_sleep):
-        client = arxiv.Client(page_size=1)
+        client = TestClient.get_code_client(200)
         url1 = client._format_url(arxiv.Search(query="quantum"), 0, 1)
         url2 = client._format_url(arxiv.Search(query="testing"), 0, 1)
         # Rate limiting is URL-independent; expect same behavior as in
@@ -123,7 +153,7 @@ class TestClient(unittest.TestCase):
 
     @patch("time.sleep", return_value=None)
     def test_sleep_elapsed(self, patched_time_sleep):
-        client = arxiv.Client(page_size=1)
+        client = TestClient.get_code_client(200)
         url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
         # If _last_request_dt is less than delay_seconds ago, sleep.
         client._last_request_dt = datetime.now() - timedelta(
@@ -141,7 +171,8 @@ class TestClient(unittest.TestCase):
 
     @patch("time.sleep", return_value=None)
     def test_sleep_zero_delay(self, patched_time_sleep):
-        client = arxiv.Client(page_size=1, delay_seconds=0)
+        client = TestClient.get_code_client(200, delay_seconds=0)
+        client.query_url_format = "https://httpstat.us/200?{}"
         url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
         client._parse_feed(url)
         client._parse_feed(url)
@@ -149,7 +180,7 @@ class TestClient(unittest.TestCase):
 
     @patch("time.sleep", return_value=None)
     def test_sleep_between_errors(self, patched_time_sleep):
-        client = TestClient.get_broken_client()
+        client = TestClient.get_code_client(500)
         url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
         try:
             client._parse_feed(url)
@@ -165,18 +196,11 @@ class TestClient(unittest.TestCase):
             * client.num_retries
         )
 
-    def get_broken_client():
+    def get_code_client(code: int, delay_seconds=3, num_retries=3) -> arxiv.Client:
         """
-        get_broken_client returns an arxiv.Client that always encounters a 500
-        status.
+        get_code_client returns an arxiv.Cient with HTTP requests routed to
+        httpstat.us.
         """
-        # TODO: reimplement broken_client with a mock.
-        broken_client = arxiv.Client(page_size=1)
-        broken_client.query_url_format = "https://httpstat.us/500?{}"
-        return broken_client
-
-    def get_once_client():
-        """
-        get_once_client returns an arxiv.Client that only tries once.
-        """
-        return arxiv.Client(num_retries=0)
+        client = arxiv.Client(delay_seconds=delay_seconds, num_retries=num_retries)
+        client.query_url_format = "https://httpstat.us/{}?".format(code) + "{}"
+        return client

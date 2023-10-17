@@ -4,8 +4,9 @@ from __future__ import annotations
 import logging
 import time
 import feedparser
-import re
 import os
+import re
+import requests
 import warnings
 
 from urllib.parse import urlencode
@@ -514,7 +515,9 @@ class Client(object):
     """Number of seconds to wait between API requests."""
     num_retries: int
     """Number of times to retry a failing API request."""
+
     _last_request_dt: datetime
+    _session: requests.Session
 
     def __init__(
         self, page_size: int = 100, delay_seconds: int = 3, num_retries: int = 3
@@ -531,6 +534,7 @@ class Client(object):
         self.delay_seconds = delay_seconds
         self.num_retries = num_retries
         self._last_request_dt = None
+        self._session = requests.Session()
 
     def __str__(self) -> str:
         # TODO: develop a more informative string representation.
@@ -579,7 +583,7 @@ class Client(object):
             page_size = min(self.page_size, search.max_results - offset)
             logger.info("Requesting %d results at offset %d", page_size, offset)
             page_url = self._format_url(search, offset, page_size)
-            feed = self._parse_feed(page_url, first_page)
+            feed = self._parse_feed(page_url, first_page=first_page)
             if first_page:
                 # NOTE: this is an ugly fix for a known bug. The totalresults
                 # value is set to 1 for results with zero entries. If that API
@@ -626,7 +630,7 @@ class Client(object):
         return self.query_url_format.format(urlencode(url_args))
 
     def _parse_feed(
-        self, url: str, first_page: bool = True
+        self, url: str, first_page: bool = True, _try_index: int = 0
     ) -> feedparser.FeedParserDict:
         """
         Fetches the specified URL and parses it with feedparser.
@@ -634,24 +638,34 @@ class Client(object):
         If a request fails or is unexpectedly empty, retries the request up to
         `self.num_retries` times.
         """
-        # Invoke the recursive helper with initial available retries.
-        return self.__try_parse_feed(
-            url, first_page=first_page, retries_left=self.num_retries
-        )
+        try:
+            return self.__try_parse_feed(
+                url, first_page=first_page, try_index=_try_index
+            )
+        except (
+            HTTPError,
+            UnexpectedEmptyPageError,
+            requests.exceptions.ConnectionError,
+        ) as err:
+            if _try_index < self.num_retries:
+                logger.debug("Got error (try %d): %s", _try_index, err)
+                return self._parse_feed(
+                    url, first_page=first_page, _try_index=_try_index + 1
+                )
+            logger.debug("Giving up (try %d): %s", _try_index, err)
+            raise err
 
     def __try_parse_feed(
         self,
         url: str,
         first_page: bool,
-        retries_left: int,
-        last_err: Exception = None,
+        try_index: int,
     ) -> feedparser.FeedParserDict:
         """
         Recursive helper for _parse_feed. Enforces `self.delay_seconds`: if that
         number of seconds has not passed since `_parse_feed` was last called,
         sleeps until delay_seconds seconds have passed.
         """
-        retry = self.num_retries - retries_left
         # If this call would violate the rate limit, sleep until it doesn't.
         if self._last_request_dt is not None:
             required = timedelta(seconds=self.delay_seconds)
@@ -660,34 +674,26 @@ class Client(object):
                 to_sleep = (required - since_last_request).total_seconds()
                 logger.info("Sleeping: %f seconds", to_sleep)
                 time.sleep(to_sleep)
+
         logger.info(
-            "Requesting page (try %d): %s",
-            retry,
-            url,
-            extra={
-                "first_page": first_page,
-                "last_err": last_err.message if last_err is not None else None,
-            },
+            "Requesting page (first: %r, try: %d): %s", first_page, try_index, url
         )
-        feed = feedparser.parse(url)
+
+        resp = self._session.get(url, headers={"user-agent": "arxiv.py/1.4.8"})
         self._last_request_dt = datetime.now()
-        err = None
-        if feed.status != 200:
-            err = HTTPError(url, retry, feed)
-        elif len(feed.entries) == 0 and not first_page:
-            err = UnexpectedEmptyPageError(url, retry)
-        if err is not None:
-            logger.debug("Got error (try %d): %s", retry, err)
-            if retries_left > 0:
-                return self.__try_parse_feed(
-                    url,
-                    first_page=first_page,
-                    retries_left=retries_left - 1,
-                    last_err=err,
-                )
-            # Feed was never returned in self.num_retries tries. Raise the last
-            # exception encountered.
-            raise err
+        if resp.status_code != requests.codes.OK:
+            raise HTTPError(url, try_index, resp.status_code)
+
+        feed = feedparser.parse(resp.content)
+        if len(feed.entries) == 0 and not first_page:
+            raise UnexpectedEmptyPageError(url, try_index, feed)
+
+        if feed.bozo:
+            logger.warning(
+                "Bozo feed; consider handling: %s",
+                feed.bozo_exception if "bozo_exception" in feed else None,
+            )
+
         return feed
 
 
@@ -727,16 +733,25 @@ class UnexpectedEmptyPageError(ArxivError):
     See `Client.results` for usage.
     """
 
-    def __init__(self, url: str, retry: int):
+    raw_feed: feedparser.FeedParserDict
+    """
+    The raw output of `feedparser.parse`. Sometimes this contains useful
+    diagnostic information, e.g. in 'bozo_exception'.
+    """
+
+    def __init__(self, url: str, retry: int, raw_feed: feedparser.FeedParserDict):
         """
         Constructs an `UnexpectedEmptyPageError` encountered for the specified
         API URL after `retry` tries.
         """
         self.url = url
+        self.raw_feed = raw_feed
         super().__init__(url, retry, "Page of results was unexpectedly empty")
 
     def __repr__(self) -> str:
-        return "{}({}, {})".format(_classname(self), repr(self.url), repr(self.retry))
+        return "{}({}, {}, {})".format(
+            _classname(self), repr(self.url), repr(self.retry), repr(self.raw_feed)
+        )
 
 
 class HTTPError(ArxivError):
@@ -748,29 +763,18 @@ class HTTPError(ArxivError):
 
     status: int
     """The HTTP status reported by feedparser."""
-    entry: feedparser.FeedParserDict
-    """The feed entry describing the error, if present."""
 
-    def __init__(self, url: str, retry: int, feed: feedparser.FeedParserDict):
+    def __init__(self, url: str, retry: int, status: int):
         """
         Constructs an `HTTPError` for the specified status code, encountered for
         the specified API URL after `retry` tries.
         """
         self.url = url
-        self.status = feed.status
-        # If the feed is valid and includes a single entry, trust it's an
-        # explanation.
-        if not feed.bozo and len(feed.entries) == 1:
-            self.entry = feed.entries[0]
-        else:
-            self.entry = None
+        self.status = status
         super().__init__(
             url,
             retry,
-            "Page request resulted in HTTP {}: {}".format(
-                self.status,
-                self.entry.summary if self.entry else None,
-            ),
+            "Page request resulted in HTTP {}".format(self.status),
         )
 
     def __repr__(self) -> str:
