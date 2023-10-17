@@ -673,7 +673,6 @@ class Client(object):
         )
         resp = requests.get(url, {"user-agent": "arxiv.py/1.4.8"})
         self._last_request_dt = datetime.now()
-        # TODO: consider loosening to 2XX.
         if resp.status_code != requests.codes.OK:
             raise HTTPError(url, try_index, resp.status_code)
 
@@ -681,8 +680,6 @@ class Client(object):
         if len(feed.entries) == 0 and not first_page:
             raise UnexpectedEmptyPageError(url, try_index, feed)
 
-        # TODO: probably handle other errros with a feed present.
-        # + Handle XML errors; usually these will result in an empty feed.
         if feed.bozo:
             logger.warning(
                 "Bozo feed; consider handling: %s",

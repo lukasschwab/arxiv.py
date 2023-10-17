@@ -186,7 +186,6 @@ class TestClient(unittest.TestCase):
         get_code_client returns an arxiv.Cient with HTTP requests routed to
         httpstat.us.
         """
-        # TODO: reimplement with a mock.
         client = arxiv.Client(delay_seconds=delay_seconds, num_retries=num_retries)
         client.query_url_format = "https://httpstat.us/{}?".format(code) + "{}"
         return client
