@@ -3,8 +3,10 @@ from __future__ import annotations
 
 import logging
 import time
+import itertools
 import feedparser
 import os
+import math
 import re
 import requests
 import warnings
@@ -422,12 +424,12 @@ class Search(object):
     Manual](https://arxiv.org/help/api/user-manual#search_query_and_id_list)
     for documentation of the interaction between `query` and `id_list`.
     """
-    max_results: float
+    max_results: int | None
     """
     The maximum number of results to be returned in an execution of this
     search.
 
-    To fetch every result available, set `max_results=float('inf')`.
+    To fetch every result available, set `max_results=None`.
     """
     sort_by: SortCriterion
     """The sort criterion for results."""
@@ -438,7 +440,7 @@ class Search(object):
         self,
         query: str = "",
         id_list: List[str] = [],
-        max_results: float = float("inf"),
+        max_results: int | None = None,
         sort_by: SortCriterion = SortCriterion.Relevance,
         sort_order: SortOrder = SortOrder.Descending,
     ):
@@ -447,7 +449,8 @@ class Search(object):
         """
         self.query = query
         self.id_list = id_list
-        self.max_results = max_results
+        # Handle deprecated v1 default behavior.
+        self.max_results = None if max_results == math.inf else max_results
         self.sort_by = sort_by
         self.sort_order = sort_order
 
@@ -479,23 +482,19 @@ class Search(object):
             "sortOrder": self.sort_order.value,
         }
 
-    def get(self) -> Generator[Result, None, None]:
-        """
-        **Deprecated** after 1.2.0; use `Search.results`.
-        """
-        warnings.warn(
-            "The 'get' method is deprecated, use 'results' instead",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.results()
-
     def results(self, offset: int = 0) -> Generator[Result, None, None]:
         """
         Executes the specified search using a default arXiv API client.
 
         For info on default behavior, see `Client.__init__` and `Client.results`.
+
+        **Deprecated** after 2.0.0; use `Client.results`.
         """
+        warnings.warn(
+            "The '(Search).results' method is deprecated, use 'Client.results' instead",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return Client().results(self, offset=offset)
 
 
@@ -511,7 +510,7 @@ class Client(object):
     """The arXiv query API endpoint format."""
     page_size: int
     """Maximum number of results fetched in a single API request."""
-    delay_seconds: int
+    delay_seconds: float
     """Number of seconds to wait between API requests."""
     num_retries: int
     """Number of times to retry a failing API request."""
@@ -520,7 +519,7 @@ class Client(object):
     _session: requests.Session
 
     def __init__(
-        self, page_size: int = 100, delay_seconds: int = 3, num_retries: int = 3
+        self, page_size: int = 100, delay_seconds: float = 3.0, num_retries: int = 3
     ):
         """
         Constructs an arXiv API client with the specified options.
@@ -548,17 +547,6 @@ class Client(object):
             repr(self.num_retries),
         )
 
-    def get(self, search: Search) -> Generator[Result, None, None]:
-        """
-        **Deprecated** after 1.2.0; use `Client.results`.
-        """
-        warnings.warn(
-            "The 'get' method is deprecated, use 'results' instead",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.results(search)
-
     def results(self, search: Search, offset: int = 0) -> Generator[Result, None, None]:
         """
         Uses this client configuration to fetch one page of the search results
@@ -574,46 +562,37 @@ class Client(object):
         For more on using generators, see
         [Generators](https://wiki.python.org/moin/Generators).
         """
+        limit = search.max_results - offset if search.max_results else None
+        if limit and limit < 0:
+            return iter(())
+        return itertools.islice(self._results(search, offset), limit)
 
-        # total_results may be reduced according to the feed's
-        # opensearch:totalResults value.
-        total_results = search.max_results
-        first_page = True
-        while offset < total_results:
-            page_size = min(self.page_size, search.max_results - offset)
-            logger.info("Requesting %d results at offset %d", page_size, offset)
-            page_url = self._format_url(search, offset, page_size)
-            feed = self._parse_feed(page_url, first_page=first_page)
-            if first_page:
-                # NOTE: this is an ugly fix for a known bug. The totalresults
-                # value is set to 1 for results with zero entries. If that API
-                # bug is fixed, we can remove this conditional and always set
-                # `total_results = min(...)`.
-                if len(feed.entries) == 0:
-                    logger.info("Got empty first page; stopping generation")
-                    total_results = 0
-                else:
-                    total_results = min(
-                        total_results, int(feed.feed.opensearch_totalresults)
-                    )
-                    logger.info(
-                        "Got first page: %d of %d total results",
-                        total_results,
-                        search.max_results
-                        if search.max_results != float("inf")
-                        else -1,
-                    )
-                # Subsequent pages are not the first page.
-                first_page = False
-            # Update offset for next request: account for received results.
-            offset += len(feed.entries)
-            # Yield query results until page is exhausted.
+    def _results(
+        self, search: Search, offset: int = 0
+    ) -> Generator[Result, None, None]:
+        page_url = self._format_url(search, offset, self.page_size)
+        feed = self._parse_feed(page_url, first_page=True)
+        if not feed.entries:
+            logger.info("Got empty first page; stopping generation")
+            return
+        total_results = int(feed.feed.opensearch_totalresults)
+        logger.info(
+            "Got first page: %d of %d total results",
+            len(feed.entries),
+            total_results,
+        )
+
+        while feed.entries:
             for entry in feed.entries:
                 try:
                     yield Result._from_feed_entry(entry)
                 except Result.MissingFieldError as e:
                     logger.warning("Skipping partial result: %s", e)
-                    continue
+            offset += len(feed.entries)
+            if offset >= total_results:
+                break
+            page_url = self._format_url(search, offset, self.page_size)
+            feed = self._parse_feed(page_url, first_page=False)
 
     def _format_url(self, search: Search, start: int, page_size: int) -> str:
         """
@@ -679,7 +658,7 @@ class Client(object):
             "Requesting page (first: %r, try: %d): %s", first_page, try_index, url
         )
 
-        resp = self._session.get(url, headers={"user-agent": "arxiv.py/1.4.8"})
+        resp = self._session.get(url, headers={"user-agent": "arxiv.py/2.0.0"})
         self._last_request_dt = datetime.now()
         if resp.status_code != requests.codes.OK:
             raise HTTPError(url, try_index, resp.status_code)
