@@ -565,9 +565,9 @@ class Client(object):
         limit = search.max_results - offset if search.max_results else None
         if limit and limit < 0:
             return iter(())
-        return itertools.islice(self.__results(search, offset), limit)
+        return itertools.islice(self._results(search, offset), limit)
 
-    def __results(
+    def _results(
         self, search: Search, offset: int = 0
     ) -> Generator[Result, None, None]:
         page_url = self._format_url(search, offset, self.page_size)
