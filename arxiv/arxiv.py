@@ -482,23 +482,19 @@ class Search(object):
             "sortOrder": self.sort_order.value,
         }
 
-    def get(self) -> Generator[Result, None, None]:
-        """
-        **Deprecated** after 1.2.0; use `Search.results`.
-        """
-        warnings.warn(
-            "The 'get' method is deprecated, use 'results' instead",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.results()
-
     def results(self, offset: int = 0) -> Generator[Result, None, None]:
         """
         Executes the specified search using a default arXiv API client.
 
         For info on default behavior, see `Client.__init__` and `Client.results`.
+
+        **Deprecated** after 2.0.0; use `Client.results`.
         """
+        warnings.warn(
+            "The '(Search).results' method is deprecated, use 'Client.results' instead",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return Client().results(self, offset=offset)
 
 
@@ -550,17 +546,6 @@ class Client(object):
             repr(self.delay_seconds),
             repr(self.num_retries),
         )
-
-    def get(self, search: Search) -> Generator[Result, None, None]:
-        """
-        **Deprecated** after 1.2.0; use `Client.results`.
-        """
-        warnings.warn(
-            "The 'get' method is deprecated, use 'results' instead",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.results(search)
 
     def results(self, search: Search, offset: int = 0) -> Generator[Result, None, None]:
         """

@@ -6,6 +6,8 @@ from datetime import datetime, timezone
 
 
 class TestResult(unittest.TestCase):
+    client = arxiv.Client()
+
     def tearDown(self) -> None:
         # Bodge: sleep three seconds between tests to simulate a shared rate limit.
         time.sleep(3)
@@ -41,13 +43,13 @@ class TestResult(unittest.TestCase):
     def test_result_shape(self):
         max_results = 100
         search = arxiv.Search("testing", max_results=max_results)
-        results = [r for r in search.results()]
+        results = [r for r in self.client.results(search)]
         self.assertEqual(len(results), max_results)
         for result in results:
             self.assert_valid_result(result)
 
     def test_from_feed_entry(self):
-        feed = arxiv.Client()._parse_feed(
+        feed = self.client._parse_feed(
             "https://export.arxiv.org/api/query?search_query=testing"
         )
         feed_entry = feed.entries[0]
@@ -56,7 +58,7 @@ class TestResult(unittest.TestCase):
 
     def test_get_short_id(self):
         result_id = "1707.08567"
-        result = next(arxiv.Search(id_list=[result_id]).results())
+        result = next(self.client.results(arxiv.Search(id_list=[result_id])))
         got = result.get_short_id()
         self.assertTrue(got.startswith(result_id))
         # Should be of form `1707.08567v1`.
@@ -104,5 +106,5 @@ class TestResult(unittest.TestCase):
 
     def test_legacy_ids(self):
         full_legacy_id = "quant-ph/0201082v1"
-        result = next(arxiv.Search(id_list=[full_legacy_id]).results())
+        result = next(self.client.results(arxiv.Search(id_list=[full_legacy_id])))
         self.assertEqual(result.get_short_id(), full_legacy_id)
