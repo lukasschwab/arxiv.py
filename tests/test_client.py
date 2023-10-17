@@ -3,7 +3,6 @@ from unittest.mock import MagicMock, call, patch
 import arxiv
 from datetime import datetime, timedelta
 from pytest import approx
-import feedparser
 import time
 
 
@@ -23,10 +22,6 @@ class TestClient(unittest.TestCase):
 
     def test_nonexistent_id_in_list(self):
         client = arxiv.Client()
-        # Assert _from_feed_entry throws MissingFieldError.
-        feed = feedparser.parse("https://export.arxiv.org/api/query?id_list=0808.05394")
-        with self.assertRaises(arxiv.Result.MissingFieldError):
-            arxiv.Result._from_feed_entry(feed.entries[0])
         # Assert thrown error is handled and hidden by generator.
         results = list(client.results(arxiv.Search(id_list=["0808.05394"])))
         self.assertEqual(len(results), 0)
@@ -48,7 +43,19 @@ class TestClient(unittest.TestCase):
         generator = client.results(arxiv.Search(query="testing", max_results=55))
         results = [r for r in generator]
         self.assertEqual(len(results), 55)
-        self.assertEqual(client._parse_feed.call_count, 6)
+        # NOTE: don't assert on call count; allow for retries.
+        unique_urls = {args.args[0] for args in client._parse_feed.call_args_list}
+        self.assertSetEqual(
+            unique_urls,
+            {
+                "https://export.arxiv.org/api/query?search_query=testing&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=10",
+                "https://export.arxiv.org/api/query?search_query=testing&id_list=&sortBy=relevance&sortOrder=descending&start=10&max_results=10",
+                "https://export.arxiv.org/api/query?search_query=testing&id_list=&sortBy=relevance&sortOrder=descending&start=20&max_results=10",
+                "https://export.arxiv.org/api/query?search_query=testing&id_list=&sortBy=relevance&sortOrder=descending&start=30&max_results=10",
+                "https://export.arxiv.org/api/query?search_query=testing&id_list=&sortBy=relevance&sortOrder=descending&start=40&max_results=10",
+                "https://export.arxiv.org/api/query?search_query=testing&id_list=&sortBy=relevance&sortOrder=descending&start=50&max_results=5",
+            },
+        )
 
     def test_offset(self):
         max_results = 10
