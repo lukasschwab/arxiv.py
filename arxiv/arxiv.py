@@ -679,7 +679,7 @@ class Client(object):
             "Requesting page (first: %r, try: %d): %s", first_page, try_index, url
         )
 
-        resp = self._session.get(url, headers={"user-agent": "arxiv.py/1.4.8"})
+        resp = self._session.get(url, headers={"user-agent": "arxiv.py/2.0.0"})
         self._last_request_dt = datetime.now()
         if resp.status_code != requests.codes.OK:
             raise HTTPError(url, try_index, resp.status_code)
