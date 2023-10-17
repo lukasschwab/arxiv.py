@@ -5,7 +5,7 @@ import arxiv
 import unittest
 
 
-class TestClient(unittest.TestCase):
+class TestAPIBugs(unittest.TestCase):
     def test_missing_title(self):
         """
         Papers with the title "0" do not have a title element in the Atom feed.

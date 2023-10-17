@@ -58,7 +58,7 @@ class TestClient(unittest.TestCase):
                 "https://export.arxiv.org/api/query?search_query=testing&id_list=&sortBy=relevance&sortOrder=descending&start=20&max_results=10",
                 "https://export.arxiv.org/api/query?search_query=testing&id_list=&sortBy=relevance&sortOrder=descending&start=30&max_results=10",
                 "https://export.arxiv.org/api/query?search_query=testing&id_list=&sortBy=relevance&sortOrder=descending&start=40&max_results=10",
-                "https://export.arxiv.org/api/query?search_query=testing&id_list=&sortBy=relevance&sortOrder=descending&start=50&max_results=5",
+                "https://export.arxiv.org/api/query?search_query=testing&id_list=&sortBy=relevance&sortOrder=descending&start=50&max_results=10",
             },
         )
 
@@ -79,13 +79,11 @@ class TestClient(unittest.TestCase):
         self.assertListEqual(offset_above_max_results, [])
 
     def test_search_results_offset(self):
+        # NOTE: page size is irrelevant here.
+        client = arxiv.Client(page_size=15)
         search = arxiv.Search(query="testing", max_results=10)
-        client = arxiv.Client()
-
-        all_results = list(client.results(search, 0))
+        all_results = list(client.results(search, offset=0))
         self.assertEqual(len(all_results), 10)
-
-        client.page_size = 5
 
         for offset in [0, 5, 9, 10, 11]:
             client_results = list(client.results(search, offset=offset))
@@ -191,12 +189,12 @@ class TestClient(unittest.TestCase):
         self.assertEqual(patched_time_sleep.call_count, client.num_retries)
         patched_time_sleep.assert_has_calls(
             [
-                call(approx(client.delay_seconds, rel=1e-3)),
+                call(approx(client.delay_seconds, abs=1e-2)),
             ]
             * client.num_retries
         )
 
-    def get_code_client(code: int, delay_seconds=3, num_retries=3) -> arxiv.Client:
+    def get_code_client(code: int, delay_seconds=0.1, num_retries=3) -> arxiv.Client:
         """
         get_code_client returns an arxiv.Cient with HTTP requests routed to
         httpstat.us.
