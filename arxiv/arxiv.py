@@ -580,7 +580,7 @@ class Client(object):
             page_size = min(self.page_size, search.max_results - offset)
             logger.info("Requesting %d results at offset %d", page_size, offset)
             page_url = self._format_url(search, offset, page_size)
-            feed = self._parse_feed(page_url, self.num_retries, first_page)
+            feed = self._parse_feed(page_url, first_page=first_page)
             if first_page:
                 # NOTE: this is an ugly fix for a known bug. The totalresults
                 # value is set to 1 for results with zero entries. If that API
@@ -627,7 +627,7 @@ class Client(object):
         return self.query_url_format.format(urlencode(url_args))
 
     def _parse_feed(
-        self, url: str, first_page: bool = True, retries_left: int | None = None
+        self, url: str, first_page: bool = True, _try_index: int = 0
     ) -> feedparser.FeedParserDict:
         """
         Fetches the specified URL and parses it with feedparser.
@@ -635,20 +635,17 @@ class Client(object):
         If a request fails or is unexpectedly empty, retries the request up to
         `self.num_retries` times.
         """
-        retries_left = retries_left if retries_left is not None else self.num_retries
-        print(retries_left)
-        try_index = self.num_retries - retries_left
         try:
             return self.__try_parse_feed(
-                url, first_page=first_page, try_index=try_index
+                url, first_page=first_page, try_index=_try_index
             )
         except (HTTPError, UnexpectedEmptyPageError) as err:
-            if retries_left > 0:
-                logger.debug("Got error (try %d): %s", try_index, err)
+            if _try_index < self.num_retries:
+                logger.debug("Got error (try %d): %s", _try_index, err)
                 return self._parse_feed(
-                    url, first_page=first_page, retries_left=retries_left - 1
+                    url, first_page=first_page, _try_index=_try_index + 1
                 )
-            logger.debug("Giving up (try %d): %s", try_index, err)
+            logger.debug("Giving up (try %d): %s", _try_index, err)
             raise err
 
     def __try_parse_feed(
