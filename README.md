@@ -36,7 +36,7 @@ A `Search` specifies a search of arXiv's database.
 arxiv.Search(
   query: str = "",
   id_list: List[str] = [],
-  max_results: float = float('inf'),
+  max_results: int | None = None,
   sort_by: SortCriterion = SortCriterion.Relevance,
   sort_order: SortOrder = SortOrder.Descending
 )
@@ -44,7 +44,7 @@ arxiv.Search(
 
 + `query`: an arXiv query string. Advanced query formats are documented in the [arXiv API User Manual](https://arxiv.org/help/api/user-manual#query_details).
 + `id_list`: list of arXiv record IDs (typically of the format `"0710.5765v1"`). See [the arXiv API User's Manual](https://arxiv.org/help/api/user-manual#search_query_and_id_list) for documentation of the interaction between `query` and `id_list`.
-+ `max_results`: The maximum number of results to be returned in an execution of this search. To fetch every result available, set `max_results=float('inf')` (default); to fetch up to 10 results, set `max_results=10`. The API's limit is 300,000 results.
++ `max_results`: The maximum number of results to be returned in an execution of this search. To fetch every result available, set `max_results=None` (default); to fetch up to 10 results, set `max_results=10`. The API's limit is 300,000 results.
 + `sort_by`: The sort criterion for results: `relevance`, `lastUpdatedDate`, or `submittedDate`.
 + `sort_order`: The sort order for results: `'descending'` or `'ascending'`.
 
@@ -140,7 +140,7 @@ For most use cases the default client should suffice. You can construct it expli
 ```python
 arxiv.Client(
   page_size: int = 100,
-  delay_seconds: int = 3,
+  delay_seconds: float = 3.0,
   num_retries: int = 3
 )
 ```
@@ -158,7 +158,7 @@ import arxiv
 
 big_slow_client = arxiv.Client(
   page_size = 1000,
-  delay_seconds = 10,
+  delay_seconds = 10.0,
   num_retries = 5
 )
 
