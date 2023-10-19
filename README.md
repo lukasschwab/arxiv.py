@@ -106,7 +106,7 @@ for result in big_slow_client.results(arxiv.Search(query="quantum")):
 
 #### Logging
 
-To inspect this package's network behavior and API logic, configure an `DEBUG`-level logger.
+To inspect this package's network behavior and API logic, configure a `DEBUG`-level logger.
 
 ```pycon
 >>> import logging, arxiv
