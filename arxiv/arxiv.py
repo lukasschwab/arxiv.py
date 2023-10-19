@@ -7,4 +7,4 @@ Use `import arxiv`.
 from .__init__ import *  # noqa: F403
 import warnings
 
-warnings.warn("**Deprecated** after 2.0.0; use `import arxiv` instead.")
+warnings.warn("**Deprecated** after 2.0.0; use 'import arxiv' instead.")
