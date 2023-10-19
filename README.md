@@ -5,13 +5,6 @@ Python wrapper for [the arXiv API](https://arxiv.org/help/api/index).
 
 [arXiv](https://arxiv.org/) is a project by the Cornell University Library that provides open access to 1,000,000+ articles in Physics, Mathematics, Computer Science, Quantitative Biology, Quantitative Finance, and Statistics.
 
-## Quick links
-
-+ [Full package documentation](https://lukasschwab.me/arxiv.py/index.html)
-+ [Example: fetching results](#fetching-results): the most common usage.
-+ [Example: downloading papers](#downloading-papers)
-+ [Example: fetching results with a custom client](#fetching-results-with-a-custom-client)
-
 ## Usage
 
 ### Installation
