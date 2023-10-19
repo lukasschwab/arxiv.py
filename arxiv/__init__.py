@@ -427,9 +427,9 @@ class Search(object):
     max_results: int | None
     """
     The maximum number of results to be returned in an execution of this
-    search.
+    search. To fetch every result available, set `max_results=None`.
 
-    To fetch every result available, set `max_results=None`.
+    The API's limit is 300,000 results per query.
     """
     sort_by: SortCriterion
     """The sort criterion for results."""
@@ -484,14 +484,13 @@ class Search(object):
 
     def results(self, offset: int = 0) -> Generator[Result, None, None]:
         """
-        Executes the specified search using a default arXiv API client.
-
-        For info on default behavior, see `Client.__init__` and `Client.results`.
+        Executes the specified search using a default arXiv API client. For info
+        on default behavior, see `Client.__init__` and `Client.results`.
 
         **Deprecated** after 2.0.0; use `Client.results`.
         """
         warnings.warn(
-            "The '(Search).results' method is deprecated, use 'Client.results' instead",
+            "The 'Search.results' method is deprecated, use 'Client.results' instead",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -507,13 +506,27 @@ class Client(object):
     """
 
     query_url_format = "https://export.arxiv.org/api/query?{}"
-    """The arXiv query API endpoint format."""
+    """
+    The arXiv query API endpoint format.
+    """
     page_size: int
-    """Maximum number of results fetched in a single API request."""
+    """
+    Maximum number of results fetched in a single API request. Smaller pages can
+    be retrieved faster, but may require more round-trips.
+
+    The API's limit is 2000 results per page.
+    """
     delay_seconds: float
-    """Number of seconds to wait between API requests."""
+    """
+    Number of seconds to wait between API requests.
+
+    [arXiv's Terms of Use](https://arxiv.org/help/api/tou) ask that you "make no
+    more than one request every three seconds."
+    """
     num_retries: int
-    """Number of times to retry a failing API request."""
+    """
+    Number of times to retry a failing API request before raising an Exception.
+    """
 
     _last_request_dt: datetime
     _session: requests.Session
