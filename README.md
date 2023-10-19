@@ -67,6 +67,16 @@ for result in arxiv.Client().results(search):
   print(result.title)
 ```
 
+Use the `query` syntax documented in the [arXiv API User Manual](https://arxiv.org/help/api/user-manual#query_details):
+
+```python
+import arxiv
+
+search = arxiv.Search(query = "au:del_maestro AND ti:checkerboard")
+first_result = next(arxiv.Client().results(search))
+print(first_result)
+```
+
 Fetch and print the title of the paper with ID "1605.08386v1:"
 
 ```python
