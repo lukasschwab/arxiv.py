@@ -9,9 +9,7 @@ class TestDownload(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.fetched_result = next(arxiv.Search(id_list=["1605.08386"]).results())
-        self.fetched_result_with_slash = next(
-            arxiv.Search(id_list=["hep-ex/0406020v1"]).results()
-        )
+        self.fetched_result_with_slash = next(arxiv.Search(id_list=["hep-ex/0406020v1"]).results())
 
     @classmethod
     def setUp(self):

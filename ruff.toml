@@ -1,4 +1,4 @@
-ignore = []
+ignore = ["E501", "W191"]
 select = [
     "E",
     "F",

@@ -17,9 +17,7 @@ class TestPackage(unittest.TestCase):
         import arxiv as nondeprecated
 
         expected = TestPackage.get_public_classes(nondeprecated)
-        self.assertTrue(
-            expected, "should export non-empty set of classes; check the helper"
-        )
+        self.assertTrue(expected, "should export non-empty set of classes; check the helper")
 
         from arxiv import arxiv as deprecated_from
 

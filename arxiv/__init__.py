@@ -124,9 +124,7 @@ class Result(object):
         if hasattr(entry, "title"):
             title = entry.title
         else:
-            logger.warning(
-                "Result %s is missing title attribute; defaulting to '0'", entry.id
-            )
+            logger.warning("Result %s is missing title attribute; defaulting to '0'", entry.id)
         return Result(
             entry_id=entry.id,
             updated=Result._to_datetime(entry.updated_parsed),
@@ -459,9 +457,7 @@ class Search(object):
         return repr(self)
 
     def __repr__(self) -> str:
-        return (
-            "{}(query={}, id_list={}, max_results={}, sort_by={}, " "sort_order={})"
-        ).format(
+        return ("{}(query={}, id_list={}, max_results={}, sort_by={}, " "sort_order={})").format(
             _classname(self),
             repr(self.query),
             repr(self.id_list),
@@ -531,9 +527,7 @@ class Client(object):
     _last_request_dt: datetime
     _session: requests.Session
 
-    def __init__(
-        self, page_size: int = 100, delay_seconds: float = 3.0, num_retries: int = 3
-    ):
+    def __init__(self, page_size: int = 100, delay_seconds: float = 3.0, num_retries: int = 3):
         """
         Constructs an arXiv API client with the specified options.
 
@@ -580,9 +574,7 @@ class Client(object):
             return iter(())
         return itertools.islice(self._results(search, offset), limit)
 
-    def _results(
-        self, search: Search, offset: int = 0
-    ) -> Generator[Result, None, None]:
+    def _results(self, search: Search, offset: int = 0) -> Generator[Result, None, None]:
         page_url = self._format_url(search, offset, self.page_size)
         feed = self._parse_feed(page_url, first_page=True)
         if not feed.entries:
@@ -631,9 +623,7 @@ class Client(object):
         `self.num_retries` times.
         """
         try:
-            return self.__try_parse_feed(
-                url, first_page=first_page, try_index=_try_index
-            )
+            return self.__try_parse_feed(url, first_page=first_page, try_index=_try_index)
         except (
             HTTPError,
             UnexpectedEmptyPageError,
@@ -641,9 +631,7 @@ class Client(object):
         ) as err:
             if _try_index < self.num_retries:
                 logger.debug("Got error (try %d): %s", _try_index, err)
-                return self._parse_feed(
-                    url, first_page=first_page, _try_index=_try_index + 1
-                )
+                return self._parse_feed(url, first_page=first_page, _try_index=_try_index + 1)
             logger.debug("Giving up (try %d): %s", _try_index, err)
             raise err
 
@@ -667,9 +655,7 @@ class Client(object):
                 logger.info("Sleeping: %f seconds", to_sleep)
                 time.sleep(to_sleep)
 
-        logger.info(
-            "Requesting page (first: %r, try: %d): %s", first_page, try_index, url
-        )
+        logger.info("Requesting page (first: %r, try: %d): %s", first_page, try_index, url)
 
         resp = self._session.get(url, headers={"user-agent": "arxiv.py/2.1.0"})
         self._last_request_dt = datetime.now()

@@ -20,9 +20,7 @@ class TestClient(unittest.TestCase):
         results = list(client.results(arxiv.Search(id_list=["0808.05394"])))
         self.assertEqual(len(results), 0)
         # Generator should still yield valid entries.
-        results = list(
-            client.results(arxiv.Search(id_list=["0808.05394", "1707.08567"]))
-        )
+        results = list(client.results(arxiv.Search(id_list=["0808.05394", "1707.08567"])))
         self.assertEqual(len(results), 1)
 
     def test_max_results(self):
@@ -83,9 +81,7 @@ class TestClient(unittest.TestCase):
             client_results = list(client.results(search, offset=offset))
             self.assertEqual(len(client_results), max(0, search.max_results - offset))
             if client_results:
-                self.assertEqual(
-                    all_results[offset].entry_id, client_results[0].entry_id
-                )
+                self.assertEqual(all_results[offset].entry_id, client_results[0].entry_id)
 
     def test_no_duplicates(self):
         search = arxiv.Search("testing", max_results=100)
@@ -124,9 +120,7 @@ class TestClient(unittest.TestCase):
         # environments will have different page fetch times.
         client._last_request_dt = datetime.now()
         client._parse_feed(url)
-        patched_time_sleep.assert_called_once_with(
-            approx(client.delay_seconds, rel=1e-3)
-        )
+        patched_time_sleep.assert_called_once_with(approx(client.delay_seconds, rel=1e-3))
 
     @patch("time.sleep", return_value=None)
     def test_sleep_multiple_requests(self, patched_time_sleep):
@@ -139,25 +133,19 @@ class TestClient(unittest.TestCase):
         patched_time_sleep.assert_not_called()
         client._last_request_dt = datetime.now()
         client._parse_feed(url2)
-        patched_time_sleep.assert_called_once_with(
-            approx(client.delay_seconds, rel=1e-3)
-        )
+        patched_time_sleep.assert_called_once_with(approx(client.delay_seconds, rel=1e-3))
 
     @patch("time.sleep", return_value=None)
     def test_sleep_elapsed(self, patched_time_sleep):
         client = TestClient.get_code_client(200)
         url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
         # If _last_request_dt is less than delay_seconds ago, sleep.
-        client._last_request_dt = datetime.now() - timedelta(
-            seconds=client.delay_seconds - 1
-        )
+        client._last_request_dt = datetime.now() - timedelta(seconds=client.delay_seconds - 1)
         client._parse_feed(url)
         patched_time_sleep.assert_called_once()
         patched_time_sleep.reset_mock()
         # If _last_request_dt is at least delay_seconds ago, don't sleep.
-        client._last_request_dt = datetime.now() - timedelta(
-            seconds=client.delay_seconds
-        )
+        client._last_request_dt = datetime.now() - timedelta(seconds=client.delay_seconds)
         client._parse_feed(url)
         patched_time_sleep.assert_not_called()
 
