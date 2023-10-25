@@ -3,6 +3,6 @@ requests==2.31.0
 
 # Development dependencies
 pytest>=6.2.2
-ruff>=0.0.261
+ruff>=0.1.2
 pdoc==13.1.0
 pip-audit>=1.1.2
