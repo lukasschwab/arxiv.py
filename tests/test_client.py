@@ -194,5 +194,5 @@ class TestClient(unittest.TestCase):
         httpstat.us.
         """
         client = arxiv.Client(delay_seconds=delay_seconds, num_retries=num_retries)
-        client.query_url_format = "https://httpstat.us/{}?".format(code) + "{}"
+        client.query_url_format = "https://teapot.fly.dev/{}?".format(code) + "{}"
         return client
