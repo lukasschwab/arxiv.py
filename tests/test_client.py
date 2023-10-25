@@ -163,8 +163,7 @@ class TestClient(unittest.TestCase):
 
     @patch("time.sleep", return_value=None)
     def test_sleep_zero_delay(self, patched_time_sleep):
-        client = TestClient.get_code_client(200, delay_seconds=0)
-        client.query_url_format = "https://httpstat.us/200?{}"
+        client = TestClient.get_code_client(code=200, delay_seconds=0)
         url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
         client._parse_feed(url)
         client._parse_feed(url)
