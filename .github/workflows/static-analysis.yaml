@@ -11,11 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Check format with black
-      uses: psf/black@stable
-      with:
-        options: "--check --verbose"
-        src: "."
+    - name: Check format with ruff
+      uses: chartboost/ruff-action@v1
   lint:
     runs-on: ubuntu-latest
     steps:
