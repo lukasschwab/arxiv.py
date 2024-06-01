@@ -1,5 +1,5 @@
 feedparser==6.0.10
-requests==2.31.0
+requests==2.32.0
 
 # Development dependencies
 pytest>=6.2.2
