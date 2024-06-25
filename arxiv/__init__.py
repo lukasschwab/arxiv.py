@@ -17,7 +17,7 @@ from datetime import datetime, timedelta, timezone
 from calendar import timegm
 
 from enum import Enum
-from typing import Dict, Generator, List
+from typing import Dict, Generator, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -44,12 +44,12 @@ class Result(object):
     """The result's authors."""
     summary: str
     """The result abstract."""
-    comment: str
-    """The authors' comment if present."""
-    journal_ref: str
-    """A journal reference if present."""
-    doi: str
-    """A URL for the resolved DOI to an external resource if present."""
+    comment: Optional[str]
+    """The authors' comment."""
+    journal_ref: Optional[str]
+    """A journal reference."""
+    doi: Optional[str]
+    """A URL for the resolved DOI to an external resource."""
     primary_category: str
     """
     The result's primary arXiv category. See [arXiv: Category
@@ -62,7 +62,7 @@ class Result(object):
     """
     links: List[Link]
     """Up to three URLs associated with this result."""
-    pdf_url: str
+    pdf_url: Optional[str]
     """The URL of a PDF version of this result if present among links."""
     _raw: feedparser.FeedParserDict
     """
@@ -294,7 +294,7 @@ class Result(object):
 
         href: str
         """The link's `href` attribute."""
-        title: str
+        title: Optional[str]
         """The link's title."""
         rel: str
         """The link's relationship to the `Result`."""
