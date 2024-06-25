@@ -45,11 +45,11 @@ class Result(object):
     summary: str
     """The result abstract."""
     comment: Optional[str]
-    """The authors' comment."""
+    """The authors' comment if present."""
     journal_ref: Optional[str]
-    """A journal reference."""
+    """A journal reference if present."""
     doi: Optional[str]
-    """A URL for the resolved DOI to an external resource."""
+    """A URL for the resolved DOI to an external resource if present."""
     primary_category: str
     """
     The result's primary arXiv category. See [arXiv: Category
