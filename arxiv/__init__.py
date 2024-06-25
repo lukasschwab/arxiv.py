@@ -17,7 +17,7 @@ from datetime import datetime, timedelta, timezone
 from calendar import timegm
 
 from enum import Enum
-from typing import Dict, Generator, List
+from typing import Dict, Generator, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -44,11 +44,11 @@ class Result(object):
     """The result's authors."""
     summary: str
     """The result abstract."""
-    comment: str
+    comment: Optional[str]
     """The authors' comment if present."""
-    journal_ref: str
+    journal_ref: Optional[str]
     """A journal reference if present."""
-    doi: str
+    doi: Optional[str]
     """A URL for the resolved DOI to an external resource if present."""
     primary_category: str
     """
@@ -62,7 +62,7 @@ class Result(object):
     """
     links: List[Link]
     """Up to three URLs associated with this result."""
-    pdf_url: str
+    pdf_url: Optional[str]
     """The URL of a PDF version of this result if present among links."""
     _raw: feedparser.FeedParserDict
     """
@@ -294,7 +294,7 @@ class Result(object):
 
         href: str
         """The link's `href` attribute."""
-        title: str
+        title: Optional[str]
         """The link's title."""
         rel: str
         """The link's relationship to the `Result`."""
@@ -657,7 +657,7 @@ class Client(object):
 
         logger.info("Requesting page (first: %r, try: %d): %s", first_page, try_index, url)
 
-        resp = self._session.get(url, headers={"user-agent": "arxiv.py/2.1.2"})
+        resp = self._session.get(url, headers={"user-agent": "arxiv.py/2.1.3"})
         self._last_request_dt = datetime.now()
         if resp.status_code != requests.codes.OK:
             raise HTTPError(url, try_index, resp.status_code)
