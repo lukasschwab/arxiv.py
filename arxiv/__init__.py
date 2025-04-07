@@ -209,7 +209,8 @@ class Result(object):
         if not filename:
             filename = self._get_default_filename()
         path = os.path.join(dirpath, filename)
-        written_path, _ = urlretrieve(self.pdf_url, path)
+        src_url = self.pdf_url.replace("://arxiv.org/", "://export.arxiv.org/") # as per https://info.arxiv.org/help/bulk_data.html#play-nice
+        written_path, _ = urlretrieve(src_url, path)
         return written_path
 
     def download_source(self, dirpath: str = "./", filename: str = "") -> str:
@@ -222,9 +223,9 @@ class Result(object):
         if not filename:
             filename = self._get_default_filename("tar.gz")
         path = os.path.join(dirpath, filename)
-        # Bodge: construct the source URL from the PDF URL.
-        source_url = self.pdf_url.replace("/pdf/", "/src/")
-        written_path, _ = urlretrieve(source_url, path)
+        src_url = self.pdf_url.replace("://arxiv.org/", "://export.arxiv.org/") # as per https://info.arxiv.org/help/bulk_data.html#play-nice
+        src_url = src_url.replace("/pdf/", "/src/") # Bodge: construct the source URL from the PDF URL.
+        written_path, _ = urlretrieve(src_url, path)
         return written_path
 
     def _get_pdf_url(links: List[Link]) -> str:
