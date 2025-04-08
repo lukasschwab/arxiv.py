@@ -479,7 +479,7 @@ class Search(object):
         return repr(self)
 
     def __repr__(self) -> str:
-        return ("{}(query={}, id_list={}, max_results={}, sort_by={}, " "sort_order={})").format(
+        return ("{}(query={}, id_list={}, max_results={}, sort_by={}, sort_order={})").format(
             _classname(self),
             repr(self.query),
             repr(self.id_list),
