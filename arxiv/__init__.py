@@ -1,4 +1,5 @@
 """.. include:: ../README.md"""
+
 from __future__ import annotations
 
 import logging
@@ -11,7 +12,7 @@ import re
 import requests
 import warnings
 
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse
 from urllib.request import urlretrieve
 from datetime import datetime, timedelta, timezone
 from calendar import timegm
@@ -200,7 +201,12 @@ class Result(object):
             ]
         )
 
-    def download_pdf(self, dirpath: str = "./", filename: str = "") -> str:
+    def download_pdf(
+        self,
+        dirpath: str = "./",
+        filename: str = "",
+        download_domain: str = "export.arxiv.org",
+    ) -> str:
         """
         Downloads the PDF for this result to the specified directory.
 
@@ -209,11 +215,16 @@ class Result(object):
         if not filename:
             filename = self._get_default_filename()
         path = os.path.join(dirpath, filename)
-        src_url = self.pdf_url.replace("://arxiv.org/", "://export.arxiv.org/") # as per https://info.arxiv.org/help/bulk_data.html#play-nice
-        written_path, _ = urlretrieve(src_url, path)
+        pdf_url = Result._substitute_domain(self.pdf_url, download_domain)
+        written_path, _ = urlretrieve(pdf_url, path)
         return written_path
 
-    def download_source(self, dirpath: str = "./", filename: str = "") -> str:
+    def download_source(
+        self,
+        dirpath: str = "./",
+        filename: str = "",
+        download_domain: str = "export.arxiv.org",
+    ) -> str:
         """
         Downloads the source tarfile for this result to the specified
         directory.
@@ -223,8 +234,9 @@ class Result(object):
         if not filename:
             filename = self._get_default_filename("tar.gz")
         path = os.path.join(dirpath, filename)
-        src_url = self.pdf_url.replace("://arxiv.org/", "://export.arxiv.org/") # as per https://info.arxiv.org/help/bulk_data.html#play-nice
-        src_url = src_url.replace("/pdf/", "/src/") # Bodge: construct the source URL from the PDF URL.
+        pdf_url = Result._substitute_domain(self.pdf_url, download_domain)
+        # Bodge: construct the source URL from the PDF URL.
+        src_url = pdf_url.replace("/pdf/", "/src/")
         written_path, _ = urlretrieve(src_url, path)
         return written_path
 
@@ -250,6 +262,15 @@ class Result(object):
         available](https://github.com/kurtmckee/feedparser/issues/212).
         """
         return datetime.fromtimestamp(timegm(ts), tz=timezone.utc)
+
+    def _substitute_domain(url: str, domain: str) -> str:
+        """
+        Replaces the domain of the given URL with the specified domain.
+
+        This is useful for testing purposes.
+        """
+        parsed_url = urlparse(url)
+        return parsed_url._replace(netloc=domain).geturl()
 
     class Author(object):
         """
