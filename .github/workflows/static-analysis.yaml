@@ -7,22 +7,16 @@ on:
   workflow_dispatch:
 
 jobs:
-  format:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Check format with ruff
-      uses: chartboost/ruff-action@v1
-      with:
-        args: --verbose
   lint:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - name: Set up flake8 annotations
       uses: rbialon/flake8-annotations@v1
-    - name: Lint with ruff
-      uses: chartboost/ruff-action@v1
+    - name: Set up ruff
+      uses: astral-sh/ruff-action@v3
+    - run: make lint
+    - run: make format
   audit:
     runs-on: ubuntu-latest
     steps:

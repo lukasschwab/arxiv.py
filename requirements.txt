@@ -1,8 +1,8 @@
-feedparser==6.0.10
-requests==2.31.0
+feedparser~=6.0.10
+requests~=2.32.0
 
 # Development dependencies
 pytest>=6.2.2
 ruff>=0.1.2
-pdoc==13.1.0
+pdoc==14.5.1
 pip-audit>=1.1.2

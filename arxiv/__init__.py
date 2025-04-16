@@ -1,4 +1,5 @@
 """.. include:: ../README.md"""
+
 from __future__ import annotations
 
 import logging
@@ -11,13 +12,13 @@ import re
 import requests
 import warnings
 
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse
 from urllib.request import urlretrieve
 from datetime import datetime, timedelta, timezone
 from calendar import timegm
 
 from enum import Enum
-from typing import Dict, Generator, List
+from typing import Dict, Generator, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -44,11 +45,11 @@ class Result(object):
     """The result's authors."""
     summary: str
     """The result abstract."""
-    comment: str
+    comment: Optional[str]
     """The authors' comment if present."""
-    journal_ref: str
+    journal_ref: Optional[str]
     """A journal reference if present."""
-    doi: str
+    doi: Optional[str]
     """A URL for the resolved DOI to an external resource if present."""
     primary_category: str
     """
@@ -62,7 +63,7 @@ class Result(object):
     """
     links: List[Link]
     """Up to three URLs associated with this result."""
-    pdf_url: str
+    pdf_url: Optional[str]
     """The URL of a PDF version of this result if present among links."""
     _raw: feedparser.FeedParserDict
     """
@@ -200,7 +201,12 @@ class Result(object):
             ]
         )
 
-    def download_pdf(self, dirpath: str = "./", filename: str = "") -> str:
+    def download_pdf(
+        self,
+        dirpath: str = "./",
+        filename: str = "",
+        download_domain: str = "export.arxiv.org",
+    ) -> str:
         """
         Downloads the PDF for this result to the specified directory.
 
@@ -209,10 +215,16 @@ class Result(object):
         if not filename:
             filename = self._get_default_filename()
         path = os.path.join(dirpath, filename)
-        written_path, _ = urlretrieve(self.pdf_url, path)
+        pdf_url = Result._substitute_domain(self.pdf_url, download_domain)
+        written_path, _ = urlretrieve(pdf_url, path)
         return written_path
 
-    def download_source(self, dirpath: str = "./", filename: str = "") -> str:
+    def download_source(
+        self,
+        dirpath: str = "./",
+        filename: str = "",
+        download_domain: str = "export.arxiv.org",
+    ) -> str:
         """
         Downloads the source tarfile for this result to the specified
         directory.
@@ -222,9 +234,10 @@ class Result(object):
         if not filename:
             filename = self._get_default_filename("tar.gz")
         path = os.path.join(dirpath, filename)
+        pdf_url = Result._substitute_domain(self.pdf_url, download_domain)
         # Bodge: construct the source URL from the PDF URL.
-        source_url = self.pdf_url.replace("/pdf/", "/src/")
-        written_path, _ = urlretrieve(source_url, path)
+        src_url = pdf_url.replace("/pdf/", "/src/")
+        written_path, _ = urlretrieve(src_url, path)
         return written_path
 
     def _get_pdf_url(links: List[Link]) -> str:
@@ -249,6 +262,15 @@ class Result(object):
         available](https://github.com/kurtmckee/feedparser/issues/212).
         """
         return datetime.fromtimestamp(timegm(ts), tz=timezone.utc)
+
+    def _substitute_domain(url: str, domain: str) -> str:
+        """
+        Replaces the domain of the given URL with the specified domain.
+
+        This is useful for testing purposes.
+        """
+        parsed_url = urlparse(url)
+        return parsed_url._replace(netloc=domain).geturl()
 
     class Author(object):
         """
@@ -294,7 +316,7 @@ class Result(object):
 
         href: str
         """The link's `href` attribute."""
-        title: str
+        title: Optional[str]
         """The link's title."""
         rel: str
         """The link's relationship to the `Result`."""
@@ -457,7 +479,7 @@ class Search(object):
         return repr(self)
 
     def __repr__(self) -> str:
-        return ("{}(query={}, id_list={}, max_results={}, sort_by={}, " "sort_order={})").format(
+        return ("{}(query={}, id_list={}, max_results={}, sort_by={}, sort_order={})").format(
             _classname(self),
             repr(self.query),
             repr(self.id_list),
@@ -657,7 +679,7 @@ class Client(object):
 
         logger.info("Requesting page (first: %r, try: %d): %s", first_page, try_index, url)
 
-        resp = self._session.get(url, headers={"user-agent": "arxiv.py/2.1.0"})
+        resp = self._session.get(url, headers={"user-agent": "arxiv.py/2.2.0"})
         self._last_request_dt = datetime.now()
         if resp.status_code != requests.codes.OK:
             raise HTTPError(url, try_index, resp.status_code)
