@@ -54,7 +54,7 @@ print(first_result)
 # Search for the paper with ID "1605.08386v1"
 search_by_id = arxiv.Search(id_list=["1605.08386v1"])
 # Reuse client to fetch the paper, then print its title.
-first_result = next(client.results(search))
+first_result = next(client.results(search_by_id))
 print(first_result.title)
 ```
 
