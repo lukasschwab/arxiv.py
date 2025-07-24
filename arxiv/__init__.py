@@ -629,7 +629,7 @@ class Client(object):
         url_args = search._url_args()
         url_args.update(
             {
-                "start": start,
+                "startIndex": start,
                 "max_results": page_size,
             }
         )
