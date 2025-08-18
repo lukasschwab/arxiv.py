@@ -88,6 +88,22 @@ paper.download_source(filename="downloaded-paper.tar.gz")
 paper.download_source(dirpath="./mydir", filename="downloaded-paper.tar.gz")
 ```
 
+You can also download HTML versions of papers (when available):
+
+```python
+import arxiv
+
+paper = next(arxiv.Client().results(arxiv.Search(id_list=["1605.08386v1"])))
+# Download the HTML to the PWD with a default filename.
+paper.download_html()
+# Download the HTML to the PWD with a custom filename.
+paper.download_html(filename="downloaded-paper.html")
+# Download the HTML to a specified directory with a custom filename.
+paper.download_html(dirpath="./mydir", filename="downloaded-paper.html")
+```
+
+**Note:** HTML versions are not available for all arXiv papers. This feature is primarily available for newer papers submitted in certain formats.
+
 #### Fetching results with a custom client
 
 ```python
@@ -119,7 +135,7 @@ DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): export.arxiv.org
 DEBUG:urllib3.connectionpool:https://export.arxiv.org:443 "GET /api/query?search_query=&id_list=1605.08386v1&sortBy=relevance&sortOrder=descending&start=0&max_results=100&user-agent=arxiv.py%2F1.4.8 HTTP/1.1" 200 979
 ```
 
-## Types 
+## Types
 
 ### Client
 
@@ -137,4 +153,4 @@ The `Result` objects yielded by `Client.results` include metadata about each pap
 
 The meaning of the underlying raw data is documented in the [arXiv API User Manual: Details of Atom Results Returned](https://arxiv.org/help/api/user-manual#_details_of_atom_results_returned).
 
-`Result` also exposes helper methods for downloading papers: `Result.download_pdf` and `Result.download_source`.
+`Result` also exposes helper methods for downloading papers: `Result.download_pdf`, `Result.download_source`, and `Result.download_html`.
