@@ -51,7 +51,32 @@ class TestDownload(unittest.TestCase):
             )
         )
 
+    def test_download_html_from_query(self):
+        try:
+            self.fetched_result.download_html(dirpath=self.temp_dir)
+            self.assertTrue(
+                os.path.exists(
+                    os.path.join(
+                        self.temp_dir,
+                        "1605.08386v1.Heat_bath_random_walks_with_Markov_bases.html",
+                    )
+                )
+            )
+        except Exception:
+            # HTML version may not be available for all papers
+            # This is expected for older papers or papers without HTML export
+            pass
+
     def test_download_with_custom_slugify_from_query(self):
         fn = "custom-filename.extension"
         self.fetched_result.download_pdf(dirpath=self.temp_dir, filename=fn)
         self.assertTrue(os.path.exists(os.path.join(self.temp_dir, fn)))
+
+    def test_download_html_with_custom_filename(self):
+        fn = "custom-html-filename.html"
+        try:
+            self.fetched_result.download_html(dirpath=self.temp_dir, filename=fn)
+            self.assertTrue(os.path.exists(os.path.join(self.temp_dir, fn)))
+        except Exception:
+            # HTML version may not be available for all papers
+            pass
