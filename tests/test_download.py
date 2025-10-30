@@ -10,7 +10,8 @@ class TestDownload(unittest.TestCase):
     def setUpClass(self):
         self.fetched_result = next(arxiv.Search(id_list=["1605.08386"]).results())
         self.fetched_result_with_slash = next(arxiv.Search(id_list=["hep-ex/0406020v1"]).results())
-
+        self.fetched_result_no_src = next(arxiv.Search(id_list = ['2209.10652v1']).results())
+    
     @classmethod
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()
@@ -39,6 +40,15 @@ class TestDownload(unittest.TestCase):
                 )
             )
         )
+        self.fetched_result_no_src.download_pdf(dirpath=self.temp_dir)
+        self.assertTrue(
+            os.path.exists(
+                os.path.join(
+                    self.temp_dir,
+                    "2209.10652v1.Toy_Models_of_Superposition.pdf",
+                )
+            )
+        )
 
     def test_download_tarfile_from_query(self):
         self.fetched_result.download_source(dirpath=self.temp_dir)
@@ -55,3 +65,8 @@ class TestDownload(unittest.TestCase):
         fn = "custom-filename.extension"
         self.fetched_result.download_pdf(dirpath=self.temp_dir, filename=fn)
         self.assertTrue(os.path.exists(os.path.join(self.temp_dir, fn)))
+        
+    def test_download_no_src(self):
+        with self.assertRaises(RuntimeError) as e:
+            self.fetched_result_no_src.download_source(dirpath = self.temp_dir)
+        

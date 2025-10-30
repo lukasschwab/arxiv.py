@@ -237,7 +237,13 @@ class Result(object):
         pdf_url = Result._substitute_domain(self.pdf_url, download_domain)
         # Bodge: construct the source URL from the PDF URL.
         src_url = pdf_url.replace("/pdf/", "/src/")
-        written_path, _ = urlretrieve(src_url, path)
+        written_path, headers = urlretrieve(src_url, path)
+        if 'application/pdf' in headers.get('Content-Type', ''):
+            os.remove(written_path)
+            raise RuntimeError(
+                "No source tarfile available for this result; the URL returned a pdf."
+                "Use download_pdf() instead."
+            )
         return written_path
 
     def _get_pdf_url(links: List[Link]) -> str:
