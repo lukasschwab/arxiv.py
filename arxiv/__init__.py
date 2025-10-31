@@ -238,7 +238,7 @@ class Result(object):
         # Bodge: construct the source URL from the PDF URL.
         src_url = pdf_url.replace("/pdf/", "/src/")
         written_path, headers = urlretrieve(src_url, path)
-        if 'application/pdf' in headers.get('Content-Type', ''):
+        if "application/pdf" in headers.get("Content-Type", ""):
             os.remove(written_path)
             raise RuntimeError(
                 "No source tarfile available for this result; the URL returned a pdf."
