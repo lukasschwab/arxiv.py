@@ -257,7 +257,16 @@ class Result(object):
         Should only be called once for a given `Result`, in its constructor.
         After construction, the URL should be available in `Result.pdf_url`.
         """
-        pdf_urls = [link.href for link in links if link.title == "pdf"]
+        # pdf_urls = [link.href for link in links if link.title == "pdf"]
+        pdf_urls = []
+        for link in links:
+            if link.title == "pdf":
+                pdf_urls.append(link.href)
+            elif link.title == None:
+                pdf_urls.append(link.href.replace("/abs/", "/pdf/"))
+            else:
+                raise ValueError("Unexpected link title: {}".format(link.title))
+                
         if len(pdf_urls) == 0:
             return None
         elif len(pdf_urls) > 1:
