@@ -257,7 +257,7 @@ class Result(object):
         Should only be called once for a given `Result`, in its constructor.
         After construction, the URL should be available in `Result.pdf_url`.
         """
-        pdf_urls = [link.href for link in links if link.title == "pdf"]
+        pdf_urls = [link.href for link in links if link.title == "pdf" or "/pdf/" in link.href]
         if len(pdf_urls) == 0:
             return None
         elif len(pdf_urls) > 1:
@@ -689,7 +689,7 @@ class Client(object):
 
         logger.info("Requesting page (first: %r, try: %d): %s", first_page, try_index, url)
 
-        resp = self._session.get(url, headers={"user-agent": "arxiv.py/2.3.0"})
+        resp = self._session.get(url, headers={"user-agent": "arxiv.py/2.3.1"})
         self._last_request_dt = datetime.now()
         if resp.status_code != requests.codes.OK:
             raise HTTPError(url, try_index, resp.status_code)
