@@ -262,11 +262,11 @@ class Result(object):
         for link in links:
             if link.title == "pdf":
                 pdf_urls.append(link.href)
-            elif link.title == None:
+            elif link.title is None:
                 pdf_urls.append(link.href.replace("/abs/", "/pdf/"))
             else:
                 raise ValueError("Unexpected link title: {}".format(link.title))
-                
+
         if len(pdf_urls) == 0:
             return None
         elif len(pdf_urls) > 1:
