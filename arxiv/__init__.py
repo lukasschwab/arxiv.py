@@ -473,6 +473,8 @@ class Search(object):
         max_results: int | None = None,
         sort_by: SortCriterion = SortCriterion.Relevance,
         sort_order: SortOrder = SortOrder.Descending,
+        date_from: str = "",
+        date_to: str = "",
     ):
         """
         Constructs an arXiv API search with the specified criteria.
@@ -483,6 +485,11 @@ class Search(object):
         self.max_results = None if max_results == math.inf else max_results
         self.sort_by = sort_by
         self.sort_order = sort_order
+        if date_from and date_to:
+            if self.query:
+                self.query += f" AND submittedDate:[{date_from} TO {date_to}]"
+            else:
+                self.query = f"submittedDate:[{date_from} TO {date_to}]"
 
     def __str__(self) -> str:
         # TODO: develop a more informative string representation.

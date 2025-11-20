@@ -170,6 +170,15 @@ class TestClient(unittest.TestCase):
         client._parse_feed(url)
         mock_sleep.assert_not_called()
 
+    @patch("requests.Session.get", return_value=empty_response(200))
+    @patch("time.sleep", return_value=None)
+    def test_sleep_zero_delay(self, mock_sleep, mock_get):
+        client = arxiv.Client(delay_seconds=0)
+        url = client._format_url(arxiv.Search(query="quantum", date_from="202401010600", date_to="202412300600"), 0, 1)
+        client._parse_feed(url)
+        client._parse_feed(url)
+        mock_sleep.assert_not_called()
+
     @patch("requests.Session.get", return_value=empty_response(500))
     @patch("time.sleep", return_value=None)
     def test_sleep_between_errors(self, mock_sleep, mock_get):
