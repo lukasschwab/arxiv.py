@@ -34,6 +34,8 @@ search = arxiv.Search(
   query = "quantum",
   max_results = 10,
   sort_by = arxiv.SortCriterion.SubmittedDate
+  date_from="202501010600", # new for date range search
+  date_to="202511200600"
 )
 
 results = client.results(search)
