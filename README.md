@@ -9,11 +9,26 @@ Python wrapper for [the arXiv API](https://arxiv.org/help/api/index).
 
 ### Installation
 
+#### For End Users (Recommended)
+
 ```bash
 $ pip install arxiv
 ```
 
-In your Python script, include the line
+#### For Modern Python Development (with UV)
+
+```bash
+$ uv add arxiv
+```
+
+Or for a one-off script:
+```bash
+$ uvx --from arxiv python -c "import arxiv; print('Working!')"
+```
+
+#### Usage
+
+In your Python script, include the line:
 
 ```python
 import arxiv
@@ -108,3 +123,41 @@ The `Result` objects yielded by `Client.results` include metadata about each pap
 The meaning of the underlying raw data is documented in the [arXiv API User Manual: Details of Atom Results Returned](https://arxiv.org/help/api/user-manual#_details_of_atom_results_returned).
 
 `Result` also exposes helper methods for downloading papers: `Result.download_pdf` and `Result.download_source`.
+
+## Development
+
+This project uses [UV](https://astral.sh/uv) for modern Python development workflow, while maintaining compatibility with traditional pip installation for end users.
+
+### Development Setup
+
+1. **Install UV** (if you haven't already):
+   ```bash
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   ```
+
+2. **Clone and setup**:
+   ```bash
+   git clone https://github.com/lukasschwab/arxiv.py
+   cd arxiv.py
+   make dev-setup
+   ```
+
+3. **Available commands**:
+   ```bash
+   make test      # Run tests
+   make lint      # Run linting  
+   make format    # Format code
+   make docs      # Generate docs
+   make check     # Run lint + test
+   make audit     # Security audit
+   ```
+
+### For End Users
+
+Even though development uses UV, **end users can continue using pip** as always:
+
+```bash
+pip install arxiv  # Still works perfectly!
+```
+
+Both installation methods provide the same functionality - UV just offers a faster, more modern development experience.

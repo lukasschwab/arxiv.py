@@ -1,4 +1,4 @@
-# Run `make lint test`: flake8 and pytest.
+# Run tests with UV (modern development workflow)
 name: python-test
 
 on:
@@ -16,16 +16,14 @@ jobs:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+    - name: Install UV
+      uses: astral-sh/setup-uv@v4
       with:
-        python-version: ${{ matrix.python-version }}
-        cache: 'pip'
+        enable-cache: true
+        cache-dependency-glob: "uv.lock"
+    - name: Set up Python ${{ matrix.python-version }}
+      run: uv python install ${{ matrix.python-version }}
     - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    - name: Test with pytest
-      run: |
-        pip install pytest
-        make -B test
+      run: uv sync --group dev
+    - name: Run tests
+      run: uv run pytest

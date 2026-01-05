@@ -1,13 +1,18 @@
 from setuptools import setup
 
-version = "2.3.2"
+# Note: Version is now managed by setuptools_scm and pyproject.toml
+# This setup.py is maintained for backward compatibility
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
     name="arxiv",
-    version=version,
+    use_scm_version={
+        "write_to": "arxiv/_version.py",
+        "version_scheme": "release-branch-semver",
+    },
+    setup_requires=["setuptools_scm"],
     packages=["arxiv"],
     # dependencies
     python_requires=">=3.7",
