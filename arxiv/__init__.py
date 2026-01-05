@@ -38,6 +38,7 @@ if TYPE_CHECKING:
         arxiv_doi: str
         arxiv_primary_category: dict[str, str]
 
+
 logger = logging.getLogger(__name__)
 
 _DEFAULT_TIME = datetime.min
