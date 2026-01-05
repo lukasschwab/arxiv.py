@@ -7,34 +7,22 @@ Python wrapper for [the arXiv API](https://arxiv.org/help/api/index).
 
 ## Usage
 
-### Installation
-
-#### For End Users (Recommended)
+Install the package:
 
 ```bash
-$ pip install arxiv
+$ pip install arxiv   # Or `uv add arxiv` or similar.
 ```
 
-#### For Modern Python Development (with UV)
-
-```bash
-$ uv add arxiv
-```
-
-Or for a one-off script:
-```bash
-$ uvx --from arxiv python -c "import arxiv; print('Working!')"
-```
-
-#### Usage
-
-In your Python script, include the line:
+In your Python code, include the line:
 
 ```python
 import arxiv
 ```
 
 ### Examples
+
+> [!TIP]
+> [`arxivql`](https://pypi.org/project/arxivql/) may simplify constructing complex query strings.
 
 #### Fetching results
 
@@ -141,31 +129,3 @@ This project uses [UV](https://astral.sh/uv) for development, while maintaining 
    cd arxiv.py
    make dev-setup
    ```
-
-3. **Available commands**:
-   ```bash
-   make test      # Run tests
-   make lint      # Run linting  
-   make format    # Format code
-   make docs      # Generate docs
-   make check     # Run lint + test
-   make audit     # Security audit
-   ```
-
-### For End Users
-
-Even though development uses UV, **end users can continue using pip** as always:
-
-```bash
-pip install arxiv  # Still works perfectly!
-```
-
-Both installation methods provide the same functionality - UV just offers a faster development experience.
-
-### Modern Python Packaging
-
-This project uses current Python packaging standards:
-- **`pyproject.toml`** for all configuration (no setup.py)
-- **`uv.lock`** for reproducible development environments
-- **Hatchling** build backend for fast, reliable builds
-- **UV** for lightning-fast dependency management
