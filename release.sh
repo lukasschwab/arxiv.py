@@ -18,7 +18,7 @@ echo "🚀 Starting release process for version $VERSION"
 
 # Ensure we have UV
 if ! command -v uv &> /dev/null; then
-    echo "❌ UV is required. Install with: curl -LsSf https://astral.sh/uv/install.sh | sh"
+    echo "❌ UV is required."
     exit 1
 fi
 
@@ -40,7 +40,7 @@ echo "🧹 Cleaning previous builds..."
 make clean
 
 # Create and push tag
-TAG="v$VERSION"
+TAG="$VERSION"
 echo "🏷️  Creating tag $TAG..."
 
 if [ "$DRY_RUN" = "--dry-run" ]; then

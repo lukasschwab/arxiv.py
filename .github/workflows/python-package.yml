@@ -1,4 +1,4 @@
-# Run tests with UV (modern development workflow)
+# Run tests with UV
 name: python-test
 
 on:

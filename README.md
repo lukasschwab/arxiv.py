@@ -126,7 +126,7 @@ The meaning of the underlying raw data is documented in the [arXiv API User Manu
 
 ## Development
 
-This project uses [UV](https://astral.sh/uv) for modern Python development workflow, while maintaining compatibility with traditional pip installation for end users.
+This project uses [UV](https://astral.sh/uv) for development, while maintaining compatibility with traditional pip installation for end users.
 
 ### Development Setup
 
@@ -160,11 +160,11 @@ Even though development uses UV, **end users can continue using pip** as always:
 pip install arxiv  # Still works perfectly!
 ```
 
-Both installation methods provide the same functionality - UV just offers a faster, more modern development experience.
+Both installation methods provide the same functionality - UV just offers a faster development experience.
 
 ### Modern Python Packaging
 
-This project uses modern Python packaging standards:
+This project uses current Python packaging standards:
 - **`pyproject.toml`** for all configuration (no setup.py)
 - **`uv.lock`** for reproducible development environments
 - **Hatchling** build backend for fast, reliable builds
