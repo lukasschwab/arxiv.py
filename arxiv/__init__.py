@@ -18,10 +18,7 @@ from datetime import datetime, timedelta, timezone
 from calendar import timegm
 
 from enum import Enum
-from typing import TYPE_CHECKING, Any, ClassVar, Generator, Protocol, Iterator
-
-# Remove Self usage for broader compatibility
-from collections.abc import Iterable, Sequence
+from typing import TYPE_CHECKING, Generator, Iterator
 
 if TYPE_CHECKING:
     from typing_extensions import TypedDict
