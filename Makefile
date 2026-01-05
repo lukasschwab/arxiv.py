@@ -33,6 +33,10 @@ lint: $(source) $(tests)
 	@echo "🔍 Linting code..."
 	uv run ruff check .
 
+type-check: $(source)
+	@echo "🔍 Type checking code..."
+	uv run mypy arxiv/__init__.py
+
 test: $(source) $(tests)
 	@echo "🧪 Running tests..."
 	uv run pytest
@@ -55,7 +59,7 @@ clean:
 	uv cache clean
 
 # Convenience commands
-check: lint test
+check: lint type-check test
 	@echo "✅ All checks passed!"
 
 dev-setup: install-dev
@@ -71,10 +75,11 @@ help:
 	@echo "  make lock         - Update lockfile"
 	@echo "  make test         - Run tests"
 	@echo "  make lint         - Run linting"
+	@echo "  make type-check   - Run type checking"
 	@echo "  make format       - Format code"
 	@echo "  make docs         - Generate documentation"
 	@echo "  make audit        - Security audit"
-	@echo "  make check        - Run lint + test"
+	@echo "  make check        - Run lint + type-check + test"
 	@echo "  make clean        - Clean build artifacts"
 	@echo "  make dev-setup    - Set up development environment"
 	@echo ""
