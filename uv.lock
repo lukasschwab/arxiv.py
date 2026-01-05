@@ -37,7 +37,6 @@ dev = [
     { name = "pip-audit", version = "2.10.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "pytest", version = "8.4.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "pytest", version = "9.0.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
-    { name = "requests" },
     { name = "ruff" },
     { name = "types-requests" },
 ]
@@ -65,7 +64,6 @@ dev = [
     { name = "pdoc", specifier = "==14.5.1" },
     { name = "pip-audit", specifier = ">=1.1.2" },
     { name = "pytest", specifier = ">=6.2.2" },
-    { name = "requests" },
     { name = "ruff", specifier = ">=0.1.2" },
     { name = "types-requests" },
 ]
