@@ -60,5 +60,5 @@ release:
 		./release.sh $$version
 
 version:
-	uv run python -c "import arxiv; print(f'Package version: {getattr(arxiv, \"__version__\", \"Unknown\")}')"
-	git describe --tags --always --dirty 2>/dev/null || echo "No git tags found"
+	@uv run python -c "import importlib.metadata; print(f'Package version: {importlib.metadata.version(\"arxiv\")}')" 2>/dev/null || echo "Package version: Not available (run 'uv sync' first)"
+	@git describe --tags --always --dirty 2>/dev/null || echo "Git version: No tags found"
