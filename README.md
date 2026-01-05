@@ -7,19 +7,22 @@ Python wrapper for [the arXiv API](https://arxiv.org/help/api/index).
 
 ## Usage
 
-### Installation
+Install the package:
 
 ```bash
-$ pip install arxiv
+$ pip install arxiv   # Or `uv add arxiv` or similar.
 ```
 
-In your Python script, include the line
+In your Python code, include the line:
 
 ```python
 import arxiv
 ```
 
 ### Examples
+
+> [!TIP]
+> [`arxivql`](https://pypi.org/project/arxivql/) may simplify constructing complex query strings.
 
 #### Fetching results
 
@@ -108,3 +111,21 @@ The `Result` objects yielded by `Client.results` include metadata about each pap
 The meaning of the underlying raw data is documented in the [arXiv API User Manual: Details of Atom Results Returned](https://arxiv.org/help/api/user-manual#_details_of_atom_results_returned).
 
 `Result` also exposes helper methods for downloading papers: `Result.download_pdf` and `Result.download_source`.
+
+## Development
+
+This project uses [UV](https://astral.sh/uv) for development, while maintaining compatibility with traditional pip installation for end users.
+
+### Development Setup
+
+1. **Install UV** (if you haven't already):
+   ```bash
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   ```
+
+2. **Clone and setup**:
+   ```bash
+   git clone https://github.com/lukasschwab/arxiv.py
+   cd arxiv.py
+   make dev-setup
+   ```

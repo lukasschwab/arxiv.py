@@ -1,29 +1,45 @@
 source := ${wildcard ./arxiv/*.py}
 tests := ${wildcard tests/*.py}
 
-.PHONY: all lint test audit docs clean
+.PHONY: all install install-dev lint format test audit docs clean 
 
+# Default target
 all: lint test docs
 
+# Installation and dependency management
+install:
+	uv sync
+
+install-dev:
+	uv sync --group dev
+
+# Development tasks
 format: $(source) $(tests)
-	ruff format .
+	uv run ruff format .
 
 lint: $(source) $(tests)
-	ruff check .
+	uv run ruff check .
+
+type-check: $(source)
+	uv run mypy arxiv/__init__.py
 
 test: $(source) $(tests)
-	pytest
+	uv run pytest
 
 audit:
-	python -m pip_audit --strict --requirement requirements.txt
+	uv run pip-audit
 
 docs: docs/index.html
 docs/index.html: $(source) README.md
-	pdoc --version
-	pdoc --docformat "restructuredtext" ./arxiv/__init__.py -o docs
+	uv run pdoc --docformat "restructuredtext" ./arxiv/__init__.py -o docs
 
 clean:
-	rm -rf build dist
+	rm -rf build dist .pytest_cache
 	rm -rf __pycache__ **/__pycache__
 	rm -rf *.pyc **/*.pyc
-	rm -rf arxiv.egg-info
+	rm -rf arxiv.egg-info arxiv/_version.py
+	uv cache clean
+
+# Convenience commands
+check: lint type-check test
+

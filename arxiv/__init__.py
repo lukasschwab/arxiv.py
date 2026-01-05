@@ -18,7 +18,26 @@ from datetime import datetime, timedelta, timezone
 from calendar import timegm
 
 from enum import Enum
-from typing import Dict, Generator, List, Optional
+from typing import TYPE_CHECKING, Generator, Iterator
+
+if TYPE_CHECKING:
+    from typing_extensions import TypedDict
+    import feedparser
+
+    class FeedParserDict(TypedDict, total=False):
+        id: str
+        title: str
+        summary: str
+        authors: list[dict[str, str]]
+        links: list[dict[str, str]]
+        tags: list[dict[str, str]]
+        updated_parsed: time.struct_time
+        published_parsed: time.struct_time
+        arxiv_comment: str
+        arxiv_journal_ref: str
+        arxiv_doi: str
+        arxiv_primary_category: dict[str, str]
+
 
 logger = logging.getLogger(__name__)
 
@@ -41,29 +60,29 @@ class Result:
     """When the result was originally published."""
     title: str
     """The title of the result."""
-    authors: List[Author]
+    authors: list[Result.Author]
     """The result's authors."""
     summary: str
     """The result abstract."""
-    comment: Optional[str]
+    comment: str | None
     """The authors' comment if present."""
-    journal_ref: Optional[str]
+    journal_ref: str | None
     """A journal reference if present."""
-    doi: Optional[str]
+    doi: str | None
     """A URL for the resolved DOI to an external resource if present."""
     primary_category: str
     """
     The result's primary arXiv category. See [arXiv: Category
     Taxonomy](https://arxiv.org/category_taxonomy).
     """
-    categories: List[str]
+    categories: list[str]
     """
     All of the result's categories. See [arXiv: Category
     Taxonomy](https://arxiv.org/category_taxonomy).
     """
-    links: List[Link]
+    links: list[Result.Link]
     """Up to three URLs associated with this result."""
-    pdf_url: Optional[str]
+    pdf_url: str | None
     """The URL of a PDF version of this result if present among links."""
     _raw: feedparser.FeedParserDict
     """
@@ -77,15 +96,15 @@ class Result:
         updated: datetime = _DEFAULT_TIME,
         published: datetime = _DEFAULT_TIME,
         title: str = "",
-        authors: List[Author] = [],
+        authors: list[Result.Author] | None = None,
         summary: str = "",
         comment: str = "",
         journal_ref: str = "",
         doi: str = "",
         primary_category: str = "",
-        categories: List[str] = [],
-        links: List[Link] = [],
-        _raw: feedparser.FeedParserDict = None,
+        categories: list[str] | None = None,
+        links: list[Result.Link] | None = None,
+        _raw: feedparser.FeedParserDict | None = None,
     ):
         """
         Constructs an arXiv search result item.
@@ -97,20 +116,21 @@ class Result:
         self.updated = updated
         self.published = published
         self.title = title
-        self.authors = authors
+        self.authors = authors or []
         self.summary = summary
         self.comment = comment
         self.journal_ref = journal_ref
         self.doi = doi
         self.primary_category = primary_category
-        self.categories = categories
-        self.links = links
+        self.categories = categories or []
+        self.links = links or []
         # Calculated members
-        self.pdf_url = Result._get_pdf_url(links)
+        self.pdf_url = Result._get_pdf_url(self.links)
         # Debugging
         self._raw = _raw
 
-    def _from_feed_entry(entry: feedparser.FeedParserDict) -> Result:
+    @classmethod
+    def _from_feed_entry(cls, entry: feedparser.FeedParserDict) -> Result:
         """
         Converts a feedparser entry for an arXiv search result feed into a
         Result object.
@@ -166,7 +186,7 @@ class Result:
             repr(self.links),
         )
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, Result):
             return self.entry_id == other.entry_id
         return False
@@ -218,6 +238,8 @@ class Result:
         if not filename:
             filename = self._get_default_filename()
         path = os.path.join(dirpath, filename)
+        if self.pdf_url is None:
+            raise ValueError("No PDF URL available for this result")
         pdf_url = Result._substitute_domain(self.pdf_url, download_domain)
         written_path, _ = urlretrieve(pdf_url, path)
         return written_path
@@ -240,17 +262,23 @@ class Result:
         if not filename:
             filename = self._get_default_filename("tar.gz")
         path = os.path.join(dirpath, filename)
-        source_url = Result._substitute_domain(self.source_url(), download_domain)
+        source_url_str = self.source_url()
+        if source_url_str is None:
+            raise ValueError("No source URL available for this result")
+        source_url = Result._substitute_domain(source_url_str, download_domain)
         written_path, _ = urlretrieve(source_url, path)
         return written_path
 
-    def source_url(self) -> str:
+    def source_url(self) -> str | None:
         """
         Derives a URL for the source tarfile for this result.
         """
+        if self.pdf_url is None:
+            return None
         return self.pdf_url.replace("/pdf/", "/src/")
 
-    def _get_pdf_url(links: List[Link]) -> str:
+    @staticmethod
+    def _get_pdf_url(links: list[Result.Link]) -> str | None:
         """
         Finds the PDF link among a result's links and returns its URL.
 
@@ -264,6 +292,7 @@ class Result:
             logger.warning("Result has multiple PDF links; using %s", pdf_urls[0])
         return pdf_urls[0]
 
+    @staticmethod
     def _to_datetime(ts: time.struct_time) -> datetime:
         """
         Converts a UTC time.struct_time into a time-zone-aware datetime.
@@ -273,6 +302,7 @@ class Result:
         """
         return datetime.fromtimestamp(timegm(ts), tz=timezone.utc)
 
+    @staticmethod
     def _substitute_domain(url: str, domain: str) -> str:
         """
         Replaces the domain of the given URL with the specified domain.
@@ -299,7 +329,8 @@ class Result:
             """
             self.name = name
 
-        def _from_feed_author(feed_author: feedparser.FeedParserDict) -> Result.Author:
+        @classmethod
+        def _from_feed_author(cls, feed_author: feedparser.FeedParserDict) -> Result.Author:
             """
             Constructs an `Author` with the name specified in an author object
             from a feed entry.
@@ -314,7 +345,7 @@ class Result:
         def __repr__(self) -> str:
             return "{}({})".format(_classname(self), repr(self.name))
 
-        def __eq__(self, other) -> bool:
+        def __eq__(self, other: object) -> bool:
             if isinstance(other, Result.Author):
                 return self.name == other.name
             return False
@@ -326,19 +357,19 @@ class Result:
 
         href: str
         """The link's `href` attribute."""
-        title: Optional[str]
+        title: str | None
         """The link's title."""
         rel: str
         """The link's relationship to the `Result`."""
-        content_type: str
+        content_type: str | None
         """The link's HTTP content type."""
 
         def __init__(
             self,
             href: str,
-            title: str = None,
-            rel: str = None,
-            content_type: str = None,
+            title: str | None = None,
+            rel: str = "",
+            content_type: str | None = None,
         ):
             """
             Constructs a `Link` with the specified link metadata.
@@ -351,7 +382,8 @@ class Result:
             self.rel = rel
             self.content_type = content_type
 
-        def _from_feed_link(feed_link: feedparser.FeedParserDict) -> Result.Link:
+        @classmethod
+        def _from_feed_link(cls, feed_link: feedparser.FeedParserDict) -> Result.Link:
             """
             Constructs a `Link` with link metadata specified in a link object
             from a feed entry.
@@ -361,7 +393,7 @@ class Result:
             return Result.Link(
                 href=feed_link.href,
                 title=feed_link.get("title"),
-                rel=feed_link.get("rel"),
+                rel=feed_link.get("rel") or "",
                 content_type=feed_link.get("content_type"),
             )
 
@@ -377,7 +409,7 @@ class Result:
                 repr(self.content_type),
             )
 
-        def __eq__(self, other) -> bool:
+        def __eq__(self, other: object) -> bool:
             if isinstance(other, Result.Link):
                 return self.href == other.href
             return False
@@ -393,7 +425,7 @@ class Result:
         message: str
         """Message describing what caused this error."""
 
-        def __init__(self, missing_field):
+        def __init__(self, missing_field: str):
             self.missing_field = missing_field
             self.message = "Entry from arXiv missing required info"
 
@@ -446,7 +478,7 @@ class Search:
     See [the arXiv API User's Manual: Details of Query
     Construction](https://arxiv.org/help/api/user-manual#query_details).
     """
-    id_list: List[str]
+    id_list: list[str]
     """
     A list of arXiv article IDs to which to limit the search.
 
@@ -469,7 +501,7 @@ class Search:
     def __init__(
         self,
         query: str = "",
-        id_list: List[str] | None = None,
+        id_list: list[str] | None = None,
         max_results: int | None = None,
         sort_by: SortCriterion = SortCriterion.Relevance,
         sort_order: SortOrder = SortOrder.Descending,
@@ -504,7 +536,7 @@ class Search:
             repr(self.sort_order),
         )
 
-    def _url_args(self) -> Dict[str, str]:
+    def _url_args(self) -> dict[str, str]:
         """
         Returns a dict of search parameters that should be included in an API
         request for this search.
@@ -516,7 +548,7 @@ class Search:
             "sortOrder": self.sort_order.value,
         }
 
-    def results(self, offset: int = 0) -> Generator[Result, None, None]:
+    def results(self, offset: int = 0) -> Iterator[Result]:
         """
         Executes the specified search using a default arXiv API client. For info
         on default behavior, see `Client.__init__` and `Client.results`.
@@ -562,7 +594,7 @@ class Client:
     Number of times to retry a failing API request before raising an Exception.
     """
 
-    _last_request_dt: datetime
+    _last_request_dt: datetime | None
     _session: requests.Session
 
     def __init__(self, page_size: int = 100, delay_seconds: float = 3.0, num_retries: int = 3):
@@ -591,7 +623,7 @@ class Client:
             repr(self.num_retries),
         )
 
-    def results(self, search: Search, offset: int = 0) -> Generator[Result, None, None]:
+    def results(self, search: Search, offset: int = 0) -> Iterator[Result]:
         """
         Uses this client configuration to fetch one page of the search results
         at a time, yielding the parsed `Result`s, until `max_results` results
@@ -644,8 +676,8 @@ class Client:
         url_args = search._url_args()
         url_args.update(
             {
-                "start": start,
-                "max_results": page_size,
+                "start": str(start),
+                "max_results": str(page_size),
             }
         )
         return self.query_url_format.format(urlencode(url_args))
@@ -798,6 +830,6 @@ class HTTPError(ArxivError):
         )
 
 
-def _classname(o):
+def _classname(o: object) -> str:
     """A helper function for use in __repr__ methods: arxiv.Result.Link."""
     return "arxiv.{}".format(o.__class__.__qualname__)

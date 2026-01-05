@@ -1,5 +1,4 @@
 ADMIN.md
-release.sh
 .vscode
 docs
 
@@ -60,3 +59,6 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# UV and Python tooling
+.venv/

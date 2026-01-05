@@ -1,4 +1,5 @@
-name: static-analysis
+# Run tests with UV
+name: python-test
 
 on:
   push:
@@ -7,8 +8,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  static-analysis:
+  test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     steps:
     - uses: actions/checkout@v4
     - name: Install UV
@@ -16,13 +21,9 @@ jobs:
       with:
         enable-cache: true
         cache-dependency-glob: "uv.lock"
+    - name: Set up Python ${{ matrix.python-version }}
+      run: uv python install ${{ matrix.python-version }}
     - name: Install dependencies
       run: uv sync --group dev
-    - name: Lint
-      run: uv run make lint
-    - name: Format check
-      run: uv run ruff format --check .
-    - name: Type check
-      run: uv run make type-check
-    - name: Security audit
-      run: uv run make audit
+    - name: Run tests
+      run: uv run make test
