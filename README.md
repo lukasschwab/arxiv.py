@@ -161,3 +161,11 @@ pip install arxiv  # Still works perfectly!
 ```
 
 Both installation methods provide the same functionality - UV just offers a faster, more modern development experience.
+
+### Modern Python Packaging
+
+This project uses modern Python packaging standards:
+- **`pyproject.toml`** for all configuration (no setup.py)
+- **`uv.lock`** for reproducible development environments
+- **Hatchling** build backend for fast, reliable builds
+- **UV** for lightning-fast dependency management

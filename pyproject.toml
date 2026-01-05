@@ -1,24 +1,31 @@
 [build-system]
-requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
 [project]
 name = "arxiv"
 dynamic = ["version"]
 description = "Python wrapper for the arXiv API"
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
 authors = [
     {name = "Lukas Schwab", email = "lukas.schwab@gmail.com"}
 ]
+keywords = ["arxiv", "api", "wrapper", "academic", "journals", "papers"]
 classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.10", 
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 requires-python = ">=3.9"
 dependencies = [
@@ -58,13 +65,15 @@ test = [
     "pytest>=6.2.2",
 ]
 
-# Tool configurations that work for both UV and traditional workflows
-[tool.setuptools_scm]
-write_to = "arxiv/_version.py"
+# Modern build configuration with hatch-vcs
+[tool.hatch.version]
+source = "vcs"
 
-[tool.setuptools.packages.find]
-where = ["."] 
-include = ["arxiv*"]
+[tool.hatch.version.raw-options]
+local_scheme = "dirty-tag"
+
+[tool.hatch.build.targets.wheel]
+packages = ["arxiv"]
 
 [tool.ruff]
 line-length = 100
