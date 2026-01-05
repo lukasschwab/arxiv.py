@@ -74,8 +74,7 @@ echo ""
 
 # Run tests
 echo "🧪 Running tests..."
-make lint
-make test
+make check
 echo "✅ Tests passed"
 
 # Clean previous builds

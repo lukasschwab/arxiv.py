@@ -14,12 +14,6 @@ install:
 install-dev:
 	uv sync --group dev
 
-sync:
-	uv sync --group dev
-
-lock:
-	uv lock
-
 # Development tasks
 format: $(source) $(tests)
 	uv run ruff format .
@@ -51,8 +45,5 @@ clean:
 check: lint type-check test
 
 # Release and distribution
-build:
-	uv build
-
 release:
 	./release.sh

@@ -237,6 +237,8 @@ class Result:
         if not filename:
             filename = self._get_default_filename()
         path = os.path.join(dirpath, filename)
+        if self.pdf_url is None:
+            raise ValueError("No PDF URL available for this result")
         pdf_url = Result._substitute_domain(self.pdf_url, download_domain)
         written_path, _ = urlretrieve(pdf_url, path)
         return written_path
@@ -259,14 +261,19 @@ class Result:
         if not filename:
             filename = self._get_default_filename("tar.gz")
         path = os.path.join(dirpath, filename)
-        source_url = Result._substitute_domain(self.source_url(), download_domain)
+        source_url_str = self.source_url()
+        if source_url_str is None:
+            raise ValueError("No source URL available for this result")
+        source_url = Result._substitute_domain(source_url_str, download_domain)
         written_path, _ = urlretrieve(source_url, path)
         return written_path
 
-    def source_url(self) -> str:
+    def source_url(self) -> str | None:
         """
         Derives a URL for the source tarfile for this result.
         """
+        if self.pdf_url is None:
+            return None
         return self.pdf_url.replace("/pdf/", "/src/")
 
     @staticmethod
@@ -337,7 +344,7 @@ class Result:
         def __repr__(self) -> str:
             return "{}({})".format(_classname(self), repr(self.name))
 
-        def __eq__(self, other) -> bool:
+        def __eq__(self, other: object) -> bool:
             if isinstance(other, Result.Author):
                 return self.name == other.name
             return False
@@ -351,9 +358,9 @@ class Result:
         """The link's `href` attribute."""
         title: str | None
         """The link's title."""
-        rel: str
+        rel: str | None
         """The link's relationship to the `Result`."""
-        content_type: str
+        content_type: str | None
         """The link's HTTP content type."""
 
         def __init__(
@@ -401,7 +408,7 @@ class Result:
                 repr(self.content_type),
             )
 
-        def __eq__(self, other) -> bool:
+        def __eq__(self, other: object) -> bool:
             if isinstance(other, Result.Link):
                 return self.href == other.href
             return False
@@ -417,7 +424,7 @@ class Result:
         message: str
         """Message describing what caused this error."""
 
-        def __init__(self, missing_field):
+        def __init__(self, missing_field: str):
             self.missing_field = missing_field
             self.message = "Entry from arXiv missing required info"
 
