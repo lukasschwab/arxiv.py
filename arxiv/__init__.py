@@ -358,17 +358,17 @@ class Result:
         """The link's `href` attribute."""
         title: str | None
         """The link's title."""
-        rel: str | None
+        rel: str
         """The link's relationship to the `Result`."""
-        content_type: str | None
+        content_type: str
         """The link's HTTP content type."""
 
         def __init__(
             self,
             href: str,
             title: str | None = None,
-            rel: str | None = None,
-            content_type: str | None = None,
+            rel: str = "",
+            content_type: str = "",
         ):
             """
             Constructs a `Link` with the specified link metadata.
@@ -379,7 +379,20 @@ class Result:
             self.href = href
             self.title = title
             self.rel = rel
-            self.content_type = content_type
+            self.content_type = content_type or self._derive_content_type(href)
+
+        @staticmethod
+        def _derive_content_type(href: str) -> str:
+            """
+            Derives the content type from the URL.
+            """
+            if href.endswith('.pdf') or '/pdf/' in href:
+                return "application/pdf"
+            elif '/abs/' in href:
+                return "text/html"
+            else:
+                # Default for DOIs and other links
+                return "text/html"
 
         @classmethod
         def _from_feed_link(cls, feed_link: feedparser.FeedParserDict) -> Result.Link:
@@ -392,8 +405,8 @@ class Result:
             return Result.Link(
                 href=feed_link.href,
                 title=feed_link.get("title"),
-                rel=feed_link.get("rel"),
-                content_type=feed_link.get("content_type"),
+                rel=feed_link.get("rel") or "",
+                content_type=feed_link.get("content_type") or "",
             )
 
         def __str__(self) -> str:
