@@ -63,7 +63,6 @@ dev = [
     "pip-audit>=1.1.2",
     "mypy>=1.0.0",
     "types-requests",
-    "requests",  # For release script PyPI version checking
 ]
 test = [
     "pytest>=6.2.2",

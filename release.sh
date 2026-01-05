@@ -24,19 +24,8 @@ echo "✅ Working directory is clean"
 
 # Get current version from PyPI
 echo "📡 Fetching current version from PyPI..."
-CURRENT_VERSION=$(python -c "
-import requests
-import sys
-try:
-    response = requests.get('https://pypi.org/pypi/arxiv/json')
-    if response.status_code == 200:
-        data = response.json()
-        print(data['info']['version'])
-    else:
-        print('0.0.0')  # Fallback if package not found
-except:
-    print('0.0.0')  # Fallback on any error
-" 2>/dev/null)
+CURRENT_VERSION=$(curl -s https://pypi.org/pypi/arxiv/json | \
+    python3 -c "import sys, json; data=json.load(sys.stdin); print(data['info']['version'])" 2>/dev/null)
 
 if [ "$CURRENT_VERSION" = "0.0.0" ]; then
     echo "⚠️  Could not fetch version from PyPI, using local git tags"
