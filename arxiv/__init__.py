@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 _DEFAULT_TIME = datetime.min
 
 
-class Result(object):
+class Result:
     """
     An entry in an arXiv query results feed.
 
@@ -282,7 +282,7 @@ class Result(object):
         parsed_url = urlparse(url)
         return parsed_url._replace(netloc=domain).geturl()
 
-    class Author(object):
+    class Author:
         """
         A light inner class for representing a result's authors.
         """
@@ -319,7 +319,7 @@ class Result(object):
                 return self.name == other.name
             return False
 
-    class Link(object):
+    class Link:
         """
         A light inner class for representing a result's links.
         """
@@ -428,7 +428,7 @@ class SortOrder(Enum):
     Descending = "descending"
 
 
-class Search(object):
+class Search:
     """
     A specification for a search of arXiv's database.
 
@@ -469,7 +469,7 @@ class Search(object):
     def __init__(
         self,
         query: str = "",
-        id_list: List[str] = [],
+        id_list: List[str] | None = None,
         max_results: int | None = None,
         sort_by: SortCriterion = SortCriterion.Relevance,
         sort_order: SortOrder = SortOrder.Descending,
@@ -478,15 +478,21 @@ class Search(object):
         Constructs an arXiv API search with the specified criteria.
         """
         self.query = query
-        self.id_list = id_list
+        self.id_list = id_list or []
         # Handle deprecated v1 default behavior.
         self.max_results = None if max_results == math.inf else max_results
         self.sort_by = sort_by
         self.sort_order = sort_order
 
     def __str__(self) -> str:
-        # TODO: develop a more informative string representation.
-        return repr(self)
+        if self.query and self.id_list:
+            return f"Search(query='{self.query}', id_list={len(self.id_list)} items)"
+        elif self.query:
+            return f"Search(query='{self.query}')"
+        elif self.id_list:
+            return f"Search(id_list={len(self.id_list)} items)"
+        else:
+            return "Search(empty)"
 
     def __repr__(self) -> str:
         return ("{}(query={}, id_list={}, max_results={}, sort_by={}, sort_order={})").format(
@@ -525,7 +531,7 @@ class Search(object):
         return Client().results(self, offset=offset)
 
 
-class Client(object):
+class Client:
     """
     Specifies a strategy for fetching results from arXiv's API.
 
@@ -575,8 +581,7 @@ class Client(object):
         self._session = requests.Session()
 
     def __str__(self) -> str:
-        # TODO: develop a more informative string representation.
-        return repr(self)
+        return f"Client(page_size={self.page_size}, delay={self.delay_seconds}s, retries={self.num_retries})"
 
     def __repr__(self) -> str:
         return "{}(page_size={}, delay_seconds={}, num_retries={})".format(
@@ -689,7 +694,7 @@ class Client(object):
 
         logger.info("Requesting page (first: %r, try: %d): %s", first_page, try_index, url)
 
-        resp = self._session.get(url, headers={"user-agent": "arxiv.py/2.3.1"})
+        resp = self._session.get(url, headers={"user-agent": "arxiv.py/2.3.2"})
         self._last_request_dt = datetime.now()
         if resp.status_code != requests.codes.OK:
             raise HTTPError(url, try_index, resp.status_code)
