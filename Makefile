@@ -1,8 +1,7 @@
 source := ${wildcard ./arxiv/*.py}
 tests := ${wildcard tests/*.py}
 
-# UV-based development workflow (assumes UV is installed)
-.PHONY: all install install-dev lint format test audit docs clean sync lock help
+.PHONY: all install install-dev lint format test audit docs clean 
 
 # Default target
 all: lint test docs
@@ -44,6 +43,3 @@ clean:
 # Convenience commands
 check: lint type-check test
 
-# Release and distribution
-release:
-	./release.sh
