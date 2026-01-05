@@ -1,20 +1,12 @@
 #!/bin/bash
 set -e
 
-# Modern release script for arxiv.py with UV tooling
-# Usage: ./release.sh <version> [--dry-run]
+# Intelligent release script for arxiv.py
+# Automatically determines next version based on PyPI and user choice
 
-VERSION="$1"
-DRY_RUN="$2"
+DRY_RUN="$1"
 
-if [ -z "$VERSION" ]; then
-    echo "Usage: $0 <version> [--dry-run]"
-    echo "Example: $0 2.4.0"
-    echo "Example: $0 2.4.0 --dry-run"
-    exit 1
-fi
-
-echo "🚀 Starting release process for version $VERSION"
+echo "🚀 Starting release process"
 
 # Ensure we have UV
 if ! command -v uv &> /dev/null; then
@@ -29,6 +21,69 @@ if [ -n "$(git status --porcelain)" ]; then
 fi
 
 echo "✅ Working directory is clean"
+
+# Get current version from PyPI
+echo "📡 Fetching current version from PyPI..."
+CURRENT_VERSION=$(python -c "
+import requests
+import sys
+try:
+    response = requests.get('https://pypi.org/pypi/arxiv/json')
+    if response.status_code == 200:
+        data = response.json()
+        print(data['info']['version'])
+    else:
+        print('0.0.0')  # Fallback if package not found
+except:
+    print('0.0.0')  # Fallback on any error
+" 2>/dev/null)
+
+if [ "$CURRENT_VERSION" = "0.0.0" ]; then
+    echo "⚠️  Could not fetch version from PyPI, using local git tags"
+    CURRENT_VERSION=$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo "2.3.2")
+fi
+
+echo "📦 Current version on PyPI: $CURRENT_VERSION"
+
+# Parse current version
+if [[ $CURRENT_VERSION =~ ^([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
+    MAJOR=${BASH_REMATCH[1]}
+    MINOR=${BASH_REMATCH[2]}
+    PATCH=${BASH_REMATCH[3]}
+else
+    echo "❌ Could not parse current version: $CURRENT_VERSION"
+    exit 1
+fi
+
+# Calculate next versions
+NEXT_MAJOR="$((MAJOR + 1)).0.0"
+NEXT_MINOR="$MAJOR.$((MINOR + 1)).0"
+NEXT_PATCH="$MAJOR.$MINOR.$((PATCH + 1))"
+
+echo ""
+echo "📋 Version options:"
+echo "  1) Patch:  $CURRENT_VERSION → $NEXT_PATCH (bug fixes)"
+echo "  2) Minor:  $CURRENT_VERSION → $NEXT_MINOR (new features, backward compatible)"
+echo "  3) Major:  $CURRENT_VERSION → $NEXT_MAJOR (breaking changes)"
+echo ""
+
+# Get user choice
+if [ "$DRY_RUN" = "--dry-run" ]; then
+    echo "🔍 DRY RUN: Would prompt for version choice"
+    VERSION="$NEXT_MINOR"  # Default for dry run
+    echo "🔍 DRY RUN: Using $VERSION for testing"
+else
+    read -p "Select version type [1/2/3]: " choice
+    case $choice in
+        1) VERSION="$NEXT_PATCH" ;;
+        2) VERSION="$NEXT_MINOR" ;;
+        3) VERSION="$NEXT_MAJOR" ;;
+        *) echo "❌ Invalid choice. Exiting."; exit 1 ;;
+    esac
+fi
+
+echo "🎯 Selected version: $VERSION"
+echo ""
 
 # Run tests
 echo "🧪 Running tests..."
@@ -66,7 +121,7 @@ if [ "$DRY_RUN" = "--dry-run" ]; then
     echo "🔍 DRY RUN: Would upload to PyPI:"
     echo "   uv publish dist/*"
     echo ""
-    echo "🔍 To actually release, run: $0 $VERSION"
+    echo "🔍 To actually release, run: ./release.sh"
 else
     echo "📤 Uploading to PyPI..."
     echo "💡 Make sure you have PyPI API token configured"
@@ -89,6 +144,7 @@ fi
 echo ""
 echo "📝 Release summary:"
 echo "   Version: $VERSION"
+echo "   Previous: $CURRENT_VERSION"
 echo "   Tag: $TAG" 
 echo "   Files in dist/: $(ls -1 dist/ | wc -l)"
 echo "   Git commit: $(git rev-parse --short HEAD)"
