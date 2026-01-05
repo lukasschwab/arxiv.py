@@ -60,3 +60,9 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# UV and modern Python tooling
+.venv/
+
+# Automatically generated version files
+arxiv/_version.py
