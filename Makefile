@@ -81,3 +81,20 @@ help:
 	@echo "🔧 This Makefile uses UV for development workflow"
 	@echo "💡 Install UV: curl -LsSf https://astral.sh/uv/install.sh | sh"
 	@echo "📚 End users can still use: pip install arxiv"
+
+# Release and distribution
+build:
+	@echo "📦 Building distributions..."
+	uv build
+
+release:
+	@echo "🚀 Use the release script for safer releases:"
+	@echo "  ./release.sh <version>        # Full release"
+	@echo "  ./release.sh <version> --dry-run  # Test release process"
+	@echo ""
+	@echo "Example: ./release.sh 2.4.0"
+
+version:
+	@echo "📝 Current version info:"
+	uv run python -c "import arxiv; print(f'Package version: {getattr(arxiv, \"__version__\", \"Unknown\")}')"
+	@git describe --tags --always --dirty 2>/dev/null || echo "No git tags found"
