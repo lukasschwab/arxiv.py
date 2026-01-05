@@ -24,8 +24,7 @@ echo "✅ Working directory is clean"
 
 # Get current version from PyPI
 echo "📡 Fetching current version from PyPI..."
-CURRENT_VERSION=$(curl -s https://pypi.org/pypi/arxiv/json | \
-    python3 -c "import sys, json; data=json.load(sys.stdin); print(data['info']['version'])" 2>/dev/null)
+CURRENT_VERSION=$(curl -s https://pypi.org/pypi/arxiv/json | jq -r '.info.version' 2>/dev/null)
 
 if [ "$CURRENT_VERSION" = "0.0.0" ]; then
     echo "⚠️  Could not fetch version from PyPI, using local git tags"
@@ -58,9 +57,8 @@ echo ""
 
 # Get user choice
 if [ "$DRY_RUN" = "--dry-run" ]; then
-    echo "🔍 DRY RUN: Would prompt for version choice"
     VERSION="$NEXT_MINOR"  # Default for dry run
-    echo "🔍 DRY RUN: Using $VERSION for testing"
+    echo "🔍 DRY RUN: Auto-selecting minor version $VERSION"
 else
     read -p "Select version type [1/2/3]: " choice
     case $choice in
