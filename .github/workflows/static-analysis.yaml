@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  quality-checks:
+  static-analysis:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -22,19 +22,7 @@ jobs:
       run: uv run make lint
     - name: Format check
       run: uv run ruff format --check .
-    - name: Type check (allow failures for now)
-      run: uv run make type-check || echo "Type checking has known issues - skipping for CI"
-      
-  security-audit:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Install UV
-      uses: astral-sh/setup-uv@v4
-      with:
-        enable-cache: true
-        cache-dependency-glob: "uv.lock"
-    - name: Install dependencies
-      run: uv sync --group dev
+    - name: Type check
+      run: uv run make type-check
     - name: Security audit
       run: uv run make audit
