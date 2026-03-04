@@ -766,7 +766,7 @@ class ArxivError(Exception):
         self.message = message
         super().__init__(self.message)
 
-    def __reduce__(self):
+    def __reduce__(self) -> tuple:
         return (self.__class__, (self.url, self.retry, self.message))
 
     def __str__(self) -> str:
@@ -798,7 +798,7 @@ class UnexpectedEmptyPageError(ArxivError):
         self.raw_feed = raw_feed
         super().__init__(url, retry, "Page of results was unexpectedly empty")
 
-    def __reduce__(self):
+    def __reduce__(self) -> tuple:
         return (self.__class__, (self.url, self.retry, self.raw_feed))
 
     def __repr__(self) -> str:
@@ -830,7 +830,7 @@ class HTTPError(ArxivError):
             "Page request resulted in HTTP {}".format(self.status),
         )
 
-    def __reduce__(self):
+    def __reduce__(self) -> tuple:
         return (self.__class__, (self.url, self.retry, self.status))
 
     def __repr__(self) -> str:
