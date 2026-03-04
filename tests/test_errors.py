@@ -16,9 +16,7 @@ class TestErrorPickle(unittest.TestCase):
         self.assertEqual(str(restored), str(err))
 
     def test_http_error_pickle_roundtrip(self):
-        err = arxiv.HTTPError(
-            url="http://export.arxiv.org/api/query", retry=3, status=503
-        )
+        err = arxiv.HTTPError(url="http://export.arxiv.org/api/query", retry=3, status=503)
         restored = pickle.loads(pickle.dumps(err))
         self.assertEqual(restored.url, err.url)
         self.assertEqual(restored.retry, err.retry)
@@ -40,9 +38,7 @@ class TestErrorPickle(unittest.TestCase):
 
     def test_http_error_double_roundtrip(self):
         """Ensure repeated pickle round-trips don't degrade the object."""
-        err = arxiv.HTTPError(
-            url="http://export.arxiv.org/api/query", retry=3, status=503
-        )
+        err = arxiv.HTTPError(url="http://export.arxiv.org/api/query", retry=3, status=503)
         restored = pickle.loads(pickle.dumps(err))
         restored2 = pickle.loads(pickle.dumps(restored))
         self.assertEqual(restored2.status, 503)
