@@ -29,7 +29,7 @@ classifiers = [
 requires-python = ">=3.10"
 dependencies = [
     "feedparser~=6.0.10",
-    "requests~=2.32.0",
+    "requests>=2.32,<2.34",
     "typing_extensions>=4.0.0; python_version < '3.11'",
 ]
 
