@@ -116,16 +116,3 @@ The meaning of the underlying raw data is documented in the [arXiv API User Manu
 
 This project uses [UV](https://astral.sh/uv) for development, while maintaining compatibility with traditional pip installation for end users.
 
-### Development Setup
-
-1. **Install UV** (if you haven't already):
-   ```bash
-   curl -LsSf https://astral.sh/uv/install.sh | sh
-   ```
-
-2. **Clone and setup**:
-   ```bash
-   git clone https://github.com/lukasschwab/arxiv.py
-   cd arxiv.py
-   make dev-setup
-   ```

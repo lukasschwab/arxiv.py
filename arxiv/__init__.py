@@ -502,7 +502,7 @@ class Search:
         self,
         query: str = "",
         id_list: list[str] | None = None,
-        max_results: int | None = None,
+        max_results: int | None = 100,
         sort_by: SortCriterion = SortCriterion.Relevance,
         sort_order: SortOrder = SortOrder.Descending,
     ):
