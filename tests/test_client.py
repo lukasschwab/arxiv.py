@@ -31,6 +31,10 @@ class TestClient(unittest.TestCase):
         results = list(client.results(arxiv.Search(id_list=["0808.05394", "1707.08567"])))
         self.assertEqual(len(results), 1)
 
+    def test_default_max_results(self):
+        search = arxiv.Search(query="testing")
+        self.assertEqual(search.max_results, 100)
+
     def test_max_results(self):
         client = arxiv.Client(page_size=10)
         search = arxiv.Search(query="testing", max_results=2)
