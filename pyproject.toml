@@ -34,26 +34,11 @@ dependencies = [
     "typing_extensions>=4.0.0; python_version < '3.11'",
 ]
 
-[project.optional-dependencies]
-dev = [
-    "pytest>=6.2.2",
-    "ruff>=0.1.2",
-    "pdoc==14.5.1",
-    "pip-audit>=1.1.2",
-]
-test = [
-    "pytest>=6.2.2",
-]
-
 [project.urls]
 Homepage = "https://github.com/lukasschwab/arxiv.py"
 Repository = "https://github.com/lukasschwab/arxiv.py"
 Documentation = "https://lukasschwab.me/arxiv.py/"
 Issues = "https://github.com/lukasschwab/arxiv.py/issues"
-
-# UV-specific configuration (ignored by pip/setuptools)
-[tool.uv]
-managed = true
 
 [dependency-groups]
 dev = [
