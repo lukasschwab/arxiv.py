@@ -10,7 +10,6 @@ stable hash of the request URL.
 
 import hashlib
 import json
-import os
 import time
 import urllib.request
 from pathlib import Path
