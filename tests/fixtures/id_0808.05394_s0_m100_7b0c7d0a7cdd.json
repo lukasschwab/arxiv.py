@@ -1,0 +1,5 @@
+{
+  "url": "https://export.arxiv.org/api/query?search_query=&id_list=0808.05394&sortBy=relevance&sortOrder=descending&start=0&max_results=100",
+  "status_code": 200,
+  "body": "<?xml version='1.0' encoding='UTF-8'?>\n<feed xmlns:opensearch=\"http://a9.com/-/spec/opensearch/1.1/\" xmlns:arxiv=\"http://arxiv.org/schemas/atom\" xmlns=\"http://www.w3.org/2005/Atom\">\n  <id>https://arxiv.org/api/XYqrXUYeF6pkVqy2M3s/KYk3JfE</id>\n  <title>arXiv Query: search_query=&amp;id_list=0808.05394&amp;start=0&amp;max_results=100</title>\n  <updated>2026-04-12T22:09:33Z</updated>\n  <link href=\"https://arxiv.org/api/query?search_query=&amp;start=0&amp;max_results=100&amp;id_list=0808.05394\" type=\"application/atom+xml\"/>\n  <opensearch:itemsPerPage>100</opensearch:itemsPerPage>\n  <opensearch:totalResults>0</opensearch:totalResults>\n  <opensearch:startIndex>0</opensearch:startIndex>\n</feed>\n"
+}

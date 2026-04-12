@@ -6,7 +6,6 @@ from datetime import datetime, timezone
 
 
 class TestResult(unittest.TestCase):
-    client = arxiv.Client()
 
     def assert_nonempty(self, s):
         self.assertIsNotNone(s)
@@ -36,22 +35,25 @@ class TestResult(unittest.TestCase):
         self.assert_nonempty(result.pdf_url)
 
     def test_result_shape(self):
+        client = arxiv.Client()
         max_results = 100
         search = arxiv.Search("testing", max_results=max_results)
-        results = [r for r in self.client.results(search)]
+        results = [r for r in client.results(search)]
         self.assertEqual(len(results), max_results)
         for result in results:
             self.assert_valid_result(result)
 
     def test_from_feed_entry(self):
-        feed = self.client._parse_feed("https://export.arxiv.org/api/query?search_query=testing")
+        client = arxiv.Client()
+        feed = client._parse_feed("https://export.arxiv.org/api/query?search_query=testing")
         feed_entry = feed.entries[0]
         result = arxiv.Result._from_feed_entry(feed_entry)
         self.assert_valid_result(result)
 
     def test_get_short_id(self):
+        client = arxiv.Client()
         result_id = "1707.08567"
-        result = next(self.client.results(arxiv.Search(id_list=[result_id])))
+        result = next(client.results(arxiv.Search(id_list=[result_id])))
         got = result.get_short_id()
         self.assertTrue(got.startswith(result_id))
         # Should be of form `1707.08567v1`.
@@ -96,6 +98,7 @@ class TestResult(unittest.TestCase):
         self.assertFalse(link == id)
 
     def test_legacy_ids(self):
+        client = arxiv.Client()
         full_legacy_id = "quant-ph/0201082v1"
-        result = next(self.client.results(arxiv.Search(id_list=[full_legacy_id])))
+        result = next(client.results(arxiv.Search(id_list=[full_legacy_id])))
         self.assertEqual(result.get_short_id(), full_legacy_id)

@@ -1,0 +1,5 @@
+{
+  "url": "https://export.arxiv.org/api/query?search_query=&id_list=abc&sortBy=relevance&sortOrder=descending&start=0&max_results=100",
+  "status_code": 400,
+  "body": "<?xml version='1.0' encoding='UTF-8'?>\n<feed xmlns:opensearch=\"http://a9.com/-/spec/opensearch/1.1/\" xmlns:arxiv=\"http://arxiv.org/schemas/atom\" xmlns=\"http://www.w3.org/2005/Atom\">\n  <id>https://arxiv.org/</id>\n  <title>arXiv Search Results</title>\n  <updated>2026-04-12T22:59:06Z</updated>\n  <opensearch:itemsPerPage>1</opensearch:itemsPerPage>\n  <opensearch:totalResults>1</opensearch:totalResults>\n  <opensearch:startIndex>0</opensearch:startIndex>\n  <entry>\n    <id>https://arxiv.org/api/errors#incorrect_id_format_for_abc</id>\n    <title>Error</title>\n    <updated>2026-04-12T22:59:06Z</updated>\n    <link href=\"https://arxiv.org/api/errors#incorrect_id_format_for_abc\" rel=\"alternate\" type=\"text/html\"/>\n    <summary>incorrect id format for abc</summary>\n    <author>\n      <name>arXiv api core</name>\n    </author>\n  </entry>\n</feed>\n"
+}

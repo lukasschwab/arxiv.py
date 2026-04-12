@@ -1,4 +1,4 @@
-from arxiv import arxiv
+import arxiv
 import os
 import shutil
 import tempfile
@@ -6,16 +6,16 @@ import unittest
 
 
 class TestDownload(unittest.TestCase):
-    @classmethod
-    def setUpClass(self):
-        self.fetched_result = next(arxiv.Search(id_list=["1605.08386"]).results())
-        self.fetched_result_with_slash = next(arxiv.Search(id_list=["hep-ex/0406020v1"]).results())
-
-    @classmethod
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()
+        client = arxiv.Client()
+        self.fetched_result = next(
+            client.results(arxiv.Search(id_list=["1605.08386"]))
+        )
+        self.fetched_result_with_slash = next(
+            client.results(arxiv.Search(id_list=["hep-ex/0406020v1"]))
+        )
 
-    @classmethod
     def tearDown(self):
         shutil.rmtree(self.temp_dir)
 
