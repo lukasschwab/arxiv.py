@@ -1,8 +1,9 @@
 """Fixture infrastructure for offline/online test modes.
 
 By default, tests run against recorded golden-file fixtures (fast,
-deterministic). Use ``--live`` to hit the real arXiv API, or ``--record``
-to proxy real responses and save them as fixtures for future offline runs.
+deterministic). Use ``--live`` to hit the real arXiv API, or
+``--live --record`` to proxy real responses and save them as fixtures
+for future offline runs.
 
 Fixtures are stored as files under ``tests/fixtures/``, keyed by a
 stable hash of the request URL.
@@ -67,7 +68,7 @@ def _load_fixture(url: str) -> requests.Response:
         raise FileNotFoundError(
             f"No fixture for URL: {url}\n"
             f"Expected at: {path}\n"
-            "Run `pytest --record` to generate fixtures."
+            "Run `pytest --live --record` to generate fixtures."
         )
     _used_fixture_paths.add(path)
     data = json.loads(path.read_text(encoding="utf-8"))
@@ -101,7 +102,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 def _mock_api(request: pytest.FixtureRequest) -> None:  # type: ignore[return]
     """Autouse fixture: patches Session.get and time.sleep unless --live."""
     live = request.config.getoption("--live")
-    record = request.config.getoption("--record")
+    record = request.config.getoption("--record") and live
 
     if live and not record:
         # Run against the real API with no patching.
@@ -167,4 +168,4 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
         for name in names:
             tw.line(f"  {name}")
         tw.line("")
-        tw.line("Delete them, or run `pytest --record` to regenerate.")
+        tw.line("Delete them, or run `pytest --live --record` to regenerate.")
