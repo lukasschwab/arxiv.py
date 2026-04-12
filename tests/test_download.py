@@ -9,9 +9,7 @@ class TestDownload(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()
         client = arxiv.Client()
-        self.fetched_result = next(
-            client.results(arxiv.Search(id_list=["1605.08386"]))
-        )
+        self.fetched_result = next(client.results(arxiv.Search(id_list=["1605.08386"])))
         self.fetched_result_with_slash = next(
             client.results(arxiv.Search(id_list=["hep-ex/0406020v1"]))
         )

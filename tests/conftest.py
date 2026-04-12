@@ -117,8 +117,9 @@ def _mock_api(request: pytest.FixtureRequest) -> None:  # type: ignore[return]
             _save_fixture(url, resp)
             return resp
 
-        with patch.object(requests.Session, "get", recording_get), patch.object(
-            time, "sleep", lambda _: None
+        with (
+            patch.object(requests.Session, "get", recording_get),
+            patch.object(time, "sleep", lambda _: None),
         ):
             yield
         return

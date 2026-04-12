@@ -6,7 +6,6 @@ from datetime import datetime, timezone
 
 
 class TestResult(unittest.TestCase):
-
     def assert_nonempty(self, s):
         self.assertIsNotNone(s)
         self.assertNotEqual(s, "")
