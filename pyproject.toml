@@ -84,6 +84,9 @@ max-complexity = 10
 addopts = "--verbose"
 log_cli = true
 log_cli_level = "DEBUG"
+markers = [
+    "live_only: test requires the live arXiv API (skipped in offline mode)",
+]
 
 [tool.mypy]
 python_version = "3.10"

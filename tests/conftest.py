@@ -98,6 +98,16 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     )
 
 
+def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
+    """Skip tests marked ``live_only`` when running in offline mode."""
+    if config.getoption("--live"):
+        return
+    skip_live = pytest.mark.skip(reason="Requires --live (no offline fixture).")
+    for item in items:
+        if "live_only" in item.keywords:
+            item.add_marker(skip_live)
+
+
 @pytest.fixture(autouse=True)
 def _mock_api(request: pytest.FixtureRequest) -> None:  # type: ignore[return]
     """Autouse fixture: patches Session.get and time.sleep unless --live."""
