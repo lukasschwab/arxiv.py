@@ -1,27 +1,27 @@
 """
-Tests for work-arounds to known arXiv API bugs.
+Regression tests for previously-known arXiv API bugs.
 """
 
-import arxiv
 import unittest
+
+import arxiv
 
 
 class TestAPIBugs(unittest.TestCase):
     def test_missing_title(self):
         """
-        Papers with the title "0" do not have a title element in the Atom feed.
+        Regression test for the paper literally titled "0" (arxiv:2104.12255v1).
 
-        It's unclear whether other falsey titles (e.g. "False", "null", or empty
-        titles) are allowed by arXiv and are impacted by this bug. This may also
-        surface for other expected fields (e.g. author names).
+        The arXiv API used to omit the <title> element entirely for this paper,
+        which required a client-side fallback. The API now returns
+        ``<title>0</title>`` properly, so the workaround has been removed; this
+        test ensures the title parses normally and we don't regress.
 
         + GitHub issue: https://github.com/lukasschwab/arxiv.py/issues/71
         + Bug report: https://groups.google.com/u/1/g/arxiv-api/c/ORENISrc5gc
         """
-        paper_without_title = "2104.12255v1"
-        try:
-            results = list(arxiv.Search(id_list=[paper_without_title]).results())
-            self.assertEqual(len(results), 1)
-            self.assertEqual(results[0].get_short_id(), paper_without_title)
-        except AttributeError:
-            self.fail("got AttributeError fetching paper without title")
+        paper_id = "2104.12255v1"
+        results = list(arxiv.Search(id_list=[paper_id]).results())
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].get_short_id(), paper_id)
+        self.assertEqual(results[0].title, "0")
