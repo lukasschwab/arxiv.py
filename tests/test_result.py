@@ -47,8 +47,10 @@ class TestResult(unittest.TestCase):
         client = arxiv.Client()
         # Use a fixed id_list so the fixture key is stable and the feed
         # contains exactly one well-known entry.
-        url = client._format_url(arxiv.Search(id_list=["1605.08386"]), 0, client.page_size)
-        feed = client._parse_feed(url)
+        form_data = client._format_form_data(
+            arxiv.Search(id_list=["1605.08386"]), 0, client.page_size
+        )
+        feed = client._parse_feed(form_data)
         self.assertEqual(len(feed.results), 1)
         self.assert_valid_result(feed.results[0])
 

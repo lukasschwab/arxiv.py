@@ -11,7 +11,7 @@ import re
 import requests
 import warnings
 
-from urllib.parse import parse_qs, urlencode, urlparse
+from urllib.parse import urlencode, urlparse
 from urllib.request import urlretrieve
 from datetime import datetime, timedelta, timezone
 from calendar import timegm
@@ -578,8 +578,8 @@ class Client:
         return itertools.islice(self._results(search, offset), limit)
 
     def _results(self, search: Search, offset: int = 0) -> Generator[Result, None, None]:
-        page_url = self._format_url(search, offset, self.page_size)
-        feed = self._parse_feed(page_url, first_page=True)
+        form_data = self._format_form_data(search, offset, self.page_size)
+        feed = self._parse_feed(form_data, first_page=True)
         if not feed.results:
             logger.info("Got empty first page; stopping generation")
             return
@@ -595,8 +595,8 @@ class Client:
             offset += len(feed.results)
             if offset >= total_results:
                 break
-            page_url = self._format_url(search, offset, self.page_size)
-            feed = self._parse_feed(page_url, first_page=False)
+            form_data = self._format_form_data(search, offset, self.page_size)
+            feed = self._parse_feed(form_data, first_page=False)
 
     def _format_form_data(self, search: Search, start: int, page_size: int) -> dict[str, str]:
         """
@@ -613,24 +613,44 @@ class Client:
 
     def _format_url(self, search: Search, start: int, page_size: int) -> str:
         """
-        Construct the canonical GET-form URL for a search.
+        Construct a GET-form URL for a search.
 
-        Even though requests are sent as POSTs, this URL is still useful as
-        a stable, human-readable identifier for logging and error reporting.
+        .. deprecated::
+            Requests are now sent as HTTP POSTs (see issue #15), so this URL
+            is no longer used to make API calls. It remains a convenient
+            human-readable identifier for logging — but there is **no
+            guarantee it is a valid request URL**: searches with long
+            ``id_list``s or queries can exceed the server's URI length
+            limit. Prefer building the form-data dict via
+            ``Client._format_form_data`` if you need the actual request
+            parameters.
         """
+        warnings.warn(
+            "Client._format_url is deprecated; the client POSTs form data "
+            "instead, and the URL may be too long to be a valid GET request. "
+            "Use Client._format_form_data for the request parameters.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return "{}?{}".format(
             self.query_url, urlencode(self._format_form_data(search, start, page_size))
         )
 
-    def _parse_feed(self, url: str, first_page: bool = True, _try_index: int = 0) -> ParsedFeed:
+    def _parse_feed(
+        self,
+        form_data: dict[str, str],
+        first_page: bool = True,
+        _try_index: int = 0,
+    ) -> ParsedFeed:
         """
-        Fetches the specified URL and parses it as an Atom feed.
+        POSTs the given form data to the arXiv API and parses the response as
+        an Atom feed.
 
         If a request fails or is unexpectedly empty, retries the request up to
         `self.num_retries` times.
         """
         try:
-            return self.__try_parse_feed(url, first_page=first_page, try_index=_try_index)
+            return self.__try_parse_feed(form_data, first_page=first_page, try_index=_try_index)
         except (
             HTTPError,
             UnexpectedEmptyPageError,
@@ -638,13 +658,13 @@ class Client:
         ) as err:
             if _try_index < self.num_retries:
                 logger.debug("Got error (try %d): %s", _try_index, err)
-                return self._parse_feed(url, first_page=first_page, _try_index=_try_index + 1)
+                return self._parse_feed(form_data, first_page=first_page, _try_index=_try_index + 1)
             logger.debug("Giving up (try %d): %s", _try_index, err)
             raise err
 
     def __try_parse_feed(
         self,
-        url: str,
+        form_data: dict[str, str],
         first_page: bool,
         try_index: int,
     ) -> ParsedFeed:
@@ -662,13 +682,12 @@ class Client:
                 logger.info("Sleeping: %f seconds", to_sleep)
                 time.sleep(to_sleep)
 
-        logger.info("Requesting page (first: %r, try: %d): %s", first_page, try_index, url)
+        # The arXiv API also accepts these parameters via URL query string,
+        # but POST avoids 414 URI Too Long for large `id_list`s (issue #15).
+        # We still build the GET-form URL for logging and error reporting.
+        log_url = "{}?{}".format(self.query_url, urlencode(form_data))
+        logger.info("Requesting page (first: %r, try: %d): %s", first_page, try_index, log_url)
 
-        # POST the parameters as form data so long `id_list`s don't bump up
-        # against the server's URI length limit. See issue #15.
-        form_data = {
-            k: v[0] for k, v in parse_qs(urlparse(url).query, keep_blank_values=True).items()
-        }
         resp = self._session.post(
             self.query_url,
             data=form_data,
@@ -676,11 +695,11 @@ class Client:
         )
         self._last_request_dt = datetime.now()
         if resp.status_code != requests.codes.OK:
-            raise HTTPError(url, try_index, resp.status_code)
+            raise HTTPError(log_url, try_index, resp.status_code)
 
         feed = _feed.parse(resp.content)
         if len(feed.results) == 0 and not first_page:
-            raise UnexpectedEmptyPageError(url, try_index, feed)
+            raise UnexpectedEmptyPageError(log_url, try_index, feed)
 
         if feed.malformed:
             logger.warning("Malformed feed; consider handling: %s", feed.error)
