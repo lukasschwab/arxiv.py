@@ -100,11 +100,11 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 @pytest.fixture(autouse=True)
 def _mock_api(request: pytest.FixtureRequest) -> None:  # type: ignore[return]
-    """Autouse fixture: patches Session.post and time.sleep unless --live."""
+    """Autouse fixture: patches Session.{get,post} and time.sleep unless --live."""
     from urllib.parse import urlencode
 
     def _canonical_url(url: str, data: dict | None) -> str:
-        """Reconstruct the canonical GET-form URL for a POST request."""
+        """Reconstruct the canonical GET-form URL."""
         if not data:
             return url
         return f"{url}?{urlencode(data)}"
@@ -119,7 +119,13 @@ def _mock_api(request: pytest.FixtureRequest) -> None:  # type: ignore[return]
 
     if record:
         # Proxy: call real API, save responses, patch out sleep.
+        real_get = requests.Session.get
         real_post = requests.Session.post
+
+        def recording_get(self: requests.Session, url: str, **kwargs):  # type: ignore[no-untyped-def]
+            resp = real_get(self, url, **kwargs)
+            _save_fixture(url, resp)
+            return resp
 
         def recording_post(self: requests.Session, url: str, **kwargs):  # type: ignore[no-untyped-def]
             resp = real_post(self, url, **kwargs)
@@ -127,6 +133,7 @@ def _mock_api(request: pytest.FixtureRequest) -> None:  # type: ignore[return]
             return resp
 
         with (
+            patch.object(requests.Session, "get", recording_get),
             patch.object(requests.Session, "post", recording_post),
             patch.object(time, "sleep", lambda _: None),
         ):
@@ -134,6 +141,9 @@ def _mock_api(request: pytest.FixtureRequest) -> None:  # type: ignore[return]
         return
 
     # Default: offline mode — serve from fixtures, no sleep, stub downloads.
+    def fixture_get(self: requests.Session, url: str, **kwargs):  # type: ignore[no-untyped-def]
+        return _load_fixture(url)
+
     def fixture_post(self: requests.Session, url: str, **kwargs):  # type: ignore[no-untyped-def]
         return _load_fixture(_canonical_url(url, kwargs.get("data")))
 
@@ -143,6 +153,7 @@ def _mock_api(request: pytest.FixtureRequest) -> None:  # type: ignore[return]
         return (filename, None)
 
     with (
+        patch.object(requests.Session, "get", fixture_get),
         patch.object(requests.Session, "post", fixture_post),
         patch.object(time, "sleep", lambda _: None),
         patch.object(urllib.request, "urlretrieve", fake_urlretrieve),

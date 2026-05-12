@@ -500,14 +500,19 @@ class Client:
 
     query_url = "https://export.arxiv.org/api/query"
     """
-    The arXiv API endpoint URL. Requests are sent as HTTP POST so that
-    arbitrarily long `id_list`s do not run into the server's URI length
-    limit (see issue #15); the [arXiv user manual](
-    https://info.arxiv.org/help/api/user-manual.html#31-calling-the-api)
-    documents POST as an equivalent alternative to GET.
+    The arXiv API endpoint URL.
     """
+    long_request_threshold: int = 4000
     """
-    The arXiv query API endpoint format.
+    Requests whose GET-form URL would exceed this many bytes are sent as
+    HTTP POSTs instead, with the parameters in a form-encoded body. The
+    arXiv API accepts both verbs equivalently (see the [user manual]
+    (https://info.arxiv.org/help/api/user-manual.html#31-calling-the-api)),
+    and falling back to POST avoids HTTP 414 (URI Too Long) responses for
+    large `id_list`s and queries. See issue #15.
+
+    The default (4000 bytes) is well below the 8190-byte request-line
+    limit Apache (which arXiv uses) defaults to.
     """
     page_size: int
     """
@@ -616,19 +621,20 @@ class Client:
         Construct a GET-form URL for a search.
 
         .. deprecated::
-            Requests are now sent as HTTP POSTs (see issue #15), so this URL
-            is no longer used to make API calls. It remains a convenient
-            human-readable identifier for logging — but there is **no
-            guarantee it is a valid request URL**: searches with long
-            ``id_list``s or queries can exceed the server's URI length
-            limit. Prefer building the form-data dict via
-            ``Client._format_form_data`` if you need the actual request
-            parameters.
+            This URL is no longer guaranteed to be a valid API request:
+            searches with long ``id_list``s or queries exceed the server's
+            URI length limit and are sent as HTTP POSTs by the client (see
+            issue #15). The URL is still useful as a stable, human-readable
+            identifier for logging.
+
+            Prefer ``Client._format_form_data`` if you want the actual
+            request parameters.
         """
         warnings.warn(
-            "Client._format_url is deprecated; the client POSTs form data "
-            "instead, and the URL may be too long to be a valid GET request. "
-            "Use Client._format_form_data for the request parameters.",
+            "Client._format_url is deprecated; the URL it returns is not "
+            "guaranteed to be a valid API request for long id_lists or "
+            "queries. Use Client._format_form_data for the request "
+            "parameters.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -682,17 +688,28 @@ class Client:
                 logger.info("Sleeping: %f seconds", to_sleep)
                 time.sleep(to_sleep)
 
-        # The arXiv API also accepts these parameters via URL query string,
-        # but POST avoids 414 URI Too Long for large `id_list`s (issue #15).
-        # We still build the GET-form URL for logging and error reporting.
-        log_url = "{}?{}".format(self.query_url, urlencode(form_data))
-        logger.info("Requesting page (first: %r, try: %d): %s", first_page, try_index, log_url)
-
-        resp = self._session.post(
-            self.query_url,
-            data=form_data,
-            headers={"user-agent": "arxiv.py/2.3.2"},
+        # Most queries comfortably fit in a URL. Apache (which arXiv uses)
+        # defaults to an 8190-byte limit on the request line, so we stay
+        # well below that. Above the threshold we fall back to POST, which
+        # the arXiv API also accepts for the same parameters (see user
+        # manual §3.1) — this is what fixes issue #15.
+        get_url = "{}?{}".format(self.query_url, urlencode(form_data))
+        use_post = len(get_url) > self.long_request_threshold
+        method = "POST" if use_post else "GET"
+        logger.info(
+            "Requesting page (first: %r, try: %d, method: %s): %s",
+            first_page,
+            try_index,
+            method,
+            get_url,
         )
+
+        headers = {"user-agent": "arxiv.py/2.3.2"}
+        if use_post:
+            resp = self._session.post(self.query_url, data=form_data, headers=headers)
+        else:
+            resp = self._session.get(get_url, headers=headers)
+        log_url = get_url
         self._last_request_dt = datetime.now()
         if resp.status_code != requests.codes.OK:
             raise HTTPError(log_url, try_index, resp.status_code)

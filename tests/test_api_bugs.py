@@ -30,8 +30,10 @@ class TestAPIBugs(unittest.TestCase):
         """
         Regression test for issue #15: a long `id_list` used to produce an
         HTTP 414 (URI Too Long) when the parameters were encoded into the
-        request URL. The client now sends parameters as form data over POST,
-        which the arXiv API also accepts (see the API user manual).
+        request URL. When the GET-form URL would exceed
+        ``Client.long_request_threshold``, the client now falls back to
+        POSTing the parameters as form data, which the arXiv API also
+        accepts (see the API user manual).
 
         We don't care about the response contents here — only that the
         client formats the request such that the server doesn't reject it on
@@ -62,7 +64,15 @@ class TestAPIBugs(unittest.TestCase):
             )
             return resp
 
-        with patch.object(requests.Session, "post", fake_post):
+        def boom_get(self, url, **kwargs):  # type: ignore[no-untyped-def]
+            raise AssertionError(
+                f"Long requests should be POSTed, not GETed (URL would be {len(url)} bytes long)."
+            )
+
+        with (
+            patch.object(requests.Session, "post", fake_post),
+            patch.object(requests.Session, "get", boom_get),
+        ):
             list(arxiv.Client().results(arxiv.Search(id_list=ids)))
 
         # The endpoint URL itself stays short — IDs live in the POST body.
