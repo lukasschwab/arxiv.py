@@ -42,12 +42,15 @@ class TestResult(unittest.TestCase):
         for result in results:
             self.assert_valid_result(result)
 
-    def test_from_feed_entry(self):
+    def test_parse_feed(self):
+        """`_parse_feed` should return a `ParsedFeed` of fully-built `Result`s."""
         client = arxiv.Client()
-        feed = client._parse_feed("https://export.arxiv.org/api/query?search_query=testing")
-        feed_entry = feed.entries[0]
-        result = arxiv.Result._from_feed_entry(feed_entry)
-        self.assert_valid_result(result)
+        # Use a fixed id_list so the fixture key is stable and the feed
+        # contains exactly one well-known entry.
+        url = client._format_url(arxiv.Search(id_list=["1605.08386"]), 0, client.page_size)
+        feed = client._parse_feed(url)
+        self.assertEqual(len(feed.results), 1)
+        self.assert_valid_result(feed.results[0])
 
     def test_get_short_id(self):
         client = arxiv.Client()
@@ -101,3 +104,33 @@ class TestResult(unittest.TestCase):
         full_legacy_id = "quant-ph/0201082v1"
         result = next(client.results(arxiv.Search(id_list=[full_legacy_id])))
         self.assertEqual(result.get_short_id(), full_legacy_id)
+
+    def test_author_affiliations(self):
+        """Regression test for https://github.com/lukasschwab/arxiv.py/issues/62.
+
+        The arXiv API exposes per-author affiliations via
+        `<arxiv:affiliation>` children of `<author>` elements. This data was
+        silently dropped by the previous feedparser-based implementation; it
+        should now be available on `Result.Author.affiliation`.
+        """
+        # astro-ph/0601001 has four authors, each with a distinct affiliation.
+        client = arxiv.Client()
+        result = next(client.results(arxiv.Search(id_list=["astro-ph/0601001"])))
+        self.assertEqual(len(result.authors), 4)
+        names_and_affiliations = [(a.name, a.affiliation) for a in result.authors]
+        self.assertEqual(
+            names_and_affiliations,
+            [
+                ("Andrew Gould", ["Ohio State"]),
+                ("Susan Dorsher", ["Ohio State"]),
+                ("B. Scott Gaudi", ["CfA"]),
+                ("Andrzej Udalski", ["Warsaw University Observatory"]),
+            ],
+        )
+
+    def test_author_no_affiliation(self):
+        """Most papers have no affiliation data; the field should be an empty list."""
+        client = arxiv.Client()
+        result = next(client.results(arxiv.Search(id_list=["1605.08386"])))
+        for author in result.authors:
+            self.assertEqual(author.affiliation, [])
