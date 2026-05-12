@@ -11,7 +11,7 @@ import re
 import requests
 import warnings
 
-from urllib.parse import urlencode, urlparse
+from urllib.parse import parse_qs, urlencode, urlparse
 from urllib.request import urlretrieve
 from datetime import datetime, timedelta, timezone
 from calendar import timegm
@@ -498,7 +498,14 @@ class Client:
     `Client.results`.
     """
 
-    query_url_format = "https://export.arxiv.org/api/query?{}"
+    query_url = "https://export.arxiv.org/api/query"
+    """
+    The arXiv API endpoint URL. Requests are sent as HTTP POST so that
+    arbitrarily long `id_list`s do not run into the server's URI length
+    limit (see issue #15); the [arXiv user manual](
+    https://info.arxiv.org/help/api/user-manual.html#31-calling-the-api)
+    documents POST as an equivalent alternative to GET.
+    """
     """
     The arXiv query API endpoint format.
     """
@@ -591,19 +598,31 @@ class Client:
             page_url = self._format_url(search, offset, self.page_size)
             feed = self._parse_feed(page_url, first_page=False)
 
-    def _format_url(self, search: Search, start: int, page_size: int) -> str:
+    def _format_form_data(
+        self, search: Search, start: int, page_size: int
+    ) -> dict[str, str]:
         """
-        Construct a request API for search that returns up to `page_size`
-        results starting with the result at index `start`.
+        Build the form-encoded body parameters for a search request.
         """
-        url_args = search._url_args()
-        url_args.update(
+        form_data = search._url_args()
+        form_data.update(
             {
                 "start": str(start),
                 "max_results": str(page_size),
             }
         )
-        return self.query_url_format.format(urlencode(url_args))
+        return form_data
+
+    def _format_url(self, search: Search, start: int, page_size: int) -> str:
+        """
+        Construct the canonical GET-form URL for a search.
+
+        Even though requests are sent as POSTs, this URL is still useful as
+        a stable, human-readable identifier for logging and error reporting.
+        """
+        return "{}?{}".format(
+            self.query_url, urlencode(self._format_form_data(search, start, page_size))
+        )
 
     def _parse_feed(self, url: str, first_page: bool = True, _try_index: int = 0) -> ParsedFeed:
         """
@@ -647,7 +666,17 @@ class Client:
 
         logger.info("Requesting page (first: %r, try: %d): %s", first_page, try_index, url)
 
-        resp = self._session.get(url, headers={"user-agent": "arxiv.py/2.3.2"})
+        # POST the parameters as form data so long `id_list`s don't bump up
+        # against the server's URI length limit. See issue #15.
+        form_data = {
+            k: v[0]
+            for k, v in parse_qs(urlparse(url).query, keep_blank_values=True).items()
+        }
+        resp = self._session.post(
+            self.query_url,
+            data=form_data,
+            headers={"user-agent": "arxiv.py/2.3.2"},
+        )
         self._last_request_dt = datetime.now()
         if resp.status_code != requests.codes.OK:
             raise HTTPError(url, try_index, resp.status_code)
