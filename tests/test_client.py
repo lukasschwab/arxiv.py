@@ -105,7 +105,7 @@ class TestClient(unittest.TestCase):
             self.assertFalse(r.entry_id in ids)
             ids.add(r.entry_id)
 
-    @patch("requests.Session.post", return_value=empty_response(500))
+    @patch("requests.Session.get", return_value=empty_response(500))
     @patch("time.sleep", return_value=None)
     def test_retry(self, mock_sleep, mock_get):
         broken_client = arxiv.Client()
@@ -125,7 +125,7 @@ class TestClient(unittest.TestCase):
                 self.assertEqual(e.status, 500)
                 self.assertEqual(e.retry, broken_client.num_retries)
 
-    @patch("requests.Session.post", return_value=empty_response(200))
+    @patch("requests.Session.get", return_value=empty_response(200))
     @patch("time.sleep", return_value=None)
     def test_sleep_standard(self, mock_sleep, mock_get):
         client = arxiv.Client()
@@ -139,7 +139,7 @@ class TestClient(unittest.TestCase):
         client._parse_feed(form_data)
         mock_sleep.assert_called_once_with(approx(client.delay_seconds, rel=1e-3))
 
-    @patch("requests.Session.post", return_value=empty_response(200))
+    @patch("requests.Session.get", return_value=empty_response(200))
     @patch("time.sleep", return_value=None)
     def test_sleep_multiple_requests(self, mock_sleep, mock_get):
         client = arxiv.Client()
@@ -153,7 +153,7 @@ class TestClient(unittest.TestCase):
         client._parse_feed(form_data2)
         mock_sleep.assert_called_once_with(approx(client.delay_seconds, rel=1e-3))
 
-    @patch("requests.Session.post", return_value=empty_response(200))
+    @patch("requests.Session.get", return_value=empty_response(200))
     @patch("time.sleep", return_value=None)
     def test_sleep_elapsed(self, mock_sleep, mock_get):
         client = arxiv.Client()
@@ -168,7 +168,7 @@ class TestClient(unittest.TestCase):
         client._parse_feed(form_data)
         mock_sleep.assert_not_called()
 
-    @patch("requests.Session.post", return_value=empty_response(200))
+    @patch("requests.Session.get", return_value=empty_response(200))
     @patch("time.sleep", return_value=None)
     def test_sleep_zero_delay(self, mock_sleep, mock_get):
         client = arxiv.Client(delay_seconds=0)
@@ -177,7 +177,7 @@ class TestClient(unittest.TestCase):
         client._parse_feed(form_data)
         mock_sleep.assert_not_called()
 
-    @patch("requests.Session.post", return_value=empty_response(500))
+    @patch("requests.Session.get", return_value=empty_response(500))
     @patch("time.sleep", return_value=None)
     def test_sleep_between_errors(self, mock_sleep, mock_get):
         client = arxiv.Client()
