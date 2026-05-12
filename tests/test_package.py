@@ -27,3 +27,17 @@ class TestPackage(unittest.TestCase):
         import arxiv.arxiv as deprecated_dot
 
         self.assertSetEqual(expected, TestPackage.get_public_classes(deprecated_dot))
+
+
+class TestUserAgent(unittest.TestCase):
+    def test_user_agent_includes_version(self):
+        from importlib.metadata import PackageNotFoundError, version
+
+        from arxiv import _USER_AGENT
+
+        try:
+            expected = f"arxiv.py/{version('arxiv')}"
+        except PackageNotFoundError:
+            expected = "arxiv.py"
+        self.assertEqual(_USER_AGENT, expected)
+        self.assertTrue(_USER_AGENT.startswith("arxiv.py"))

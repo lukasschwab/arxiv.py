@@ -12,6 +12,7 @@ import re
 import requests
 import warnings
 
+from importlib.metadata import PackageNotFoundError, version
 from urllib.parse import urlencode, urlparse
 from urllib.request import urlretrieve
 from datetime import datetime, timedelta, timezone
@@ -40,6 +41,12 @@ if TYPE_CHECKING:
 
 
 logger = logging.getLogger(__name__)
+
+try:
+    _USER_AGENT = f"arxiv.py/{version('arxiv')}"
+except PackageNotFoundError:
+    # Editable / unpacked install without metadata; fall back gracefully.
+    _USER_AGENT = "arxiv.py"
 
 _DEFAULT_TIME = datetime.min
 
@@ -718,7 +725,7 @@ class Client:
 
         logger.info("Requesting page (first: %r, try: %d): %s", first_page, try_index, url)
 
-        resp = self._session.get(url, headers={"user-agent": "arxiv.py/2.3.2"})
+        resp = self._session.get(url, headers={"user-agent": _USER_AGENT})
         self._last_request_dt = datetime.now()
         if resp.status_code != requests.codes.OK:
             raise HTTPError(url, try_index, resp.status_code)
