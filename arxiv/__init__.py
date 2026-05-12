@@ -598,9 +598,7 @@ class Client:
             page_url = self._format_url(search, offset, self.page_size)
             feed = self._parse_feed(page_url, first_page=False)
 
-    def _format_form_data(
-        self, search: Search, start: int, page_size: int
-    ) -> dict[str, str]:
+    def _format_form_data(self, search: Search, start: int, page_size: int) -> dict[str, str]:
         """
         Build the form-encoded body parameters for a search request.
         """
@@ -669,8 +667,7 @@ class Client:
         # POST the parameters as form data so long `id_list`s don't bump up
         # against the server's URI length limit. See issue #15.
         form_data = {
-            k: v[0]
-            for k, v in parse_qs(urlparse(url).query, keep_blank_values=True).items()
+            k: v[0] for k, v in parse_qs(urlparse(url).query, keep_blank_values=True).items()
         }
         resp = self._session.post(
             self.query_url,
