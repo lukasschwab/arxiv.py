@@ -137,15 +137,7 @@ class Result:
         """
         if not hasattr(entry, "id"):
             raise Result.MissingFieldError("id")
-        # Title attribute may be absent for certain titles. Defaulting to "0" as
-        # it's the only title observed to cause this bug.
-        # https://github.com/lukasschwab/arxiv.py/issues/71
-        # title = entry.title if hasattr(entry, "title") else "0"
-        title = "0"
-        if hasattr(entry, "title"):
-            title = entry.title
-        else:
-            logger.warning("Result %s is missing title attribute; defaulting to '0'", entry.id)
+        title = getattr(entry, "title", "")
         return Result(
             entry_id=entry.id,
             updated=Result._to_datetime(entry.updated_parsed),
