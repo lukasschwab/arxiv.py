@@ -77,6 +77,21 @@ for result in big_slow_client.results(arxiv.Search(query="quantum")):
   print(result.title)
 ```
 
+#### Downloading a paper
+
+```python
+import arxiv
+from urllib.request import urlretrieve
+
+paper = next(arxiv.Client().results(arxiv.Search(id_list=["1605.08386v1"])))
+
+# Download the PDF.
+urlretrieve(paper.pdf_url, "paper.pdf")
+
+# Download the source tarball.
+urlretrieve(paper.source_url(), "paper.tar.gz")
+```
+
 #### Logging
 
 To inspect this package's network behavior and API logic, configure a `DEBUG`-level logger.
