@@ -21,9 +21,6 @@ import arxiv
 
 ### Examples
 
-> [!TIP]
-> [`arxivql`](https://pypi.org/project/arxivql/) may simplify constructing complex query strings.
-
 #### Fetching results
 
 ```python
@@ -60,6 +57,9 @@ search_by_id = arxiv.Search(id_list=["1605.08386v1"])
 first_result = next(client.results(search_by_id))
 print(first_result.title)
 ```
+
+> [!TIP]
+> [`arxivql`](https://pypi.org/project/arxivql/) may simplify constructing complex query strings.
 
 #### Fetching results with a custom client
 
@@ -106,11 +106,9 @@ A `Search` specifies a search of arXiv's database. Use `Client.results` to get a
 
 ### Result
 
-The `Result` objects yielded by `Client.results` include metadata about each paper and helper methods for downloading their content.
+The `Result` objects yielded by `Client.results` include metadata about each paper.
 
 The meaning of the underlying raw data is documented in the [arXiv API User Manual: Details of Atom Results Returned](https://arxiv.org/help/api/user-manual#_details_of_atom_results_returned).
-
-`Result` also exposes helper methods for downloading papers: `Result.download_pdf` and `Result.download_source`.
 
 ## Development
 

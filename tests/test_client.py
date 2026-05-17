@@ -98,7 +98,7 @@ class TestClient(unittest.TestCase):
     def test_no_duplicates(self):
         search = arxiv.Search("testing", max_results=100)
         ids = set()
-        for r in search.results():
+        for r in arxiv.Client().results(search):
             self.assertFalse(r.entry_id in ids)
             ids.add(r.entry_id)
 
