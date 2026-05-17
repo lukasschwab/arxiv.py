@@ -21,7 +21,7 @@ class TestAPIBugs(unittest.TestCase):
         + Bug report: https://groups.google.com/u/1/g/arxiv-api/c/ORENISrc5gc
         """
         paper_id = "2104.12255v1"
-        results = list(arxiv.Search(id_list=[paper_id]).results())
+        results = list(arxiv.Client().results(arxiv.Search(id_list=[paper_id])))
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].get_short_id(), paper_id)
         self.assertEqual(results[0].title, "0")

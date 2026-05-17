@@ -19,7 +19,7 @@ class TestClient(unittest.TestCase):
             list(arxiv.Client(num_retries=0).results(arxiv.Search(id_list=["abc"])))
 
     def test_invalid_id(self):
-        results = list(arxiv.Search(id_list=["0000.0000"]).results())
+        results = list(arxiv.Client().results(arxiv.Search(id_list=["0000.0000"])))
         self.assertEqual(len(results), 0)
 
     def test_nonexistent_id_in_list(self):
@@ -98,7 +98,7 @@ class TestClient(unittest.TestCase):
     def test_no_duplicates(self):
         search = arxiv.Search("testing", max_results=100)
         ids = set()
-        for r in search.results():
+        for r in arxiv.Client().results(search):
             self.assertFalse(r.entry_id in ids)
             ids.add(r.entry_id)
 

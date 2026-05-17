@@ -21,9 +21,6 @@ import arxiv
 
 ### Examples
 
-> [!TIP]
-> [`arxivql`](https://pypi.org/project/arxivql/) may simplify constructing complex query strings.
-
 #### Fetching results
 
 ```python
@@ -61,6 +58,9 @@ first_result = next(client.results(search_by_id))
 print(first_result.title)
 ```
 
+> [!TIP]
+> [`arxivql`](https://pypi.org/project/arxivql/) may simplify constructing complex query strings.
+
 #### Fetching results with a custom client
 
 ```python
@@ -75,6 +75,21 @@ big_slow_client = arxiv.Client(
 # Prints 1000 titles before needing to make another request.
 for result in big_slow_client.results(arxiv.Search(query="quantum")):
   print(result.title)
+```
+
+#### Downloading a paper
+
+```python
+import arxiv
+from urllib.request import urlretrieve
+
+paper = next(arxiv.Client().results(arxiv.Search(id_list=["1605.08386v1"])))
+
+# Download the PDF.
+urlretrieve(paper.pdf_url, "paper.pdf")
+
+# Download the source tarball.
+urlretrieve(paper.source_url(), "paper.tar.gz")
 ```
 
 #### Logging
@@ -106,11 +121,9 @@ A `Search` specifies a search of arXiv's database. Use `Client.results` to get a
 
 ### Result
 
-The `Result` objects yielded by `Client.results` include metadata about each paper and helper methods for downloading their content.
+The `Result` objects yielded by `Client.results` include metadata about each paper.
 
 The meaning of the underlying raw data is documented in the [arXiv API User Manual: Details of Atom Results Returned](https://arxiv.org/help/api/user-manual#_details_of_atom_results_returned).
-
-`Result` also exposes helper methods for downloading papers: `Result.download_pdf` and `Result.download_source`.
 
 ## Development
 
