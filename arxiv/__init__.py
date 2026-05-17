@@ -406,6 +406,7 @@ class Search:
             "sortOrder": self.sort_order.value,
         }
 
+
 class Client:
     """
     Specifies a strategy for fetching results from arXiv's API.
