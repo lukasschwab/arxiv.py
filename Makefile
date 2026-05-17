@@ -31,7 +31,7 @@ audit:
 
 docs: docs/index.html
 docs/index.html: $(source) README.md
-	uv run pdoc --docformat "restructuredtext" ./arxiv/__init__.py -o docs
+	uv run pdoc --docformat "restructuredtext" ./arxiv/__init__.py '!arxiv._feed' -o docs
 
 clean:
 	rm -rf build dist .pytest_cache
