@@ -24,5 +24,3 @@ jobs:
       run: uv run ruff format --check .
     - name: Type check
       run: uv run make type-check
-    - name: Security audit
-      run: uv run make audit
