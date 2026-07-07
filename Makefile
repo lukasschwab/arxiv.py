@@ -27,10 +27,7 @@ test: $(source) $(tests)
 	uv run pytest
 
 audit:
-	# Exclude the dev version of this package uv installs: unauditable.
-	uv export --no-dev --format requirements-txt \
-	| grep -v '^arxiv' \
-	| uv run pip-audit -r /dev/stdin
+	uv run pip-audit
 
 docs: docs/index.html
 docs/index.html: $(source) README.md
