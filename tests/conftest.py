@@ -14,10 +14,10 @@ import json
 import time
 import urllib.request
 from pathlib import Path
+from typing import Any
 from unittest.mock import patch
 
 import pytest
-import requests
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
@@ -47,21 +47,36 @@ def _url_to_fixture_path(url: str) -> Path:
     return FIXTURES_DIR / f"{prefix}_{url_hash}.json"
 
 
-def _save_fixture(url: str, response: requests.Response) -> None:
+def _save_fixture(url: str, status: int, content: bytes) -> None:
     """Persist a response to disk."""
     FIXTURES_DIR.mkdir(parents=True, exist_ok=True)
     path = _url_to_fixture_path(url)
     data = {
         "url": url,
-        "status_code": response.status_code,
+        "status_code": status,
         # Store body as latin-1 text; XML is always decodable this way and
         # it round-trips through JSON without base64 overhead.
-        "body": response.content.decode("latin-1"),
+        "body": content.decode("latin-1"),
     }
     path.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 
-def _load_fixture(url: str) -> requests.Response:
+class _FixtureResponse:
+    def __init__(self, status: int, content: bytes):
+        self.status = status
+        self._content = content
+
+    def __enter__(self) -> "_FixtureResponse":
+        return self
+
+    def __exit__(self, *args: Any) -> None:
+        pass
+
+    def read(self) -> bytes:
+        return self._content
+
+
+def _load_fixture(url: str) -> _FixtureResponse:
     """Load a previously-recorded response."""
     path = _url_to_fixture_path(url)
     if not path.exists():
@@ -72,10 +87,7 @@ def _load_fixture(url: str) -> requests.Response:
         )
     _used_fixture_paths.add(path)
     data = json.loads(path.read_text(encoding="utf-8"))
-    resp = requests.Response()
-    resp.status_code = data["status_code"]
-    resp._content = data["body"].encode("latin-1")
-    return resp
+    return _FixtureResponse(data["status_code"], data["body"].encode("latin-1"))
 
 
 # ---------------------------------------------------------------------------
@@ -100,7 +112,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 @pytest.fixture(autouse=True)
 def _mock_api(request: pytest.FixtureRequest) -> None:  # type: ignore[return]
-    """Autouse fixture: patches Session.get and time.sleep unless --live."""
+    """Autouse fixture: patches urlopen and time.sleep unless --live."""
     live = request.config.getoption("--live")
     record = request.config.getoption("--record") and live
 
@@ -111,23 +123,24 @@ def _mock_api(request: pytest.FixtureRequest) -> None:  # type: ignore[return]
 
     if record:
         # Proxy: call real API, save responses, patch out sleep.
-        real_get = requests.Session.get
+        real_urlopen = urllib.request.urlopen
 
-        def recording_get(self: requests.Session, url: str, **kwargs):  # type: ignore[no-untyped-def]
-            resp = real_get(self, url, **kwargs)
-            _save_fixture(url, resp)
-            return resp
+        def recording_urlopen(http_request: urllib.request.Request, **kwargs: Any) -> Any:
+            with real_urlopen(http_request, **kwargs) as response:
+                content = response.read()
+                _save_fixture(http_request.full_url, response.status, content)
+                return _FixtureResponse(response.status, content)
 
         with (
-            patch.object(requests.Session, "get", recording_get),
+            patch.object(urllib.request, "urlopen", recording_urlopen),
             patch.object(time, "sleep", lambda _: None),
         ):
             yield
         return
 
     # Default: offline mode — serve from fixtures, no sleep, stub downloads.
-    def fixture_get(self: requests.Session, url: str, **kwargs):  # type: ignore[no-untyped-def]
-        return _load_fixture(url)
+    def fixture_urlopen(http_request: urllib.request.Request, **kwargs: Any) -> _FixtureResponse:
+        return _load_fixture(http_request.full_url)
 
     def fake_urlretrieve(url: str, filename: str) -> tuple[str, None]:
         """Write a small dummy file so download tests can verify paths."""
@@ -135,7 +148,7 @@ def _mock_api(request: pytest.FixtureRequest) -> None:  # type: ignore[return]
         return (filename, None)
 
     with (
-        patch.object(requests.Session, "get", fixture_get),
+        patch.object(urllib.request, "urlopen", fixture_urlopen),
         patch.object(time, "sleep", lambda _: None),
         patch.object(urllib.request, "urlretrieve", fake_urlretrieve),
     ):

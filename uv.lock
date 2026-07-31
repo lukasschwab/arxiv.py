@@ -7,7 +7,6 @@ name = "arxiv"
 source = { editable = "." }
 dependencies = [
     { name = "lxml" },
-    { name = "requests" },
     { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 
@@ -18,7 +17,6 @@ dev = [
     { name = "pip-audit" },
     { name = "pytest" },
     { name = "ruff" },
-    { name = "types-requests" },
 ]
 test = [
     { name = "pytest" },
@@ -27,7 +25,6 @@ test = [
 [package.metadata]
 requires-dist = [
     { name = "lxml", specifier = ">=6.1.0,<7.0" },
-    { name = "requests", specifier = ">=2.32,<2.35" },
     { name = "typing-extensions", marker = "python_full_version < '3.11'", specifier = ">=4.0.0" },
 ]
 
@@ -38,7 +35,6 @@ dev = [
     { name = "pip-audit", specifier = ">=1.1.2" },
     { name = "pytest", specifier = ">=6.2.2" },
     { name = "ruff", specifier = ">=0.1.2" },
-    { name = "types-requests" },
 ]
 test = [{ name = "pytest", specifier = ">=6.2.2" }]
 
@@ -970,18 +966,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/19/75/241269d1da26b624c0d5e110e8149093c759b7a286138f4efd61a60e75fe/tomli_w-1.2.0.tar.gz", hash = "sha256:2dd14fac5a47c27be9cd4c976af5a12d87fb1f0b4512f81d69cce3b35ae25021", size = 7184, upload-time = "2025-01-15T12:07:24.262Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c7/18/c86eb8e0202e32dd3df50d43d7ff9854f8e0603945ff398974c1d91ac1ef/tomli_w-1.2.0-py3-none-any.whl", hash = "sha256:188306098d013b691fcadc011abd66727d3c414c571bb01b1a174ba8c983cf90", size = 6675, upload-time = "2025-01-15T12:07:22.074Z" },
-]
-
-[[package]]
-name = "types-requests"
-version = "2.32.4.20250913"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "urllib3" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/36/27/489922f4505975b11de2b5ad07b4fe1dca0bca9be81a703f26c5f3acfce5/types_requests-2.32.4.20250913.tar.gz", hash = "sha256:abd6d4f9ce3a9383f269775a9835a4c24e5cd6b9f647d64f88aa4613c33def5d", size = 23113, upload-time = "2025-09-13T02:40:02.309Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/2a/20/9a227ea57c1285986c4cf78400d0a91615d25b24e257fd9e2969606bdfae/types_requests-2.32.4.20250913-py3-none-any.whl", hash = "sha256:78c9c1fffebbe0fa487a418e0fa5252017e9c60d1a2da394077f1780f655d7e1", size = 20658, upload-time = "2025-09-13T02:40:01.115Z" },
 ]
 
 [[package]]

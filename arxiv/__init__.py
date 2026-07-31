@@ -5,9 +5,9 @@ from __future__ import annotations
 import logging
 import time
 import itertools
-import requests
 
 from importlib.metadata import PackageNotFoundError, version
+from urllib import error, request
 from urllib.parse import urlencode
 from datetime import datetime, timedelta, timezone
 from calendar import timegm
@@ -439,7 +439,6 @@ class Client:
     """
 
     _last_request_dt: datetime | None
-    _session: requests.Session
 
     def __init__(self, page_size: int = 100, delay_seconds: float = 3.0, num_retries: int = 3):
         """
@@ -454,7 +453,6 @@ class Client:
         self.delay_seconds = delay_seconds
         self.num_retries = num_retries
         self._last_request_dt = None
-        self._session = requests.Session()
 
     def __str__(self) -> str:
         return f"Client(page_size={self.page_size}, delay={self.delay_seconds}s, retries={self.num_retries})"
@@ -534,7 +532,7 @@ class Client:
         except (
             HTTPError,
             UnexpectedEmptyPageError,
-            requests.exceptions.ConnectionError,
+            error.URLError,
         ) as err:
             if _try_index < self.num_retries:
                 logger.debug("Got error (try %d): %s", _try_index, err)
@@ -564,12 +562,20 @@ class Client:
 
         logger.info("Requesting page (first: %r, try: %d): %s", first_page, try_index, url)
 
-        resp = self._session.get(url, headers={"user-agent": _USER_AGENT})
-        self._last_request_dt = datetime.now()
-        if resp.status_code != requests.codes.OK:
-            raise HTTPError(url, try_index, resp.status_code)
+        http_request = request.Request(url, headers={"User-Agent": _USER_AGENT})
+        try:
+            with request.urlopen(http_request) as resp:
+                status = resp.status
+                content = resp.read()
+        except error.HTTPError as err:
+            raise HTTPError(url, try_index, err.code) from err
+        finally:
+            self._last_request_dt = datetime.now()
 
-        feed = _feed.parse(resp.content)
+        if status != 200:
+            raise HTTPError(url, try_index, status)
+
+        feed = _feed.parse(content)
         if len(feed.results) == 0 and not first_page:
             raise UnexpectedEmptyPageError(url, try_index, feed)
 
