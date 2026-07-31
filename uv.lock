@@ -27,7 +27,7 @@ test = [
 [package.metadata]
 requires-dist = [
     { name = "lxml", specifier = ">=6.1.0,<7.0" },
-    { name = "requests", specifier = ">=2.32,<2.34" },
+    { name = "requests", specifier = ">=2.32,<2.35" },
     { name = "typing-extensions", marker = "python_full_version < '3.11'", specifier = ">=4.0.0" },
 ]
 
