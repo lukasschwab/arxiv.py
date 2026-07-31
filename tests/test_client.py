@@ -1,5 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, call, patch
+from urllib.error import URLError
+
 import arxiv
 from datetime import datetime, timedelta
 from pytest import approx
@@ -182,6 +184,18 @@ class TestClient(unittest.TestCase):
         url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
         client._parse_feed(url)
         client._parse_feed(url)
+        mock_sleep.assert_not_called()
+
+    @patch("urllib.request.urlopen", side_effect=URLError("unreachable"))
+    @patch("time.sleep", return_value=None)
+    def test_connection_errors_do_not_delay_retries(self, mock_sleep, mock_urlopen):
+        client = arxiv.Client()
+        url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
+
+        with self.assertRaises(URLError):
+            client._parse_feed(url)
+
+        self.assertEqual(mock_urlopen.call_count, client.num_retries + 1)
         mock_sleep.assert_not_called()
 
     @patch("urllib.request.urlopen", return_value=empty_response(500))

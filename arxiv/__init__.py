@@ -568,10 +568,10 @@ class Client:
                 status = resp.status
                 content = resp.read()
         except error.HTTPError as err:
-            raise HTTPError(url, try_index, err.code) from err
-        finally:
             self._last_request_dt = datetime.now()
+            raise HTTPError(url, try_index, err.code) from err
 
+        self._last_request_dt = datetime.now()
         if status != 200:
             raise HTTPError(url, try_index, status)
 
