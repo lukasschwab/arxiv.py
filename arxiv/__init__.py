@@ -437,11 +437,28 @@ class Client:
     """
     Number of times to retry a failing API request before raising an Exception.
     """
+    timeout: float | None
+    """
+    Number of seconds to wait for the arXiv API to send response data before
+    giving up on a request.
+
+    This guards against arXiv connections that stall indefinitely without
+    responding — a failure mode observed when the API is overloaded or
+    rate-limiting (HTTP 429). A timed-out request is retried like any other
+    failed request, up to `num_retries` times. Set to `None` to wait forever
+    (not recommended).
+    """
 
     _last_request_dt: datetime | None
     _session: requests.Session
 
-    def __init__(self, page_size: int = 100, delay_seconds: float = 3.0, num_retries: int = 3):
+    def __init__(
+        self,
+        page_size: int = 100,
+        delay_seconds: float = 3.0,
+        num_retries: int = 3,
+        timeout: float | None = 30.0,
+    ):
         """
         Constructs an arXiv API client with the specified options.
 
@@ -453,18 +470,23 @@ class Client:
         self.page_size = page_size
         self.delay_seconds = delay_seconds
         self.num_retries = num_retries
+        self.timeout = timeout
         self._last_request_dt = None
         self._session = requests.Session()
 
     def __str__(self) -> str:
-        return f"Client(page_size={self.page_size}, delay={self.delay_seconds}s, retries={self.num_retries})"
+        return (
+            f"Client(page_size={self.page_size}, delay={self.delay_seconds}s, "
+            f"retries={self.num_retries}, timeout={self.timeout}s)"
+        )
 
     def __repr__(self) -> str:
-        return "{}(page_size={}, delay_seconds={}, num_retries={})".format(
+        return "{}(page_size={}, delay_seconds={}, num_retries={}, timeout={})".format(
             _classname(self),
             repr(self.page_size),
             repr(self.delay_seconds),
             repr(self.num_retries),
+            repr(self.timeout),
         )
 
     def results(self, search: Search, offset: int = 0) -> Iterator[Result]:
@@ -535,6 +557,7 @@ class Client:
             HTTPError,
             UnexpectedEmptyPageError,
             requests.exceptions.ConnectionError,
+            requests.exceptions.Timeout,
         ) as err:
             if _try_index < self.num_retries:
                 logger.debug("Got error (try %d): %s", _try_index, err)
@@ -564,7 +587,9 @@ class Client:
 
         logger.info("Requesting page (first: %r, try: %d): %s", first_page, try_index, url)
 
-        resp = self._session.get(url, headers={"user-agent": _USER_AGENT})
+        resp = self._session.get(
+            url, headers={"user-agent": _USER_AGENT}, timeout=self.timeout
+        )
         self._last_request_dt = datetime.now()
         if resp.status_code != requests.codes.OK:
             raise HTTPError(url, try_index, resp.status_code)
