@@ -41,6 +41,25 @@ class TestClient(unittest.TestCase):
         results = [r for r in client.results(search)]
         self.assertEqual(len(results), 2)
 
+    def test_zero_max_results_makes_no_request(self):
+        client = arxiv.Client()
+        search = arxiv.Search(query="testing", max_results=0)
+        for offset in (0, 1):
+            with self.subTest(offset=offset):
+                with patch("requests.Session.get", return_value=empty_response(200)) as get:
+                    self.assertEqual(list(client.results(search, offset=offset)), [])
+                    get.assert_not_called()
+
+    def test_none_max_results_is_unlimited(self):
+        client = arxiv.Client()
+        expected = [arxiv.Result("first"), arxiv.Result("second")]
+        feed = arxiv._feed.ParsedFeed(
+            header=arxiv._feed.FeedHeader(total_results=len(expected)),
+            results=expected,
+        )
+        with patch.object(client, "_parse_feed", return_value=feed):
+            self.assertEqual(list(client.results(arxiv.Search(max_results=None))), expected)
+
     def test_query_page_count(self):
         client = arxiv.Client(page_size=10)
         client._parse_feed = MagicMock(wraps=client._parse_feed)

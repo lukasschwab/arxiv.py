@@ -482,7 +482,7 @@ class Client:
         For more on using generators, see
         [Generators](https://wiki.python.org/moin/Generators).
         """
-        limit = search.max_results - offset if search.max_results else None
+        limit = search.max_results - offset if search.max_results is not None else None
         if limit and limit < 0:
             return iter(())
         return itertools.islice(self._results(search, offset), limit)
