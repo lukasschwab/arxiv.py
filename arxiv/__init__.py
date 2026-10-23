@@ -490,7 +490,7 @@ class Client:
     def _results(self, search: Search, offset: int = 0) -> Generator[Result, None, None]:
         page_url = self._format_url(search, offset, self.page_size)
         feed = self._parse_feed(page_url, first_page=True)
-        if not feed.results:
+        if feed.raw_entry_count == 0:
             logger.info("Got empty first page; stopping generation")
             return
         total_results = feed.header.total_results
@@ -500,9 +500,9 @@ class Client:
             total_results,
         )
 
-        while feed.results:
+        while feed.raw_entry_count:
             yield from feed.results
-            offset += len(feed.results)
+            offset += feed.raw_entry_count
             if offset >= total_results:
                 break
             page_url = self._format_url(search, offset, self.page_size)
@@ -570,7 +570,7 @@ class Client:
             raise HTTPError(url, try_index, resp.status_code)
 
         feed = _feed.parse(resp.content)
-        if len(feed.results) == 0 and not first_page:
+        if feed.raw_entry_count == 0 and not first_page:
             raise UnexpectedEmptyPageError(url, try_index, feed)
 
         if feed.malformed:

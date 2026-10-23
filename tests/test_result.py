@@ -50,6 +50,7 @@ class TestResult(unittest.TestCase):
         url = client._format_url(arxiv.Search(id_list=["1605.08386"]), 0, client.page_size)
         feed = client._parse_feed(url)
         self.assertEqual(len(feed.results), 1)
+        self.assertEqual(feed.raw_entry_count, 1)
         self.assert_valid_result(feed.results[0])
 
     def test_get_short_id(self):

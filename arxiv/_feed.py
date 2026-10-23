@@ -76,12 +76,21 @@ class FeedHeader:
 
 @dataclass
 class ParsedFeed:
-    """A parsed arXiv API response."""
+    """A parsed arXiv API response.
+
+    ``raw_entry_count`` includes entries skipped because they lack required
+    fields and therefore do not appear in ``results``.
+    """
 
     header: FeedHeader
     results: list["Result"] = field(default_factory=list)
     malformed: bool = False
     error: Exception | None = None
+    raw_entry_count: int = 0
+
+    def __post_init__(self) -> None:
+        if self.raw_entry_count == 0:
+            self.raw_entry_count = len(self.results)
 
 
 def _build_result(entry: Any) -> "Result | None":
@@ -197,9 +206,16 @@ def parse(content: bytes) -> ParsedFeed:
     )
 
     results: list["Result"] = []
+    raw_entry_count = 0
     for entry_elem in root.iterfind("atom:entry", _NS):
+        raw_entry_count += 1
         result = _build_result(entry_elem)
         if result is not None:
             results.append(result)
 
-    return ParsedFeed(header=header, results=results, malformed=False)
+    return ParsedFeed(
+        header=header,
+        results=results,
+        malformed=False,
+        raw_entry_count=raw_entry_count,
+    )

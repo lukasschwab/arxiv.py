@@ -1,5 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, call, patch
+from urllib.parse import parse_qs, urlparse
+
 import arxiv
 from datetime import datetime, timedelta
 from pytest import approx
@@ -11,6 +13,57 @@ def empty_response(code: int) -> Response:
     r.status_code = code
     r._content = b""
     return r
+
+
+def atom_entry(short_id: str, valid: bool = True) -> str:
+    published = "<published>2026-01-01T00:00:00Z</published>" if valid else ""
+    return (
+        "<entry>"
+        f"<id>https://arxiv.org/abs/{short_id}</id>"
+        "<updated>2026-01-01T00:00:00Z</updated>"
+        f"{published}"
+        "</entry>"
+    )
+
+
+def atom_feed(
+    entries: list[tuple[str, bool]], total_results: int, start: int, page_size: int
+) -> bytes:
+    entry_xml = "".join(atom_entry(short_id, valid) for short_id, valid in entries)
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"
+      xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">
+  <opensearch:totalResults>{total_results}</opensearch:totalResults>
+  <opensearch:itemsPerPage>{page_size}</opensearch:itemsPerPage>
+  <opensearch:startIndex>{start}</opensearch:startIndex>
+  {entry_xml}
+</feed>
+""".encode()
+
+
+def paginated_client(
+    entries: list[tuple[str, bool]], page_size: int = 2, empty_page_once: int | None = None
+) -> tuple[arxiv.Client, list[int]]:
+    starts: list[int] = []
+    total_results = len(entries)
+
+    def fake_get(url: str, **kwargs: object) -> Response:
+        nonlocal empty_page_once
+        del kwargs
+        start = int(parse_qs(urlparse(url).query)["start"][0])
+        starts.append(start)
+        page = entries[start : start + page_size]
+        if start == empty_page_once:
+            page = []
+            empty_page_once = None
+        response = Response()
+        response.status_code = 200
+        response._content = atom_feed(page, total_results, start, page_size)
+        return response
+
+    client = arxiv.Client(page_size=page_size, delay_seconds=0, num_retries=0)
+    client._session.get = fake_get
+    return client, starts
 
 
 class TestClient(unittest.TestCase):
@@ -65,6 +118,112 @@ class TestClient(unittest.TestCase):
                 "https://export.arxiv.org/api/query?search_query=testing&id_list=&sortBy=relevance&sortOrder=descending&start=50&max_results=10",
             },
         )
+
+    def test_pagination_uses_raw_entry_count(self):
+        entries = [
+            ("2601.00000", True),
+            ("2601.00001", False),
+            ("2601.00002", True),
+            ("2601.00003", True),
+            ("2601.00004", True),
+        ]
+        client, starts = paginated_client(entries)
+
+        results = list(client.results(arxiv.Search(query="testing", max_results=5)))
+
+        self.assertEqual(
+            [result.get_short_id() for result in results],
+            [
+                "2601.00000",
+                "2601.00002",
+                "2601.00003",
+                "2601.00004",
+            ],
+        )
+        self.assertEqual(starts, [0, 2, 4])
+
+    def test_all_invalid_first_page_does_not_stop_pagination(self):
+        entries = [
+            ("2601.00000", False),
+            ("2601.00001", False),
+            ("2601.00002", True),
+        ]
+        client, starts = paginated_client(entries)
+
+        results = list(client.results(arxiv.Search(query="testing", max_results=3)))
+
+        self.assertEqual([result.get_short_id() for result in results], ["2601.00002"])
+        self.assertEqual(starts, [0, 2])
+
+    def test_all_invalid_middle_page_does_not_raise(self):
+        entries = [
+            ("2601.00000", True),
+            ("2601.00001", True),
+            ("2601.00002", False),
+            ("2601.00003", False),
+            ("2601.00004", True),
+        ]
+        client, starts = paginated_client(entries)
+        client.num_retries = 2
+
+        results = list(client.results(arxiv.Search(query="testing", max_results=5)))
+
+        self.assertEqual(
+            [result.get_short_id() for result in results],
+            ["2601.00000", "2601.00001", "2601.00004"],
+        )
+        self.assertEqual(starts, [0, 2, 4])
+
+    def test_true_empty_middle_page_is_retried(self):
+        entries = [(f"2601.0000{i}", True) for i in range(5)]
+        client, starts = paginated_client(entries, empty_page_once=2)
+        client.num_retries = 1
+
+        results = list(client.results(arxiv.Search(query="testing", max_results=5)))
+
+        self.assertEqual([result.get_short_id() for result in results], [e[0] for e in entries])
+        self.assertEqual(starts, [0, 2, 2, 4])
+
+    def test_manually_constructed_feed_without_raw_count(self):
+        result = arxiv.Result(entry_id="https://arxiv.org/abs/2601.00000")
+        feed = arxiv.ParsedFeed(arxiv._feed.FeedHeader(total_results=1), [result])
+        client = arxiv.Client()
+
+        with patch.object(client, "_parse_feed", return_value=feed):
+            self.assertEqual(list(client.results(arxiv.Search(query="testing"))), [result])
+
+    def test_all_invalid_final_page_does_not_raise(self):
+        entries = [
+            ("2601.00000", True),
+            ("2601.00001", True),
+            ("2601.00002", False),
+            ("2601.00003", False),
+        ]
+        client, starts = paginated_client(entries)
+
+        results = list(client.results(arxiv.Search(query="testing", max_results=4)))
+
+        self.assertEqual(
+            [result.get_short_id() for result in results], ["2601.00000", "2601.00001"]
+        )
+        self.assertEqual(starts, [0, 2])
+
+    def test_pagination_respects_initial_offset_and_finite_limit(self):
+        entries = [
+            ("2601.00000", True),
+            ("2601.00001", False),
+            ("2601.00002", True),
+            ("2601.00003", True),
+            ("2601.00004", True),
+        ]
+        client, starts = paginated_client(entries)
+
+        results = list(client.results(arxiv.Search(query="testing", max_results=3), offset=1))
+
+        self.assertEqual(
+            [result.get_short_id() for result in results], ["2601.00002", "2601.00003"]
+        )
+        self.assertEqual(starts, [1, 3])
 
     def test_offset(self):
         max_results = 10
