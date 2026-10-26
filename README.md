@@ -162,13 +162,14 @@ dependencies or auditing only the scanner's installed environment. This includes
 test, lint/type, docs, scanner, and build-backend dependencies; the audit group
 mirrors `build-system.requires` to keep the build tools in the lockfile too.
 The audit checks known vulnerabilities by package/version, not artifact contents.
-Requirement markers are evaluated for the current interpreter/platform; CI
-audits each supported Python version on Linux, on PRs and weekly for newly
-disclosed vulnerabilities. This does not check platform-only dependencies for
-other operating systems. To audit those, run `make audit` on that platform.
+Requirement markers are evaluated for the current interpreter/platform. Run
+`make audit` with other Python versions or on other platforms to check their
+applicable dependencies. Auditing remains a manual, opt-in command; there is no
+audit workflow or scheduled scan in CI. Dependabot provides ongoing vulnerability
+alerts.
 
 After `make audit`, `uv run --no-sync uv build --no-build-isolation --wheel` builds with those
-same locked, audited backend versions (also checked in CI). Normal isolated
+same locked, audited backend versions. Normal isolated
 PEP 517 builds, including end-user pip installations, resolve their build tools
 independently of `uv.lock`.
 
