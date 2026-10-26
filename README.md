@@ -129,3 +129,50 @@ The meaning of the underlying raw data is documented in the [arXiv API User Manu
 
 This project uses [UV](https://astral.sh/uv) for development, while maintaining compatibility with traditional pip installation for end users.
 
+Run these commands from a checkout. They use the committed `uv.lock`; `--locked`
+fails rather than silently updating an out-of-date lockfile.
+
+| Environment | Install | Run |
+| --- | --- | --- |
+| Runtime only | `make install` | `uv run --no-sync python` |
+| Default development (tests, lint, types) | `make install-dev` | `make check` |
+| Tests only | `uv sync --locked --no-default-groups --group test` | `uv run --no-sync pytest` |
+| Lint/type tools only | `uv sync --locked --no-default-groups --group lint` | `uv run --no-sync ruff check .`, `uv run --no-sync ruff format --check .`, `uv run --no-sync mypy arxiv` |
+| Documentation only | `uv sync --locked --no-default-groups --group docs` | `uv run --no-sync pdoc --docformat restructuredtext ./arxiv/__init__.py '!arxiv._feed' -o docs` |
+| Security audit | `make audit` installs the opt-in audit tools and audits the lockfile | See below |
+
+The default `dev` group includes `test` and `lint`; documentation and audit tools
+are opt-in, not runtime dependencies. Use `uv sync --locked --all-groups` only
+when you want every tool installed. Syncing is exact, so changing groups removes
+unneeded packages. After a scoped sync, use `uv run --no-sync` to preserve that
+environment: plain `uv run` would install the default development group again.
+The standalone `make test`, `make lint`, `make type-check`, `make format`, and
+`make docs` targets explicitly select their own groups and enforce the lockfile.
+`make clean` removes project artifacts, not the shared uv cache.
+
+The local interpreter defaults to `.python-version`. To select another supported
+version consistently for both sync and run, set `UV_PYTHON`, for example
+`UV_PYTHON=3.13 make test`. CI selects and verifies each test interpreter
+explicitly, rather than merely installing it. Add `--live` to the pytest command
+to exercise the real arXiv API instead of offline fixtures.
+
+`make audit` exports **all groups** from the committed lockfile with hashes and
+audits those pinned requirements using stable `pip-audit`, without re-resolving
+dependencies or auditing only the scanner's installed environment. This includes
+test, lint/type, docs, scanner, and build-backend dependencies; the audit group
+mirrors `build-system.requires` to keep the build tools in the lockfile too.
+The audit checks known vulnerabilities by package/version, not artifact contents.
+Requirement markers are evaluated for the current interpreter/platform; CI
+audits each supported Python version on Linux, on PRs and weekly for newly
+disclosed vulnerabilities. This does not check platform-only dependencies for
+other operating systems. To audit those, run `make audit` on that platform.
+
+After `make audit`, `uv run --no-sync uv build --no-build-isolation --wheel` builds with those
+same locked, audited backend versions (also checked in CI). Normal isolated
+PEP 517 builds, including end-user pip installations, resolve their build tools
+independently of `uv.lock`.
+
+When intentionally changing dependencies, update `pyproject.toml` and run
+`uv lock`, review the lockfile diff, then run the relevant checks above.
+Ordinary installation and CI should not regenerate the lockfile.
+

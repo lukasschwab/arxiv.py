@@ -1,0 +1,37 @@
+name: dependency-audit
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 8 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    env:
+      UV_PYTHON: ${{ matrix.python-version }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install UV
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.13.5"
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+      # make audit installs only the scanner/build tooling, but scans a hashed,
+      # all-groups export of the lockfile, not just the scanner's environment.
+      # Each interpreter evaluates the export's Python/platform markers.
+      - name: Audit locked runtime, development, and build dependencies
+        run: make audit
+      - name: Build wheel with the audited backend versions
+        run: uv run --no-sync uv build --no-build-isolation --wheel
