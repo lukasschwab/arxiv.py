@@ -127,5 +127,5 @@ The meaning of the underlying raw data is documented in the [arXiv API User Manu
 
 ## Development
 
-This project uses [UV](https://astral.sh/uv) for development, while maintaining compatibility with traditional pip installation for end users.
+This project uses [uv](https://astral.sh/uv) for development, while maintaining compatibility with traditional pip installation for end users.
 

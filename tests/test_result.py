@@ -1,4 +1,5 @@
 import arxiv
+from arxiv import _feed
 import unittest
 import re
 import time
@@ -72,6 +73,32 @@ class TestResult(unittest.TestCase):
         actual = arxiv.Result._to_datetime(paper_published_parsed)
         self.assertEqual(actual, expected)
         self.assertEqual(actual.strftime("%Y-%m-%dT%H:%M:%SZ"), paper_published)
+
+    def test_optional_metadata(self):
+        """Missing Atom metadata remains None, as Result's annotations promise."""
+        for metadata, expected in [
+            ("", (None, None, None)),
+            (
+                "<arxiv:comment>Comment</arxiv:comment>"
+                "<arxiv:journal_ref>Journal</arxiv:journal_ref>"
+                "<arxiv:doi>10.1234/example</arxiv:doi>",
+                ("Comment", "Journal", "10.1234/example"),
+            ),
+        ]:
+            with self.subTest(metadata=metadata):
+                feed = _feed.parse(
+                    (
+                        '<feed xmlns="http://www.w3.org/2005/Atom" '
+                        'xmlns:arxiv="http://arxiv.org/schemas/atom"><entry>'
+                        "<id>http://arxiv.org/abs/1605.08386v1</id>"
+                        "<updated>2016-05-26T17:59:46Z</updated>"
+                        "<published>2016-05-26T17:59:46Z</published>"
+                        f"{metadata}</entry></feed>"
+                    ).encode()
+                )
+                self.assertEqual(len(feed.results), 1)
+                result = feed.results[0]
+                self.assertEqual((result.comment, result.journal_ref, result.doi), expected)
 
     def test_eq(self):
         # Results

@@ -1,4 +1,4 @@
-# Run tests with UV
+# Run tests with uv
 name: python-test
 
 on:
@@ -10,22 +10,26 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      # Installing Python alone does not override .python-version.
+      UV_PYTHON: ${{ matrix.python-version }}
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
     - uses: actions/checkout@v4
-    - name: Install UV
+    - name: Install uv
       uses: astral-sh/setup-uv@v4
       with:
+        version: "0.13.5"
         enable-cache: true
         cache-dependency-glob: "uv.lock"
     - name: Set up Python ${{ matrix.python-version }}
       run: uv python install ${{ matrix.python-version }}
     - name: Install dependencies
-      run: uv sync --group dev
+      run: uv sync --locked
     - name: Run tests (offline, using fixtures)
-      run: uv run pytest
+      run: uv run --no-sync pytest
     - name: Run tests (live API)
-      run: uv run pytest --live
+      run: uv run --no-sync pytest --live

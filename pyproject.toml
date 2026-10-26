@@ -30,7 +30,6 @@ requires-python = ">=3.10"
 dependencies = [
     "lxml>=6.1.0,<7.0",
     "requests>=2.32,<2.35",
-    "typing_extensions>=4.0.0; python_version < '3.11'",
 ]
 
 [project.urls]
@@ -42,14 +41,15 @@ Issues = "https://github.com/lukasschwab/arxiv.py/issues"
 [dependency-groups]
 dev = [
     "pytest>=6.2.2",
-    "ruff>=0.1.2", 
-    "pdoc==14.5.1",
-    "pip-audit>=1.1.2",
+    "ruff>=0.1.2",
     "mypy>=1.0.0",
+    "lxml-stubs",
     "types-requests",
-]
-test = [
-    "pytest>=6.2.2",
+    "pdoc==14.5.1",
+    "pip-audit>=2.6.0",
+    # Mirror build-system.requires so the backend and its dependencies are audited too.
+    "hatchling",
+    "hatch-vcs",
 ]
 
 # Modern build configuration with hatch-vcs
@@ -100,8 +100,3 @@ warn_no_return = true
 warn_unreachable = true
 strict_equality = true
 show_error_codes = true
-
-[[tool.mypy.overrides]]
-module = "feedparser"
-ignore_missing_imports = true
-

@@ -25,7 +25,7 @@ import logging
 import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from lxml import etree
 
@@ -43,7 +43,7 @@ _NS = {
 }
 
 
-def _text(elem: Any, path: str) -> str | None:
+def _text(elem: etree._Element | None, path: str) -> str | None:
     if elem is None:
         return None
     found = elem.find(path, _NS)
@@ -84,7 +84,7 @@ class ParsedFeed:
     error: Exception | None = None
 
 
-def _build_result(entry: Any) -> "Result | None":
+def _build_result(entry: etree._Element) -> "Result | None":
     """Convert a parsed `<entry>` element into a `Result`, or None if invalid."""
     # Imported lazily to avoid a circular import; `Result` lives in `arxiv`.
     from . import Result

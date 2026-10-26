@@ -3,6 +3,7 @@ name: docs
 on:
   push:
     branches: [ master ]
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -13,17 +14,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install UV
+      - name: Install uv
         uses: astral-sh/setup-uv@v4
         with:
+          version: "0.13.5"
           enable-cache: true
           cache-dependency-glob: "uv.lock"
       - name: Set up Python
-        run: uv python install 3.11
+        run: uv python install
       - name: Install dependencies
-        run: uv sync --group dev
+        run: uv sync --locked
       - name: Build docs
-        run: uv run make docs
+        run: uv run --no-sync pdoc --docformat "restructuredtext" ./arxiv/__init__.py '!arxiv._feed' -o docs
       - uses: actions/upload-pages-artifact@v3
         with:
           path: docs/
@@ -31,6 +33,7 @@ jobs:
   # Deploy the artifact to GitHub Pages. Only this job has the requisite
   # permissions.
   deploy:
+    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     permissions:
