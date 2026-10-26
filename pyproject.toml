@@ -42,8 +42,8 @@ Issues = "https://github.com/lukasschwab/arxiv.py/issues"
 dev = [
     "pytest>=6.2.2",
     "ruff>=0.1.2",
-    "mypy>=1.0.0",
-    "lxml-stubs",
+    "ty==0.0.92",
+    "types-lxml",
     "types-requests",
     "pdoc==14.5.1",
     "pip-audit>=2.6.0",
@@ -68,7 +68,7 @@ line-length = 100
 [tool.ruff.lint]
 ignore = ["E501", "W191"]
 select = [
-    "E", "F", "W",
+    "ANN", "E", "F", "W",
 ]
 fixable = [
     "A", "B", "C", "D", "E", "F", "G", "I", "N", "Q", "S", "T", "W", 
@@ -85,18 +85,13 @@ addopts = "--verbose"
 log_cli = true
 log_cli_level = "DEBUG"
 
-[tool.mypy]
-python_version = "3.10"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-disallow_untyped_decorators = true
-no_implicit_optional = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-warn_no_return = true
-warn_unreachable = true
-strict_equality = true
-show_error_codes = true
+[tool.ty.src]
+include = ["arxiv"]
+
+[tool.ty.rules]
+dynamic-function-decorator-return = "error"
+redundant-cast = "error"
+redundant-condition = "error"
+unsound-return-statement = "error"
+unused-ignore-comment = "error"
+unused-type-ignore-comment = "error"

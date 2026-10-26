@@ -13,6 +13,7 @@ import hashlib
 import json
 import time
 import urllib.request
+from collections.abc import Iterator
 from pathlib import Path
 from unittest.mock import patch
 
@@ -99,7 +100,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 
 @pytest.fixture(autouse=True)
-def _mock_api(request: pytest.FixtureRequest) -> None:  # type: ignore[return]
+def _mock_api(request: pytest.FixtureRequest) -> Iterator[None]:
     """Autouse fixture: patches Session.get and time.sleep unless --live."""
     live = request.config.getoption("--live")
     record = request.config.getoption("--record") and live
@@ -113,7 +114,7 @@ def _mock_api(request: pytest.FixtureRequest) -> None:  # type: ignore[return]
         # Proxy: call real API, save responses, patch out sleep.
         real_get = requests.Session.get
 
-        def recording_get(self: requests.Session, url: str, **kwargs):  # type: ignore[no-untyped-def]
+        def recording_get(self: requests.Session, url: str, **kwargs: object) -> requests.Response:
             resp = real_get(self, url, **kwargs)
             _save_fixture(url, resp)
             return resp
@@ -126,7 +127,7 @@ def _mock_api(request: pytest.FixtureRequest) -> None:  # type: ignore[return]
         return
 
     # Default: offline mode — serve from fixtures, no sleep, stub downloads.
-    def fixture_get(self: requests.Session, url: str, **kwargs):  # type: ignore[no-untyped-def]
+    def fixture_get(self: requests.Session, url: str, **kwargs: object) -> requests.Response:
         return _load_fixture(url)
 
     def fake_urlretrieve(url: str, filename: str) -> tuple[str, None]:

@@ -86,7 +86,7 @@ class Result:
         primary_category: str = "",
         categories: list[str] | None = None,
         links: list[Result.Link] | None = None,
-    ):
+    ) -> None:
         """
         Constructs an arXiv search result item.
 
@@ -204,7 +204,7 @@ class Result:
         See https://github.com/lukasschwab/arxiv.py/issues/62.
         """
 
-        def __init__(self, name: str, affiliation: list[str] | None = None):
+        def __init__(self, name: str, affiliation: list[str] | None = None) -> None:
             """
             Constructs an `Author` with the specified name and (optional)
             affiliations.
@@ -247,7 +247,7 @@ class Result:
             title: str | None = None,
             rel: str = "",
             content_type: str | None = None,
-        ):
+        ) -> None:
             """
             Constructs a `Link` with the specified link metadata.
             """
@@ -284,7 +284,7 @@ class Result:
         message: str
         """Message describing what caused this error."""
 
-        def __init__(self, missing_field: str):
+        def __init__(self, missing_field: str) -> None:
             self.missing_field = missing_field
             self.message = "Entry from arXiv missing required info"
 
@@ -364,7 +364,7 @@ class Search:
         max_results: int | None = 100,
         sort_by: SortCriterion = SortCriterion.Relevance,
         sort_order: SortOrder = SortOrder.Descending,
-    ):
+    ) -> None:
         """
         Constructs an arXiv API search with the specified criteria.
         """
@@ -441,7 +441,9 @@ class Client:
     _last_request_dt: datetime | None
     _session: requests.Session
 
-    def __init__(self, page_size: int = 100, delay_seconds: float = 3.0, num_retries: int = 3):
+    def __init__(
+        self, page_size: int = 100, delay_seconds: float = 3.0, num_retries: int = 3
+    ) -> None:
         """
         Constructs an arXiv API client with the specified options.
 
@@ -592,7 +594,7 @@ class ArxivError(Exception):
     message: str
     """Message describing what caused this error."""
 
-    def __init__(self, url: str, retry: int, message: str):
+    def __init__(self, url: str, retry: int, message: str) -> None:
         """
         Constructs an `ArxivError` encountered while fetching the specified URL.
         """
@@ -624,7 +626,7 @@ class UnexpectedEmptyPageError(ArxivError):
     e.g. in `bozo_exception`.
     """
 
-    def __init__(self, url: str, retry: int, raw_feed: ParsedFeed):
+    def __init__(self, url: str, retry: int, raw_feed: ParsedFeed) -> None:
         """
         Constructs an `UnexpectedEmptyPageError` encountered for the specified
         API URL after `retry` tries.
@@ -652,7 +654,7 @@ class HTTPError(ArxivError):
     status: int
     """The HTTP status reported by the underlying request."""
 
-    def __init__(self, url: str, retry: int, status: int):
+    def __init__(self, url: str, retry: int, status: int) -> None:
         """
         Constructs an `HTTPError` for the specified status code, encountered for
         the specified API URL after `retry` tries.
