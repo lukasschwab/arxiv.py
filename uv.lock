@@ -11,29 +11,16 @@ dependencies = [
 ]
 
 [package.dev-dependencies]
-audit = [
+dev = [
     { name = "hatch-vcs" },
     { name = "hatchling" },
-    { name = "pip-audit" },
-]
-dev = [
     { name = "lxml-stubs" },
     { name = "mypy" },
-    { name = "pytest" },
-    { name = "ruff" },
-    { name = "types-requests" },
-]
-docs = [
     { name = "pdoc" },
-]
-lint = [
-    { name = "lxml-stubs" },
-    { name = "mypy" },
+    { name = "pip-audit" },
+    { name = "pytest" },
     { name = "ruff" },
     { name = "types-requests" },
-]
-test = [
-    { name = "pytest" },
 ]
 
 [package.metadata]
@@ -43,26 +30,17 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
-audit = [
+dev = [
     { name = "hatch-vcs" },
     { name = "hatchling" },
-    { name = "pip-audit", specifier = ">=2.6.0" },
-]
-dev = [
     { name = "lxml-stubs" },
     { name = "mypy", specifier = ">=1.0.0" },
+    { name = "pdoc", specifier = "==14.5.1" },
+    { name = "pip-audit", specifier = ">=2.6.0" },
     { name = "pytest", specifier = ">=6.2.2" },
     { name = "ruff", specifier = ">=0.1.2" },
     { name = "types-requests" },
 ]
-docs = [{ name = "pdoc", specifier = "==14.5.1" }]
-lint = [
-    { name = "lxml-stubs" },
-    { name = "mypy", specifier = ">=1.0.0" },
-    { name = "ruff", specifier = ">=0.1.2" },
-    { name = "types-requests" },
-]
-test = [{ name = "pytest", specifier = ">=6.2.2" }]
 
 [[package]]
 name = "boolean-py"

@@ -23,7 +23,7 @@ jobs:
       - name: Set up Python
         run: uv python install
       - name: Install dependencies
-        run: uv sync --locked --no-default-groups --group docs
+        run: uv sync --locked
       - name: Build docs
         run: uv run --no-sync pdoc --docformat "restructuredtext" ./arxiv/__init__.py '!arxiv._feed' -o docs
       - uses: actions/upload-pages-artifact@v3

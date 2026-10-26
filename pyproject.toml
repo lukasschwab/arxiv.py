@@ -40,22 +40,12 @@ Issues = "https://github.com/lukasschwab/arxiv.py/issues"
 
 [dependency-groups]
 dev = [
-    {include-group = "test"},
-    {include-group = "lint"},
-]
-test = [
     "pytest>=6.2.2",
-]
-lint = [
     "ruff>=0.1.2",
     "mypy>=1.0.0",
     "lxml-stubs",
     "types-requests",
-]
-docs = [
     "pdoc==14.5.1",
-]
-audit = [
     "pip-audit>=2.6.0",
     # Mirror build-system.requires so the backend and its dependencies are audited too.
     "hatchling",

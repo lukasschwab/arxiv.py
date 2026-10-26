@@ -8,35 +8,35 @@ all: lint test docs
 
 # Installation and dependency management
 install:
-	uv sync --locked --no-default-groups
+	uv sync --locked --no-dev
 
 install-dev:
 	uv sync --locked
 
 # Development tasks
 format: $(source) $(tests)
-	uv run --locked --no-default-groups --group lint ruff format .
+	uv run --locked ruff format .
 
 lint: $(source) $(tests)
-	uv run --locked --no-default-groups --group lint ruff check .
+	uv run --locked ruff check .
 
 type-check: $(source)
-	uv run --locked --no-default-groups --group lint mypy arxiv
+	uv run --locked mypy arxiv
 
 test: $(source) $(tests)
-	uv run --locked --no-default-groups --group test pytest
+	uv run --locked pytest
 
 audit:
-	uv sync --locked --no-default-groups --group audit
+	uv sync --locked
 	@requirements=$$(mktemp); trap 'rm -f "$$requirements"' EXIT; \
-		uv export --locked --all-groups --no-emit-project --format requirements.txt \
+		uv export --locked --no-emit-project --format requirements.txt \
 			--output-file "$$requirements" > /dev/null && \
 		uv run --no-sync pip-audit --strict --disable-pip --require-hashes \
 			--requirement "$$requirements"
 
 docs: docs/index.html
 docs/index.html: $(source) README.md
-	uv run --locked --no-default-groups --group docs pdoc --docformat "restructuredtext" ./arxiv/__init__.py '!arxiv._feed' -o docs
+	uv run --locked pdoc --docformat "restructuredtext" ./arxiv/__init__.py '!arxiv._feed' -o docs
 
 clean:
 	rm -rf build dist .pytest_cache
