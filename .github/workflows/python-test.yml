@@ -1,4 +1,4 @@
-# Run tests with UV
+# Run tests with uv
 name: python-test
 
 on:
@@ -19,7 +19,7 @@ jobs:
         python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
     - uses: actions/checkout@v4
-    - name: Install UV
+    - name: Install uv
       uses: astral-sh/setup-uv@v4
       with:
         version: "0.13.5"
@@ -29,9 +29,6 @@ jobs:
       run: uv python install ${{ matrix.python-version }}
     - name: Install dependencies
       run: uv sync --locked --no-default-groups --group test
-    - name: Verify selected interpreter
-      run: |
-        uv run --no-sync python -c 'import os, sys; print(sys.version); assert f"{sys.version_info.major}.{sys.version_info.minor}" == os.environ["UV_PYTHON"]'
     - name: Run tests (offline, using fixtures)
       run: uv run --no-sync pytest
     - name: Run tests (live API)

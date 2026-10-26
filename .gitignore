@@ -60,5 +60,5 @@ docs/_build/
 # PyBuilder
 target/
 
-# UV and Python tooling
+# uv and Python tooling
 .venv/

@@ -8,9 +8,9 @@ DRY_RUN="$1"
 
 echo "🚀 Starting release process"
 
-# Ensure we have UV
+# Ensure we have uv
 if ! command -v uv &> /dev/null; then
-    echo "❌ UV is required."
+    echo "❌ uv is required."
     exit 1
 fi
 
