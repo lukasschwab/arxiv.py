@@ -7,7 +7,7 @@ import arxiv
 class TestErrorPickle(unittest.TestCase):
     """Regression tests for https://github.com/lukasschwab/arxiv.py/issues/191."""
 
-    def test_arxiv_error_pickle_roundtrip(self):
+    def test_arxiv_error_pickle_roundtrip(self) -> None:
         err = arxiv.ArxivError(url="http://example.com", retry=1, message="test")
         restored = pickle.loads(pickle.dumps(err))
         self.assertEqual(restored.url, err.url)
@@ -15,7 +15,7 @@ class TestErrorPickle(unittest.TestCase):
         self.assertEqual(restored.message, err.message)
         self.assertEqual(str(restored), str(err))
 
-    def test_http_error_pickle_roundtrip(self):
+    def test_http_error_pickle_roundtrip(self) -> None:
         err = arxiv.HTTPError(url="http://export.arxiv.org/api/query", retry=3, status=503)
         restored = pickle.loads(pickle.dumps(err))
         self.assertEqual(restored.url, err.url)
@@ -25,7 +25,7 @@ class TestErrorPickle(unittest.TestCase):
         self.assertEqual(str(restored), str(err))
         self.assertEqual(repr(restored), repr(err))
 
-    def test_unexpected_empty_page_error_pickle_roundtrip(self):
+    def test_unexpected_empty_page_error_pickle_roundtrip(self) -> None:
         err = arxiv.UnexpectedEmptyPageError(
             url="http://export.arxiv.org/api/query", retry=2, raw_feed="<xml/>"
         )
@@ -36,7 +36,7 @@ class TestErrorPickle(unittest.TestCase):
         self.assertEqual(str(restored), str(err))
         self.assertEqual(repr(restored), repr(err))
 
-    def test_http_error_double_roundtrip(self):
+    def test_http_error_double_roundtrip(self) -> None:
         """Ensure repeated pickle round-trips don't degrade the object."""
         err = arxiv.HTTPError(url="http://export.arxiv.org/api/query", retry=3, status=503)
         restored = pickle.loads(pickle.dumps(err))

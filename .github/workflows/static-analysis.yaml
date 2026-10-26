@@ -24,4 +24,4 @@ jobs:
     - name: Format check
       run: uv run --no-sync ruff format --check .
     - name: Type check
-      run: uv run --no-sync mypy arxiv
+      run: uv run --no-sync ty check arxiv

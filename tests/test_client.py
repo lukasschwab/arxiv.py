@@ -14,15 +14,15 @@ def empty_response(code: int) -> Response:
 
 
 class TestClient(unittest.TestCase):
-    def test_invalid_format_id(self):
+    def test_invalid_format_id(self) -> None:
         with self.assertRaises(arxiv.HTTPError):
             list(arxiv.Client(num_retries=0).results(arxiv.Search(id_list=["abc"])))
 
-    def test_invalid_id(self):
+    def test_invalid_id(self) -> None:
         results = list(arxiv.Client().results(arxiv.Search(id_list=["0000.0000"])))
         self.assertEqual(len(results), 0)
 
-    def test_nonexistent_id_in_list(self):
+    def test_nonexistent_id_in_list(self) -> None:
         client = arxiv.Client()
         # Assert thrown error is handled and hidden by generator.
         results = list(client.results(arxiv.Search(id_list=["0808.05394"])))
@@ -31,17 +31,17 @@ class TestClient(unittest.TestCase):
         results = list(client.results(arxiv.Search(id_list=["0808.05394", "1707.08567"])))
         self.assertEqual(len(results), 1)
 
-    def test_default_max_results(self):
+    def test_default_max_results(self) -> None:
         search = arxiv.Search(query="testing")
         self.assertEqual(search.max_results, 100)
 
-    def test_max_results(self):
+    def test_max_results(self) -> None:
         client = arxiv.Client(page_size=10)
         search = arxiv.Search(query="testing", max_results=2)
         results = [r for r in client.results(search)]
         self.assertEqual(len(results), 2)
 
-    def test_query_page_count(self):
+    def test_query_page_count(self) -> None:
         client = arxiv.Client(page_size=10)
         client._parse_feed = MagicMock(wraps=client._parse_feed)
         generator = client.results(arxiv.Search(query="testing", max_results=55))
@@ -66,7 +66,7 @@ class TestClient(unittest.TestCase):
             },
         )
 
-    def test_offset(self):
+    def test_offset(self) -> None:
         max_results = 10
         search = arxiv.Search(query="testing", max_results=max_results)
         client = arxiv.Client(page_size=10)
@@ -82,7 +82,7 @@ class TestClient(unittest.TestCase):
         offset_above_max_results = list(client.results(search, offset=max_results))
         self.assertListEqual(offset_above_max_results, [])
 
-    def test_search_results_offset(self):
+    def test_search_results_offset(self) -> None:
         # NOTE: page size is irrelevant here.
         client = arxiv.Client(page_size=15)
         search = arxiv.Search(query="testing", max_results=10)
@@ -95,7 +95,7 @@ class TestClient(unittest.TestCase):
             if client_results:
                 self.assertEqual(all_results[offset].entry_id, client_results[0].entry_id)
 
-    def test_no_duplicates(self):
+    def test_no_duplicates(self) -> None:
         search = arxiv.Search("testing", max_results=100)
         ids = set()
         for r in arxiv.Client().results(search):
@@ -104,10 +104,10 @@ class TestClient(unittest.TestCase):
 
     @patch("requests.Session.get", return_value=empty_response(500))
     @patch("time.sleep", return_value=None)
-    def test_retry(self, mock_sleep, mock_get):
+    def test_retry(self, mock_sleep: MagicMock, mock_get: MagicMock) -> None:
         broken_client = arxiv.Client()
 
-        def broken_get():
+        def broken_get() -> arxiv.Result:
             search = arxiv.Search(query="quantum")
             return next(broken_client.results(search))
 
@@ -124,7 +124,7 @@ class TestClient(unittest.TestCase):
 
     @patch("requests.Session.get", return_value=empty_response(200))
     @patch("time.sleep", return_value=None)
-    def test_sleep_standard(self, mock_sleep, mock_get):
+    def test_sleep_standard(self, mock_sleep: MagicMock, mock_get: MagicMock) -> None:
         client = arxiv.Client()
         url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
         # A client should sleep until delay_seconds have passed.
@@ -138,7 +138,7 @@ class TestClient(unittest.TestCase):
 
     @patch("requests.Session.get", return_value=empty_response(200))
     @patch("time.sleep", return_value=None)
-    def test_sleep_multiple_requests(self, mock_sleep, mock_get):
+    def test_sleep_multiple_requests(self, mock_sleep: MagicMock, mock_get: MagicMock) -> None:
         client = arxiv.Client()
         url1 = client._format_url(arxiv.Search(query="quantum"), 0, 1)
         url2 = client._format_url(arxiv.Search(query="testing"), 0, 1)
@@ -152,7 +152,7 @@ class TestClient(unittest.TestCase):
 
     @patch("requests.Session.get", return_value=empty_response(200))
     @patch("time.sleep", return_value=None)
-    def test_sleep_elapsed(self, mock_sleep, mock_get):
+    def test_sleep_elapsed(self, mock_sleep: MagicMock, mock_get: MagicMock) -> None:
         client = arxiv.Client()
         url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
         # If _last_request_dt is less than delay_seconds ago, sleep.
@@ -167,7 +167,7 @@ class TestClient(unittest.TestCase):
 
     @patch("requests.Session.get", return_value=empty_response(200))
     @patch("time.sleep", return_value=None)
-    def test_sleep_zero_delay(self, mock_sleep, mock_get):
+    def test_sleep_zero_delay(self, mock_sleep: MagicMock, mock_get: MagicMock) -> None:
         client = arxiv.Client(delay_seconds=0)
         url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
         client._parse_feed(url)
@@ -176,7 +176,7 @@ class TestClient(unittest.TestCase):
 
     @patch("requests.Session.get", return_value=empty_response(500))
     @patch("time.sleep", return_value=None)
-    def test_sleep_between_errors(self, mock_sleep, mock_get):
+    def test_sleep_between_errors(self, mock_sleep: MagicMock, mock_get: MagicMock) -> None:
         client = arxiv.Client()
         url = client._format_url(arxiv.Search(query="quantum"), 0, 1)
         try:

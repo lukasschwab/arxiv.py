@@ -21,7 +21,7 @@ lint: $(source) $(tests)
 	uv run --locked ruff check .
 
 type-check: $(source)
-	uv run --locked mypy arxiv
+	uv run --locked ty check arxiv
 
 test: $(source) $(tests)
 	uv run --locked pytest
