@@ -9,8 +9,6 @@ on:
 jobs:
   static-analysis:
     runs-on: ubuntu-latest
-    env:
-      UV_PYTHON: "3.10"
     steps:
     - uses: actions/checkout@v4
     - name: Install uv
