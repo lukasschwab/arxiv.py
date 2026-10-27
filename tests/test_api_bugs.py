@@ -8,7 +8,7 @@ import arxiv
 
 
 class TestAPIBugs(unittest.TestCase):
-    def test_missing_title(self):
+    def test_missing_title(self) -> None:
         """
         Regression test for the paper literally titled "0" (arxiv:2104.12255v1).
 

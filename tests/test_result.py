@@ -1,4 +1,5 @@
 import arxiv
+from arxiv import _feed
 import unittest
 import re
 import time
@@ -6,17 +7,17 @@ from datetime import datetime, timezone
 
 
 class TestResult(unittest.TestCase):
-    def assert_nonempty(self, s):
+    def assert_nonempty(self, s: str | None) -> None:
         self.assertIsNotNone(s)
         self.assertNotEqual(s, "")
 
-    def assert_valid_author(self, a: arxiv.Result.Author):
+    def assert_valid_author(self, a: arxiv.Result.Author) -> None:
         self.assert_nonempty(a.name)
 
-    def assert_valid_link(self, link: arxiv.Result.Link):
+    def assert_valid_link(self, link: arxiv.Result.Link) -> None:
         self.assert_nonempty(link.href)
 
-    def assert_valid_result(self, result: arxiv.Result):
+    def assert_valid_result(self, result: arxiv.Result) -> None:
         self.assert_nonempty(result.entry_id)
         self.assertIsNotNone(result.updated)
         self.assertIsNotNone(result.published)
@@ -33,7 +34,7 @@ class TestResult(unittest.TestCase):
             self.assert_valid_link(link)
         self.assert_nonempty(result.pdf_url)
 
-    def test_result_shape(self):
+    def test_result_shape(self) -> None:
         client = arxiv.Client()
         max_results = 100
         search = arxiv.Search("testing", max_results=max_results)
@@ -42,7 +43,7 @@ class TestResult(unittest.TestCase):
         for result in results:
             self.assert_valid_result(result)
 
-    def test_parse_feed(self):
+    def test_parse_feed(self) -> None:
         """`_parse_feed` should return a `ParsedFeed` of fully-built `Result`s."""
         client = arxiv.Client()
         # Use a fixed id_list so the fixture key is stable and the feed
@@ -52,7 +53,7 @@ class TestResult(unittest.TestCase):
         self.assertEqual(len(feed.results), 1)
         self.assert_valid_result(feed.results[0])
 
-    def test_get_short_id(self):
+    def test_get_short_id(self) -> None:
         client = arxiv.Client()
         result_id = "1707.08567"
         result = next(client.results(arxiv.Search(id_list=[result_id])))
@@ -61,7 +62,7 @@ class TestResult(unittest.TestCase):
         # Should be of form `1707.08567v1`.
         self.assertTrue(re.match(r"^{}v\d+$".format(result_id), got))
 
-    def test_to_datetime(self):
+    def test_to_datetime(self) -> None:
         """Test time.struct_time to datetime conversion."""
         # paper_published and paper_published_parsed correspond to
         # r._raw.published and r._raw.published_parsed for 1605.08386v1. It's
@@ -73,7 +74,33 @@ class TestResult(unittest.TestCase):
         self.assertEqual(actual, expected)
         self.assertEqual(actual.strftime("%Y-%m-%dT%H:%M:%SZ"), paper_published)
 
-    def test_eq(self):
+    def test_optional_metadata(self) -> None:
+        """Missing Atom metadata remains None, as Result's annotations promise."""
+        for metadata, expected in [
+            ("", (None, None, None)),
+            (
+                "<arxiv:comment>Comment</arxiv:comment>"
+                "<arxiv:journal_ref>Journal</arxiv:journal_ref>"
+                "<arxiv:doi>10.1234/example</arxiv:doi>",
+                ("Comment", "Journal", "10.1234/example"),
+            ),
+        ]:
+            with self.subTest(metadata=metadata):
+                feed = _feed.parse(
+                    (
+                        '<feed xmlns="http://www.w3.org/2005/Atom" '
+                        'xmlns:arxiv="http://arxiv.org/schemas/atom"><entry>'
+                        "<id>http://arxiv.org/abs/1605.08386v1</id>"
+                        "<updated>2016-05-26T17:59:46Z</updated>"
+                        "<published>2016-05-26T17:59:46Z</published>"
+                        f"{metadata}</entry></feed>"
+                    ).encode()
+                )
+                self.assertEqual(len(feed.results), 1)
+                result = feed.results[0]
+                self.assertEqual((result.comment, result.journal_ref, result.doi), expected)
+
+    def test_eq(self) -> None:
         # Results
         id = "some-result"
         result = arxiv.Result(entry_id=id)
@@ -99,13 +126,13 @@ class TestResult(unittest.TestCase):
         self.assertFalse(link == arxiv.Result.Link("other"))
         self.assertFalse(link == id)
 
-    def test_legacy_ids(self):
+    def test_legacy_ids(self) -> None:
         client = arxiv.Client()
         full_legacy_id = "quant-ph/0201082v1"
         result = next(client.results(arxiv.Search(id_list=[full_legacy_id])))
         self.assertEqual(result.get_short_id(), full_legacy_id)
 
-    def test_author_affiliations(self):
+    def test_author_affiliations(self) -> None:
         """Regression test for https://github.com/lukasschwab/arxiv.py/issues/62.
 
         The arXiv API exposes per-author affiliations via
@@ -128,7 +155,7 @@ class TestResult(unittest.TestCase):
             ],
         )
 
-    def test_author_no_affiliation(self):
+    def test_author_no_affiliation(self) -> None:
         """Most papers have no affiliation data; the field should be an empty list."""
         client = arxiv.Client()
         result = next(client.results(arxiv.Search(id_list=["1605.08386"])))
