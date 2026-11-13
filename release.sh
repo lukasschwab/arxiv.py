@@ -14,13 +14,13 @@ if ! command -v uv &> /dev/null; then
     exit 1
 fi
 
-# Ensure clean working directory
-if [ -n "$(git status --porcelain)" ]; then
-    echo "❌ Working directory is not clean. Please commit or stash changes."
+# Allow release script edits while requiring all package files to be clean.
+if [ -n "$(git status --porcelain -- . ':(top,exclude)release.sh')" ]; then
+    echo "❌ Working directory is not clean (excluding release.sh). Please commit or stash changes."
     exit 1
 fi
 
-echo "✅ Working directory is clean"
+echo "✅ Working directory is clean (excluding release.sh)"
 
 # Get current version from PyPI
 echo "📡 Fetching current version from PyPI..."
@@ -72,6 +72,20 @@ fi
 echo "🎯 Selected version: $VERSION"
 echo ""
 
+# A failed upload may leave the release tag in place. Only reuse it if
+# rebuilding this checkout will release the same commit.
+TAG="$VERSION"
+TAG_EXISTS=false
+if git show-ref --verify --quiet "refs/tags/$TAG"; then
+    if [ "$(git rev-parse "refs/tags/$TAG^{commit}")" != "$(git rev-parse HEAD)" ]; then
+        echo "❌ Tag $TAG already exists at a different commit."
+        echo "   Check out $TAG to retry that release, or select a different version."
+        exit 1
+    fi
+    TAG_EXISTS=true
+    echo "♻️  Reusing existing tag $TAG at HEAD"
+fi
+
 # Run tests
 echo "🧪 Running tests..."
 make check
@@ -82,21 +96,25 @@ echo "🧹 Cleaning previous builds..."
 make clean
 
 # Create and push tag
-TAG="$VERSION"
-echo "🏷️  Creating tag $TAG..."
-
 if [ "$DRY_RUN" = "--dry-run" ]; then
-    echo "🔍 DRY RUN: Would create tag $TAG"
+    if [ "$TAG_EXISTS" = false ]; then
+        echo "🔍 DRY RUN: Would create tag $TAG"
+    fi
     echo "🔍 DRY RUN: Would push tag to origin"
 else
-    git tag -a "$TAG" -m "Release $VERSION"
+    if [ "$TAG_EXISTS" = false ]; then
+        echo "🏷️  Creating tag $TAG..."
+        git tag -a "$TAG" -m "Release $VERSION"
+    fi
     git push origin "$TAG"
-    echo "✅ Tag $TAG created and pushed"
+    echo "✅ Tag $TAG is available on origin"
 fi
 
 # Build distributions
 echo "📦 Building distributions..."
-uv build
+# hatch-vcs still sees allowed release.sh edits as a dirty checkout.
+# The release tag and package files were checked above, so use its version.
+SETUPTOOLS_SCM_PRETEND_VERSION="$VERSION" uv build
 echo "✅ Build completed"
 
 # Show what was built
@@ -106,25 +124,37 @@ ls -la dist/
 # Upload to PyPI
 if [ "$DRY_RUN" = "--dry-run" ]; then
     echo "🔍 DRY RUN: Would upload to PyPI:"
-    echo "   uv publish dist/*"
+    echo "   UV_PUBLISH_TOKEN=pypi-... uv publish dist/*"
     echo ""
     echo "🔍 To actually release, run: ./release.sh"
 else
     echo "📤 Uploading to PyPI..."
-    echo "💡 Make sure you have PyPI API token configured"
+    echo "💡 You will be prompted for a PyPI API token unless UV_PUBLISH_TOKEN is set"
     echo "💡 Or set: export UV_PUBLISH_TOKEN=pypi-..."
     
-    read -p "Continue with PyPI upload? [y/N] " -n 1 -r
-    echo
+    read -r -p "Continue with PyPI upload? [y/N] " REPLY
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        uv publish dist/*
+        PYPI_TOKEN="${UV_PUBLISH_TOKEN:-}"
+        if [ -z "$PYPI_TOKEN" ]; then
+            if ! read -r -s -p "Enter PyPI API token (pypi-...): " PYPI_TOKEN; then
+                echo
+                echo "❌ Could not read a PyPI API token."
+                exit 1
+            fi
+            echo
+        fi
+        if [[ $PYPI_TOKEN != pypi-?* ]]; then
+            echo "❌ A PyPI API token starting with pypi- is required."
+            exit 1
+        fi
+        UV_PUBLISH_TOKEN="$PYPI_TOKEN" uv publish dist/*
         echo "✅ Successfully released $VERSION to PyPI!"
         echo ""
         echo "🎉 Release $VERSION completed successfully!"
         echo "📍 Check: https://pypi.org/project/arxiv/$VERSION/"
     else
         echo "❌ Upload cancelled. You can upload manually later with:"
-        echo "   uv publish dist/*"
+        echo "   UV_PUBLISH_TOKEN=pypi-... uv publish dist/*"
     fi
 fi
 
