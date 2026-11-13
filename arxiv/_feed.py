@@ -23,11 +23,13 @@ from __future__ import annotations
 
 import logging
 import re
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Protocol, cast
 
-from lxml import etree
+# ty cannot inspect this compiled extension without the third-party stubs.
+from lxml import etree  # ty: ignore[unresolved-import]
 
 if TYPE_CHECKING:
     from . import Result
@@ -43,7 +45,39 @@ _NS = {
 }
 
 
-def _text(elem: etree._Element | None, path: str) -> str | None:
+class _Element(Protocol):
+    """The read-only element API used by this parser.
+
+    Compatibility with real lxml objects is exercised in
+    tests/test_feed_contract.py, not established by static type checking.
+    """
+
+    @property
+    def text(self) -> str | None: ...
+
+    def find(self, path: str, namespaces: dict[str, str]) -> _Element | None: ...
+
+    def iterfind(self, path: str, namespaces: dict[str, str]) -> Iterator[_Element]: ...
+
+    def get(self, key: str) -> str | None: ...
+
+
+def _parse_xml(content: bytes | bytearray) -> _Element | None:
+    """The single trust boundary between untyped lxml and our element protocol."""
+    # Disable network access and entity expansion; arXiv responses never
+    # need to reference external resources.
+    parser = etree.XMLParser(
+        resolve_entities=False,
+        no_network=True,
+        huge_tree=False,
+        recover=True,
+    )
+    # This cast is an assumption validated by behavioral contract tests.
+    # Keep untyped lxml objects out of the rest of the feed parser.
+    return cast(_Element | None, etree.fromstring(content, parser=parser))
+
+
+def _text(elem: _Element | None, path: str) -> str | None:
     if elem is None:
         return None
     found = elem.find(path, _NS)
@@ -84,7 +118,7 @@ class ParsedFeed:
     error: Exception | None = None
 
 
-def _build_result(entry: etree._Element) -> "Result | None":
+def _build_result(entry: _Element) -> "Result | None":
     """Convert a parsed `<entry>` element into a `Result`, or None if invalid."""
     # Imported lazily to avoid a circular import; `Result` lives in `arxiv`.
     from . import Result
@@ -161,15 +195,7 @@ def parse(content: bytes) -> ParsedFeed:
         raise TypeError("parse expects bytes")
 
     try:
-        # Disable network access and entity expansion; arXiv responses never
-        # need to reference external resources.
-        parser = etree.XMLParser(
-            resolve_entities=False,
-            no_network=True,
-            huge_tree=False,
-            recover=True,
-        )
-        root = etree.fromstring(content, parser=parser)
+        root = _parse_xml(content)
     except etree.XMLSyntaxError as exc:
         return ParsedFeed(header=FeedHeader(), results=[], malformed=True, error=exc)
 
