@@ -43,7 +43,6 @@ dev = [
     "pytest>=6.2.2",
     "ruff>=0.1.2",
     "ty==0.0.92",
-    "types-lxml",
     "types-requests",
     "pdoc==14.5.1",
     "pip-audit>=2.6.0",
