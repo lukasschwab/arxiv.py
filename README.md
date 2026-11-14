@@ -129,3 +129,6 @@ The meaning of the underlying raw data is documented in the [arXiv API User Manu
 
 This project uses [uv](https://astral.sh/uv) for development, while maintaining compatibility with traditional pip installation for end users.
 
+See [RELEASING.md](https://github.com/lukasschwab/arxiv.py/blob/master/RELEASING.md) for release preparation, PyPI Trusted Publishing
+setup, and provenance attestations.
+
